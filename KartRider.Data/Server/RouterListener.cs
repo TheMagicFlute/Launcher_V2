@@ -65,8 +65,8 @@ namespace KartRider
 				RouterListener.MySession = new SessionGroup(clientSocket, null);
 				IPEndPoint clientEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
 				RouterListener.client = clientEndPoint;
-				Console.WriteLine("Client: " + RouterListener.client.Address.ToString() + ":" + RouterListener.client.Port.ToString());
-				if (File.Exists(Program.LauncherDlg.kartRiderDirectory + "KartRider-bak.pin"))
+				Console.WriteLine("Client: {0}:{1}", RouterListener.client.Address.ToString(), RouterListener.client.Port.ToString());
+                if (File.Exists(Program.LauncherDlg.kartRiderDirectory + "KartRider-bak.pin"))
 				{
 					File.Delete(Program.LauncherDlg.kartRiderDirectory + "KartRider.pin");
 					File.Move(Program.LauncherDlg.kartRiderDirectory + "KartRider-bak.pin", Program.LauncherDlg.kartRiderDirectory + "KartRider.pin");

@@ -43,7 +43,7 @@ namespace KartRider
 			{
 				iPacket.Position = 0;
 				uint hash = iPacket.ReadUInt();
-				if (hash != 1950550337)//PqServerSideUdpBindCheck
+				if (hash != 1950550337) // PqServerSideUdpBindCheck
 				{
 					Console.WriteLine((PacketName)hash + "：" + BitConverter.ToString(iPacket.ToArray()).Replace("-", ""));
 				}
@@ -59,19 +59,38 @@ namespace KartRider
 					}
 					return;
 				}
-				if (hash == Adler32Helper.GenerateAdler32(Encoding.ASCII.GetBytes("PcReportRaidOccur"), 0) ? false : hash != 1340475309)//PqGameReportMyBadUdp
+				if (hash == Adler32Helper.GenerateAdler32(Encoding.ASCII.GetBytes("PcReportRaidOccur"), 0) ? false : hash != 1340475309) // PqGameReportMyBadUdp
 				{
-					if (hash == Adler32Helper.GenerateAdler32_ASCII("GrRiderTalkPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqEnterMagicHatPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoPingRequestPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqGetRiderQuestUX2ndData", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventInitPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqCountdownBoxPeriodPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqServerSideUdpBindCheck", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqVipGradeCheck", 0))
+					if (hash == Adler32Helper.GenerateAdler32_ASCII("GrRiderTalkPacket", 0)
+						|| hash == Adler32Helper.GenerateAdler32_ASCII("PqEnterMagicHatPacket", 0)
+						|| hash == Adler32Helper.GenerateAdler32_ASCII("LoPingRequestPacket", 0)
+						|| hash == Adler32Helper.GenerateAdler32_ASCII("PqGetRiderQuestUX2ndData", 0)
+						|| hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventInitPacket", 0)
+						|| hash == Adler32Helper.GenerateAdler32_ASCII("PqCountdownBoxPeriodPacket", 0)
+						|| hash == Adler32Helper.GenerateAdler32_ASCII("PqServerSideUdpBindCheck", 0)
+						|| hash == Adler32Helper.GenerateAdler32_ASCII("PqVipGradeCheck", 0))
 					{
 						return;
 					}
-					else if (hash == Adler32Helper.GenerateAdler32_ASCII("LoRqUpdateRiderSchoolDataPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("RmRiderTalkPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqNeedTimerGiftEvent", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("GameBoosterAddPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqCheckReplayItemPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqGetRecommandChatServerInfo", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoCheckLoginEvent", 0))
+					else if (hash == Adler32Helper.GenerateAdler32_ASCII("LoRqUpdateRiderSchoolDataPacket", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("RmRiderTalkPacket", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("PqNeedTimerGiftEvent", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("GameBoosterAddPacket", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqCheckReplayItemPacket", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("PqGetRecommandChatServerInfo", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("LoCheckLoginEvent", 0))
 					{
 						return;
 					}
-					else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqBlockWordLogPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqWriteActionLogPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventTimerPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqTimeShopOpenTimePacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqItemPresetSlotDataList", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("VipPlaytimeCheck", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqEventRewardPacket", 0))
+					else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqBlockWordLogPacket", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("PqWriteActionLogPacket", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventTimerPacket", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("PqTimeShopOpenTimePacket", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("PqItemPresetSlotDataList", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("VipPlaytimeCheck", 0)
+						  || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqEventRewardPacket", 0))
 					{
-						//PqGetRecommandChatServerInfo = 라이더 챗
+						//PqGetRecommandChatServerInfo = 라이더 챗 // Chat
 						return;
 					}
 					else if (hash == Adler32Helper.GenerateAdler32_ASCII("LoRqAddRacingTimePacket", 0))
@@ -327,17 +346,17 @@ namespace KartRider
 						SetGameOption.Unk5 = iPacket.ReadByte();
 						SetGameOption.Unk6 = iPacket.ReadByte();
 						SetGameOption.Unk7 = iPacket.ReadByte();
-						SetGameOption.Unk8 = iPacket.ReadByte();//오토 레디
-						SetGameOption.Unk9 = iPacket.ReadByte();//아이템 설명
-						SetGameOption.Unk10 = iPacket.ReadByte();//녹화 품질
-						SetGameOption.Unk11 = iPacket.ReadByte();
-						SetGameOption.BGM_Check = iPacket.ReadByte();//배경음
-						SetGameOption.Sound_Check = iPacket.ReadByte();//효과음
-						SetGameOption.Unk12 = iPacket.ReadByte();
+						SetGameOption.Unk8 = iPacket.ReadByte(); // 오토 레디 Auto Ready
+						SetGameOption.Unk9 = iPacket.ReadByte(); // 아이템 설명 Item Instruction
+                        SetGameOption.Unk10 = iPacket.ReadByte(); // 녹화 품질 Record Quality
+                        SetGameOption.Unk11 = iPacket.ReadByte();
+						SetGameOption.BGM_Check = iPacket.ReadByte(); // 배경음 BGM
+						SetGameOption.Sound_Check = iPacket.ReadByte(); // 효과음 Effect Sound
+                        SetGameOption.Unk12 = iPacket.ReadByte();
 						SetGameOption.Unk13 = iPacket.ReadByte();
-						SetGameOption.GameType = iPacket.ReadByte();//팀전 개인전 여부
-						SetGameOption.SetGhost = iPacket.ReadByte();//고스트 사용여부
-						SetGameOption.SpeedType = iPacket.ReadByte();//채널 속도
+						SetGameOption.GameType = iPacket.ReadByte(); // 팀전 개인전 여부 Team or Individual
+                        SetGameOption.SetGhost = iPacket.ReadByte(); // 고스트 사용여부 Whether to use ghost
+                        SetGameOption.SpeedType = iPacket.ReadByte(); // 채널 속도 Speed Channel
 						SetGameOption.Unk14 = iPacket.ReadByte();
 						SetGameOption.Unk15 = iPacket.ReadByte();
 						SetGameOption.Unk16 = iPacket.ReadByte();
@@ -383,18 +402,19 @@ namespace KartRider
 						}
 						using (OutPacket outPacket = new OutPacket("PcSlaveNotice"))
 						{
-							outPacket.WriteString("单机版完全免费，跑跑資訊站：https://kartinfo.me/thread-9369-1-1.html 源代码仓库地址：https://github.com/yanygm/Launcher_V2");
+                            // Login Notice
+                            outPacket.WriteString("单机版完全免费，跑跑資訊站：https://kartinfo.me/thread-9369-1-1.html 源代码仓库地址：https://github.com/yanygm/Launcher_V2");
 							this.Parent.Client.Send(outPacket);
 						}
 						return;
 					}
 					else if (hash == Adler32Helper.GenerateAdler32_ASCII("ChReRqEnterMyRoomPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("ChRqEnterRandomMyRoomPacket", 0))
 					{
-						if (hash == 1733888222)//ChReRqEnterMyRoomPacket
+						if (hash == 1733888222) // ChReRqEnterMyRoomPacket
 						{
 							GameType.EnterMyRoomType = 0;
 						}
-						else if (hash == 2423851656)//ChRqEnterRandomMyRoomPacket
+						else if (hash == 2423851656) // ChRqEnterRandomMyRoomPacket
 						{
 							GameType.EnterMyRoomType = 5;
 						}
@@ -454,7 +474,7 @@ namespace KartRider
 					}
 					else if (hash == Adler32Helper.GenerateAdler32_ASCII("ChRqSecedeMyRoomPacket", 0))
 					{
-						//마이룸 나갈때
+						// 마이룸 나갈때 When I Leave The Room
 						using (OutPacket outPacket = new OutPacket("ChRpSecedeMyRoomPacket"))
 						{
 							outPacket.WriteByte(1);
@@ -803,6 +823,7 @@ namespace KartRider
 						}
 						using (OutPacket outPacket = new OutPacket("PcSlaveNotice"))
 						{
+							// Mod Notice
 							outPacket.WriteString("使用粒子激活器R直接获得启变佳！");
 							this.Parent.Client.Send(outPacket);
 						}
@@ -1196,12 +1217,12 @@ namespace KartRider
 					else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqFavoriteTrackUpdate", 0))
 					{
 						iPacket.ReadByte();
-						int tracks = iPacket.ReadInt(); //赛道数量
+						int tracks = iPacket.ReadInt(); // 赛道数量 Track Count
 						for (int i = 0; i < tracks; i++)
 						{
-							short theme = iPacket.ReadShort(); //主题代码
-							int track = iPacket.ReadInt(); //赛道代码
-							byte Add_Del = iPacket.ReadByte(); //1添加，2删除
+							short theme = iPacket.ReadShort(); // 主题代码 Theme Code
+							int track = iPacket.ReadInt(); // 赛道代码 Track Code
+							byte Add_Del = iPacket.ReadByte(); // 1添加，2删除 1:ADD, 2:DEL
 							if (Add_Del == 1)
 							{
 								FavoriteItem.Favorite_Track_Add(theme, track);
@@ -1280,8 +1301,8 @@ namespace KartRider
 						{
 							outPacket.WriteInt(type);
 							outPacket.WriteHexString("00 00 00 00 00 00 00 00 00 00 00 00 FF FF FF FF 00 00 00 00 00");
-							outPacket.WriteUInt(GameType.TimeAttack_RP);//RP
-							outPacket.WriteUInt(GameType.TimeAttack_Lucci);//LUCCI
+							outPacket.WriteUInt(GameType.TimeAttack_RP); // RP
+							outPacket.WriteUInt(GameType.TimeAttack_Lucci); // LUCCI
 							this.Parent.Client.Send(outPacket);
 						}
 						SetGameData.Save_RewardTimeAttack();
@@ -1507,11 +1528,11 @@ namespace KartRider
 					}
 					else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqRiderSchoolDataPacket", 0))
 					{
-						//RiderSchool.PrRiderSchoolData();
+						// RiderSchool.PrRiderSchoolData();
 						using (OutPacket outPacket = new OutPacket("PrRiderSchoolDataPacket"))
 						{
-							outPacket.WriteByte(6);//라이센스 등급
-							outPacket.WriteByte(42);//마지막 클리어
+							outPacket.WriteByte(6); // 라이센스 등급 License Level
+							outPacket.WriteByte(42); // 마지막 클리어 Last Passed
 							outPacket.WriteUShort((ushort)RouterListener.DataTime()[0]);
 							outPacket.WriteUShort((ushort)RouterListener.DataTime()[1]);
 							outPacket.WriteInt(0);
@@ -1522,7 +1543,7 @@ namespace KartRider
 					}
 					else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqRiderSchoolProPacket", 0))
 					{
-						//RiderSchool.PrRiderSchoolPro();
+						// RiderSchool.PrRiderSchoolPro();
 						int stepcount = 6;
 						int remainder = RouterListener.DataTime()[2] % stepcount;
 						if (remainder == 0) remainder = stepcount;
@@ -1553,7 +1574,7 @@ namespace KartRider
 						}
 						using (OutPacket oPacket = new OutPacket("PrRiderSchoolProPacket"))
 						{
-							oPacket.WriteByte(1);//엠블럼 체크
+							oPacket.WriteByte(1); // 엠블럼 체크 Badge Check
 							oPacket.WriteByte(step);
 							oPacket.WriteByte(6);
 							oPacket.WriteByte((byte)((int)step + 1));
@@ -2031,7 +2052,7 @@ namespace KartRider
 						}
 						return;
 					}
-					else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqFavoriteItemGet", 0)) //즐겨 찾기 목록
+					else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqFavoriteItemGet", 0)) // 즐겨 찾기 목록 Favourite List
 					{
 						FavoriteItem.Favorite_Item();
 						return;
@@ -2058,7 +2079,7 @@ namespace KartRider
 						}
 						return;
 					}
-					else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqLockedItemGet", 0))//아이템 보호
+					else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqLockedItemGet", 0)) // 아이템 보호 Locked Items
 					{
 						using (OutPacket outPacket = new OutPacket("PrLockedItemGet"))
 						{
@@ -2450,7 +2471,7 @@ namespace KartRider
 								outPacket.WriteShort(sn);
 								short Level = (short)((int)existingParts[2] + 1);
 								existingParts[2] = Level;
-								outPacket.WriteShort(Level);//1-1,2-3,3-6,4-10,5-15
+								outPacket.WriteShort(Level); // 1-1, 2-3, 3-6, 4-10, 5-15
 								short Point = (short)((int)existingParts[9] + (int)Level);
 								existingParts[9] = Point;
 								outPacket.WriteShort(Point);
@@ -2475,7 +2496,7 @@ namespace KartRider
 								outPacket.WriteShort(3);
 								outPacket.WriteShort(kart);
 								outPacket.WriteShort(sn);
-								outPacket.WriteShort(5);//1-1,2-3,3-6,4-10,5-15
+								outPacket.WriteShort(5); // 1-1, 2-3, 3-6, 4-10, 5-15
 								outPacket.WriteShort(15);
 								outPacket.WriteShort(0);
 								outPacket.WriteShort(4);
@@ -2817,7 +2838,7 @@ namespace KartRider
 					}
 					else
 					{
-						MultyPlayer.Clientsession(hash, iPacket);
+						MultiPlayer.Clientsession(hash, iPacket);
 						return;
 					}
 				}

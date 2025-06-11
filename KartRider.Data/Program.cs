@@ -39,10 +39,16 @@ namespace KartRider
         [STAThread]
         private static async Task Main(string[] args)
         {
-            Console.WriteLine("中国跑跑卡丁车单机服务器已启动");
-            Console.WriteLine("--------------------------------------------------");
             string input;
             string output;
+#if DEBUG
+            Console.WriteLine("中国跑跑卡丁车单机服务器已启动 [DEBUG]");
+#else
+            Console.WriteLine("中国跑跑卡丁车单机服务器已启动");
+#endif
+            Console.WriteLine("--------------------------------------------------");
+            
+            // delete updater
             string Update_File = AppDomain.CurrentDomain.BaseDirectory + "Update.bat";
             string Update_Folder = AppDomain.CurrentDomain.BaseDirectory + "Update";
             if (File.Exists(Update_File))
@@ -58,6 +64,7 @@ namespace KartRider
             Console.InputEncoding = Encoding.UTF8;
             if (!await Update.UpdateDataAsync())
             {
+                // check update
                 string Load_CC = AppDomain.CurrentDomain.BaseDirectory + "Profile\\CountryCode.ini";
                 if (File.Exists(Load_CC))
                 {
@@ -77,17 +84,20 @@ namespace KartRider
                 }
                 if (args == null || args.Length == 0)
                 {
-                    string text = "HKEY_CURRENT_USER\\SOFTWARE\\TCGame\\kart";
-                    RootDirectory = (string)Registry.GetValue(text, "gamepath", null);
+                    string regPth = "HKEY_CURRENT_USER\\SOFTWARE\\TCGame\\kart";
+                    RootDirectory = (string)Registry.GetValue(regPth, "gamepath", null);
                     if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "KartRider.pin") && File.Exists(AppDomain.CurrentDomain.BaseDirectory + "KartRider.exe"))
-                    {
+                    {// working directory
                         RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                        Console.WriteLine("使用当前目录下的游戏");
                     }
                     else if (File.Exists(RootDirectory + "KartRider.pin") && File.Exists(RootDirectory + "KartRider.exe"))
-                    {
+                    {// TCGame registered directory
+                        Console.WriteLine("使用TCGame注册的游戏目录下的游戏");
                     }
                     else
-                    {
+                    {// game not found
+                        Console.WriteLine("Error: 未找到游戏!");
                         LauncherSystem.MessageBoxType3();
                         return;
                     }
@@ -95,6 +105,7 @@ namespace KartRider
                     {
                         try
                         {
+                            Console.WriteLine("读取Data文件");
                             KartRhoFile.Dump(RootDirectory + "Data\\aaa.pk");
                             KartRhoFile.packFolderManager.Reset();
                         }
@@ -102,6 +113,7 @@ namespace KartRider
                         {
                             Console.WriteLine($"读取Data文件时出错: {ex.Message}");
                         }
+                        
                         string Load_Console = AppDomain.CurrentDomain.BaseDirectory + "Profile\\Console.ini";
                         IntPtr consoleHandle = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
                         if (!File.Exists(Load_Console))
@@ -121,7 +133,7 @@ namespace KartRider
                         Launcher StartLauncher = new Launcher();
                         Program.LauncherDlg = StartLauncher;
                         Program.LauncherDlg.kartRiderDirectory = RootDirectory;
-                        Application.Run(StartLauncher);
+                        Application.Run(StartLauncher); 
                     }
                     input = "";
                     output = "";

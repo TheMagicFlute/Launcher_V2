@@ -28,13 +28,13 @@
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<WarningLevel>0</WarningLevel>
-		<PublishDir>.\</PublishDir>
+		<PublishDir>.\dist\Debug</PublishDir>
 		<DebugType>none</DebugType>
 		<Optimize>False</Optimize>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<WarningLevel>0</WarningLevel>
-		<PublishDir>.\</PublishDir>
+		<PublishDir>.\dist\Release</PublishDir>
 		<DebugType>none</DebugType>
 	</PropertyGroup>
 	<ItemGroup>

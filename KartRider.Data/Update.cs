@@ -15,27 +15,37 @@ namespace KartRider
 {
     internal static class Update
     {
+        public static string formattedDate = GetCurrentVersion();
+
+        public static string owner = "yanygm"; // GitHub 仓库所有者
+        public static string repo = "Launcher_V2"; // GitHub 仓库名称
+
         public static async Task<bool> UpdateDataAsync()
         {
-            DateTime compilationDate = File.GetLastWriteTime(AppDomain.CurrentDomain.BaseDirectory + "Launcher.exe");
-            string formattedDate = compilationDate.ToString("yyMMdd");
+            Console.WriteLine("正在检查更新...");
+            
             string tag_name = await GetTag_name();
+            string update_info = await GetUpdate_Info();
+            formattedDate = "250505";
             Console.WriteLine($"当前版本为: {formattedDate}");
             if (tag_name != "" && int.Parse(formattedDate) < int.Parse(tag_name))
             {
                 // 询问是否需要更新
-                Console.WriteLine($"发现新版本: {tag_name}, 请问是否需要更新? (Y/n)");
-                string usrInput = "";
+                Console.WriteLine($"发现新版本: {tag_name}");
+                Console.WriteLine($"更新信息: \n{update_info}");
+                Console.Write("请问是否需要更新? (Y/n): ");
+                string usrInput = null;
                 while (usrInput != "y" && usrInput != "Y" && usrInput != "n" && usrInput != "N")
                 {
                     usrInput = Console.ReadLine();
                     if (usrInput == "n" || usrInput == "N")
                     {
-                        return false;
+                        return false; // cancel update
                     }
                     else if (usrInput != "y" && usrInput != "Y")
                     {
-                        Console.WriteLine("请输入 (Y/n): ");
+                        // usrInput is not valid, ask again
+                        Console.Write("请输入 (Y for yes / n for no): ");
                     }
                 }
                 // 尝试下载最新的版本
@@ -74,6 +84,7 @@ namespace KartRider
                 catch (Exception ex)
                 {
                     Console.WriteLine($"下载过程中出现错误: {ex.Message}");
+                    Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载新版本");
                     return false;
                 }
             }
@@ -81,6 +92,15 @@ namespace KartRider
             {
                 return false;
             }
+        }
+        public static string GetCurrentVersion()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            AssemblyName assemblyName = assembly.GetName();
+            string simpleName = assemblyName.Name + ".exe";
+            DateTime compilationDate = File.GetLastWriteTime(AppDomain.CurrentDomain.BaseDirectory + simpleName);
+            string formattedDate = compilationDate.ToString("yyMMdd");
+            return formattedDate;
         }
 
         public static async Task<bool> DownloadUpdate(string UpdatePackageUrl)
@@ -122,19 +142,23 @@ namespace KartRider
             catch (Exception ex)
             {
                 Console.WriteLine($"下载过程中出现错误: {ex.Message}");
+                Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载新版本");
                 return false;
             }
         }
 
         public static bool ApplyUpdate()
         {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            AssemblyName assemblyName = assembly.GetName();
+            string simpleName = assemblyName.Name + ".exe";
             try
             {
                 System.IO.Compression.ZipFile.ExtractToDirectory(AppDomain.CurrentDomain.BaseDirectory + "Update\\Launcher.zip", AppDomain.CurrentDomain.BaseDirectory + "Update\\");
                 string script = @$"@echo off
 timeout /t 3 /nobreak
-move {"\"" + AppDomain.CurrentDomain.BaseDirectory + "Update\\Launcher.exe\""} {"\"" + AppDomain.CurrentDomain.BaseDirectory + "\""}
-start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + "Launcher.exe\""}
+move {"\"" + AppDomain.CurrentDomain.BaseDirectory + "Update\\" + simpleName + "\""} {"\"" + AppDomain.CurrentDomain.BaseDirectory + "\""}
+start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + "\""}
 ";
                 string filePath = AppDomain.CurrentDomain.BaseDirectory + "Update.bat";
                 try
@@ -153,6 +177,7 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + "Launcher.exe\""}
             catch (Exception ex)
             {
                 Console.WriteLine($"\n应用更新时出错: {ex.Message}");
+                Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载新版本");
                 return false;
             }
         }
@@ -173,7 +198,7 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + "Launcher.exe\""}
                     }
                     else
                     {
-                        Console.WriteLine($"请求失败，状态码: {response.StatusCode}");
+                        Console.WriteLine($"请求IP地址失败，状态码: {response.StatusCode}");
                         return "";
                     }
                 }
@@ -185,33 +210,58 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + "Launcher.exe\""}
             }
         }
 
-        public static async Task<string> GetTag_name()
+        public static async Task<HttpResponseMessage> GetReleaseInfoAsync(string owner, string repo)
         {
+            string url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
             try
             {
-                string owner = "yanygm";
-                string repo = "Launcher_V2";
-                string url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
+                
                 using (HttpClient client = new HttpClient())
                 {
                     client.DefaultRequestHeaders.Add("User-Agent", repo);
                     HttpResponseMessage response = await client.GetAsync(url);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string json = await response.Content.ReadAsStringAsync();
-                        dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-                        return data.tag_name;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"请求失败，状态码: {response.StatusCode}");
-                        return "";
-                    }
+                    return response;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"发生异常: {ex.Message}");
+                Console.WriteLine($"请求时发生异常: {ex.Message}");
+                return null;
+            }
+        }
+
+        public static async Task<string> GetTag_name(string owner = "yanygm", string repo = "Launcher_V2")
+        {
+            HttpResponseMessage responseMsg = await GetReleaseInfoAsync(owner, repo);
+            if (responseMsg == null) return ""; // fail to get response
+            if (responseMsg.IsSuccessStatusCode)
+            {
+                // parse JSON
+                string json = await responseMsg.Content.ReadAsStringAsync();
+                dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                return data.tag_name;
+            }
+            else
+            {
+                Console.WriteLine($"请求当前版本失败，状态码: {responseMsg.StatusCode}");
+                return "";
+            }
+        }
+
+        public static async Task<string> GetUpdate_Info(string owner = "yanygm", string repo = "Launcher_V2")
+        {
+            HttpResponseMessage responseMsg = await GetReleaseInfoAsync(owner, repo);
+            if (responseMsg == null) return ""; // fail to get response
+            if (responseMsg.IsSuccessStatusCode)
+            {
+                // parse JSON
+                string json = await responseMsg.Content.ReadAsStringAsync();
+                dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                return data.body;
+            }
+            else
+            {
+                Console.WriteLine($"请求更新信息失败，状态码: {responseMsg.StatusCode}");
                 return "";
             }
         }

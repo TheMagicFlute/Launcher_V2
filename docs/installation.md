@@ -6,7 +6,7 @@
 
 前往 [release](https://github.com/yanygm/Launcher_V2 "release") 中下载最新的二进制文件压缩包，解压即可。
 
-此方法**容易报毒**！
+此方法**容易报毒**！提前关闭Windows Defender对相关目录的扫描，或者添加信任。
 
 ## 2. 使用Visual Studio进行编译
 

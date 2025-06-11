@@ -17,6 +17,7 @@ using KartRider.Common.Utilities;
 using KartLibrary.File;
 using static KartRider.Common.Data.PINFile;
 using System.Collections;
+using System.Reflection;
 
 namespace KartRider
 {
@@ -124,10 +125,6 @@ namespace KartRider
             Speed_comboBox.ForeColor = System.Drawing.Color.Red;
             Speed_comboBox.FormattingEnabled = true;
             Speed_comboBox.Sorted = false;
-            foreach (string key in SpeedType.speedNames.Keys)
-            {
-                Speed_comboBox.Items.Add(key);
-            }
             Speed_comboBox.Location = new System.Drawing.Point(54, 78);
             Speed_comboBox.Name = "Speed_comboBox";
             Speed_comboBox.Size = new System.Drawing.Size(100, 20);
@@ -223,8 +220,8 @@ namespace KartRider
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "Launcher";
-            StartPosition = FormStartPosition.CenterScreen;
             Text = "Launcher";
+            StartPosition = FormStartPosition.CenterScreen;
             FormClosing += OnFormClosing;
             Load += OnLoad;
             ResumeLayout(false);
@@ -247,11 +244,24 @@ namespace KartRider
 
         private void OnLoad(object sender, EventArgs e)
         {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            AssemblyName assemblyName = assembly.GetName();
+            string simpleName = assemblyName.Name + ".exe";
+
+            Console.WriteLine("读取配置文件");
             Load_KartExcData();
+            Console.WriteLine("读取完成");
+
             StartingLoad_ALL.StartingLoad();
             PINFile val = new PINFile(this.kartRiderDirectory + "KartRider.pin");
             SetGameOption.Version = val.Header.MinorVersion;
             SetGameOption.Save_SetGameOption();
+
+            foreach (string key in SpeedType.speedNames.Keys)
+            {
+                Speed_comboBox.Items.Add(key);
+            }
+
             ClientVersion.Text = $"P{SetGameOption.Version.ToString()}";
             DateTime compilationDate = File.GetLastWriteTime(AppDomain.CurrentDomain.BaseDirectory + "Launcher.exe");
             string formattedDate = compilationDate.ToString("yyMMdd");
@@ -282,12 +292,17 @@ namespace KartRider
                     foreach (AuthMethod authMethod in val.AuthMethods)
                     {
                         Console.WriteLine("Changing IP Addr to local... {0}", authMethod.Name);
+                        foreach(IPEndPoint loginServer in authMethod.LoginServers)
+                        {
+                            Console.WriteLine("Old IP Addr: {0}", loginServer.ToString());
+                        }
                         authMethod.LoginServers.Clear();
                         authMethod.LoginServers.Add(new IPEndPoint
                         {
                             IP = "127.0.0.1",
                             Port = 39312
                         });
+                        Console.WriteLine("Changed!\n");
                     }
                     foreach (BmlObject bml in val.BmlObjects)
                     {
@@ -307,7 +322,8 @@ namespace KartRider
                     File.WriteAllBytes(this.kartRiderDirectory + "KartRider.pin", val.GetEncryptedData());
                     Start_Button.Enabled = true;
                     Launcher.GetKart = false;
-                    ProcessStartInfo startInfo = new ProcessStartInfo(Launcher.KartRider, "TGC -region:3 -passport:aHR0cHM6Ly9naXRodWIuY29tL3lhbnlnbS9MYXVuY2hlcl9WMi9yZWxlYXNlcw==")
+                    // origin passport:aHR0cHM6Ly9naXRodWIuY29tL3lhbnlnbS9MYXVuY2hlcl9WMi9yZWxlYXNlcw==
+                    ProcessStartInfo startInfo = new ProcessStartInfo(Launcher.KartRider, "TGC -region:3 -passport:OFFLINE")
                     {
                         WorkingDirectory = this.kartRiderDirectory,
                         UseShellExecute = true,
@@ -317,7 +333,7 @@ namespace KartRider
                     {
                         Process.Start(startInfo);
                         Thread.Sleep(1000);
-                        Start_Button.Enabled = true;
+                        //Start_Button.Enabled = true;
                         Launcher.GetKart = true;
                     }
                     catch (System.ComponentModel.Win32Exception ex)

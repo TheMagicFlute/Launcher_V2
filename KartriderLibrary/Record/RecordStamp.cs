@@ -15,7 +15,7 @@ namespace KartLibrary.Record
             Angle = new Quaternion();
         }
 
-        public int Time { get; set; } = -1; //Unit: ms
+        public int Time { get; set; } = -1; // Unit: ms
         public float X { get; set; } = 0f;
         public float Y { get; set; } = 0f;
         public float Z { get; set; } = 0f;
@@ -24,9 +24,9 @@ namespace KartLibrary.Record
         public bool IsInitialObject => Time == -1;
         public string[] GetCarStatus()
         {
-            string[] gasStatus = { "", "噴紅氣", "噴藍氣", "短噴", "開前噴", "gas(101)", "gas(110)", "開噴" };
-            string[] characterStatus = { "", "左擺頭", "右擺頭", "閃到頭", "倒退頭", "倒左頭", "倒右頭", "撞到頭" };
-            string[] effectStatus = { "", "加速特效", "甩尾特效", "甩+加速" };
+            string[] gasStatus = ["", "红气", "蓝气", "短喷", "开前喷", "gas(101)", "gas(110)", "开喷火"];
+            string[] characterStatus = ["", "左摆头", "右摆头", "闪到头", "倒退头", "倒左头", "倒右头", "撞到头"];
+            string[] effectStatus = ["", "加速", "漂移", "加速&漂移"];
             List<string> output = new List<string>();
             if (gasStatus[Status & 7] != "")
                 output.Add(gasStatus[Status & 7]);

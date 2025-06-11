@@ -68,8 +68,8 @@ namespace Set_Data
 			else
 			{
 				Program.SpeedPatch = true;
-				Program.LauncherDlg.Text = "Launcher (속도 패치)";
-			}
+				Program.LauncherDlg.Text = "Launcher (Speed Patch)"; // 속도 패치 Speed Patch
+            }
 		}
 
 		public static void Load_ALL()
