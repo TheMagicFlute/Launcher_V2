@@ -1064,7 +1064,7 @@ namespace KartRider
 								if (existingList[5] != -1 && (int)(existingList[5]) + 2 == i)
 								{
 								}
-								else if(existingList[7] != -1 && (int)(existingList[7]) + 2 == i)
+								else if (existingList[7] != -1 && (int)(existingList[7]) + 2 == i)
 								{
 								}
 								else
@@ -1151,13 +1151,17 @@ namespace KartRider
 					{
 						int type = iPacket.ReadInt();
 						uint track = iPacket.ReadUInt();
+						byte Level = FavoriteItem.GetTrackLevel(track);
 						//PrGetTrainingMission 00 08 B7 51 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
 						using (OutPacket outPacket = new OutPacket("PrGetTrainingMission"))
 						{
 							outPacket.WriteInt(type);
 							outPacket.WriteInt(0);
 							outPacket.WriteInt(0);
-							outPacket.WriteInt(0);
+							outPacket.WriteByte(0); //完成赛道
+							outPacket.WriteByte(0); //使用加速器道具（完成时累积）
+							outPacket.WriteByte(0); //撞击次数%s次以内
+							outPacket.WriteByte(0); //达成赛道纪录
 							this.Parent.Client.Send(outPacket);
 						}
 						return;
@@ -1170,7 +1174,14 @@ namespace KartRider
 							outPacket.WriteInt(0);
 							outPacket.WriteUShort((ushort)RouterListener.DataTime()[0]);
 							outPacket.WriteUShort((ushort)RouterListener.DataTime()[1]);
-							outPacket.WriteHexString("0F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
+							outPacket.WriteInt(FavoriteItem.MissionList.Count);
+							foreach (string Track in FavoriteItem.MissionList)
+							{
+								byte Level = FavoriteItem.GetTrackLevel(Adler32Helper.GenerateAdler32_UNICODE(Track, 0));
+								outPacket.WriteByte(Level);
+								outPacket.WriteInt(0);
+							}
+							//outPacket.WriteHexString("0F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
 							this.Parent.Client.Send(outPacket);
 						}
 						return;
@@ -1774,6 +1785,15 @@ namespace KartRider
 							outPacket.WriteInt(0);
 							outPacket.WriteInt(0);
 							outPacket.WriteByte(1);
+							this.Parent.Client.Send(outPacket);
+						}
+						return;
+					}
+					else if (hash == Adler32Helper.GenerateAdler32_ASCII("SpRqReceiveRewardItemPacket", 0))
+					{
+						using (OutPacket outPacket = new OutPacket("SpRpReceiveRewardItemPacket"))
+						{
+							outPacket.WriteInt(0);
 							this.Parent.Client.Send(outPacket);
 						}
 						return;

@@ -25,10 +25,7 @@ namespace KartLibrary.File
             public PackFolderInfo Parent;
         }
 
-        public PackFolderManager()
-        {
-
-        }
+        public PackFolderManager() {}
 
         //private List<PackFolderInfo> RootFolder { get; init; } = new List<PackFolderInfo>();
 

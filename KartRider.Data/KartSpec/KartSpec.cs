@@ -17,7 +17,7 @@ namespace KartRider
 			if (StartGameData.Kart_id == 0)
 			{
 				SchoolSpec.DefaultSpec();
-				//StartGameData.Start_KartSpac();
+				// StartGameData.Start_KartSpac();
 			}
 			else
 			{
@@ -33,13 +33,13 @@ namespace KartRider
 					else
 					{
 						SchoolSpec.DefaultSpec();
-						//StartGameData.Start_KartSpac();
+						// StartGameData.Start_KartSpac();
 					}
 				}
 				else
 				{
 					SchoolSpec.DefaultSpec();
-					//StartGameData.Start_KartSpac();
+					// StartGameData.Start_KartSpac();
 				}
 			}
 		}
@@ -59,7 +59,7 @@ namespace KartRider
 			else
 			{
 				SchoolSpec.DefaultSpec();
-				//StartGameData.Start_KartSpac();
+				// StartGameData.Start_KartSpac();
 			}
 		}
 
@@ -255,7 +255,7 @@ namespace KartRider
 			Kart.startItemId = 0;
 			var v2Spec = new V2Spec();
 			v2Spec.ExceedSpec();
-			//StartGameData.Start_KartSpac();
+			// StartGameData.Start_KartSpac();
 		}
 
 		public static string GetAttributeValue(XmlElement xe, string attributeName, decimal fallbackValue, decimal defaultValue, decimal scale)

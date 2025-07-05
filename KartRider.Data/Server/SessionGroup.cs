@@ -7,11 +7,7 @@ namespace KartRider
 	{
 		public object m_lock = new object();
 
-		public ClientSession Client
-		{
-			get;
-			set;
-		}
+		public ClientSession Client { get; set; }
 
 		public int TimeAttackStartTicks = 0;
 		public int SendPlaneCount = 6;

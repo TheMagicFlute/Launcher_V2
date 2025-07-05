@@ -1,48 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<AssemblyName>Launcher</AssemblyName>
-		<TargetFramework>net8.0-windows7.0</TargetFramework>
-		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<SelfContained>false</SelfContained>
-		<PublishSingleFile>true</PublishSingleFile>
-		<PublishReadyToRun>false</PublishReadyToRun>
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-		<UseWindowsForms>true</UseWindowsForms>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<Nullable>enable</Nullable>
-		<UseWindowsForms>true</UseWindowsForms>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
-		<ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
-	</PropertyGroup>
-	<PropertyGroup>
-		<PlatformTarget>x64</PlatformTarget>
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<RootNamespace>Launcher</RootNamespace>
-		<SignAssembly>False</SignAssembly>
-		<BaseOutputPath></BaseOutputPath>
-		<OutputType>Exe</OutputType>
-		<NuGetAuditLevel>low</NuGetAuditLevel>
-		<ApplicationIcon>Properties\favicon.ico</ApplicationIcon>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<WarningLevel>0</WarningLevel>
-		<PublishDir>.\dist\Debug</PublishDir>
-		<DebugType>none</DebugType>
-		<Optimize>False</Optimize>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<WarningLevel>0</WarningLevel>
-		<PublishDir>.\dist\Release</PublishDir>
-		<DebugType>none</DebugType>
-	</PropertyGroup>
-	<ItemGroup>
-	  <Content Include="Properties\favicon.ico" />
-	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Ionic.Zlib.Core" Version="1.0.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="Veldrid" Version="4.9.0" />
-	</ItemGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+
+    <!--PublishAot>true</PublishAot-->
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+
+    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <RootNamespace>Launcher</RootNamespace>
+    <ApplicationIcon>Properties\favicon.ico</ApplicationIcon>
+
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+
+    <!-- Versioning & Assembly Information -->
+    <AssemblyName>Launcher</AssemblyName>
+    <Description>CN Kart Offline Launcher</Description>
+    <GitVersion>false</GitVersion>
+    <Version>1.0.0</Version>
+    <FileVersion>$(Version)</FileVersion>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <InformationalVersion>$(Version)</InformationalVersion>
+    <Authors>Yanygm, LAON, TheMagicFlute</Authors>
+    <Copyright>$(Authors)</Copyright>
+    <RepositoryUrl>https://github.com/yanygm/Launcher_V2</RepositoryUrl>
+    <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <NeutralLanguage>zh-CN</NeutralLanguage>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>favicon.ico</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>0</WarningLevel>
+    <PublishDir>.\</PublishDir>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningLevel>0</WarningLevel>
+    <PublishDir>.\</PublishDir>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="GitInfo" Version="3.5.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Ionic.Zlib.Core" Version="1.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\favicon.ico">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 </Project>

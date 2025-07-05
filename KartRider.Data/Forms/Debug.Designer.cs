@@ -1,4 +1,7 @@
-﻿namespace Launcher.KartRider.Data.Forms
+﻿using System.Drawing;
+using System.Windows.Forms;
+
+namespace Launcher.KartRider.Data.Forms
 {
     partial class DebugForm
     {

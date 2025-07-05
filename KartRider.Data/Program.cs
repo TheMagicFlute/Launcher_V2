@@ -16,7 +16,6 @@ using System.Windows.Forms;
 using System.Xml;
 using System.Linq;
 using System.Xml.Linq;
-using Vortice.Direct3D11;
 using System.Threading.Tasks;
 
 namespace KartRider
@@ -42,10 +41,11 @@ namespace KartRider
             string input;
             string output;
 #if DEBUG
-            Console.WriteLine("中国跑跑卡丁车单机服务器已启动 [DEBUG]");
+            Console.Write("中国跑跑卡丁车单机服务器已启动 [DEBUG]");
 #else
-            Console.WriteLine("中国跑跑卡丁车单机服务器已启动");
+            Console.Write("中国跑跑卡丁车单机服务器已启动");
 #endif
+            Console.WriteLine($" Git Hash: {ThisAssembly.Git.Commit}");
             Console.WriteLine("--------------------------------------------------");
             
             // delete updater

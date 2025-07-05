@@ -12,7 +12,7 @@ namespace Set_Data
 			if (di_SetRiderItem.Exists == false)
 			{
 				di_SetRiderItem.Create();
-			}        
+			}
 			string folderPath_MyRoom = FileName.SetMyRoom_LoadFile;
 			DirectoryInfo di_MyRoom = new DirectoryInfo(folderPath_MyRoom);
 			if (di_MyRoom.Exists == false)

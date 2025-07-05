@@ -17,8 +17,8 @@ namespace KartRider
     {
         public static string formattedDate = GetCurrentVersion();
 
-        public static string owner = "yanygm"; // GitHub 仓库所有者
-        public static string repo = "Launcher_V2"; // GitHub 仓库名称
+        public static string owner = "yanygm"; // GitHub Repo Owner
+        public static string repo = "Launcher_V2"; // GitHub Repo ID
 
         public static async Task<bool> UpdateDataAsync()
         {
@@ -26,7 +26,6 @@ namespace KartRider
             
             string tag_name = await GetTag_name();
             string update_info = await GetUpdate_Info();
-            formattedDate = "250505";
             Console.WriteLine($"当前版本为: {formattedDate}");
             if (tag_name != "" && int.Parse(formattedDate) < int.Parse(tag_name))
             {
@@ -53,11 +52,12 @@ namespace KartRider
                 try
                 {
                     string country = await GetCountryAsync();
-                    string url = "https://github.com/yanygm/Launcher_V2/releases/download/" + tag_name + "/Launcher.zip";
-                    // 中国大陆需要使用代理下载，处理url
+                    string url = $"https://github.com/{owner}/{repo}/releases/download/" + tag_name + "/Launcher.zip";
+                    // 中国大陆需要使用代理下载，处理 url
                     if (country != "" && country == "CN")
                     {
                         List<string> urls = new List<string>() { "https://ghproxy.net/", "https://gh-proxy.com/", "https://hub.myany.uk/", "http://kra.myany.uk:2233/", "http://krb.myany.uk:2233/" };
+                        Console.WriteLine("Using proxy.");
                         foreach (string url_ in urls)
                         {
                             if (url_ == "https://ghproxy.net/" || url_ == "https://hub.myany.uk/")

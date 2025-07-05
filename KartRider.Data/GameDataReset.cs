@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using ExcData;
 using Set_Data;
 
@@ -156,10 +157,7 @@ namespace KartRider
 
 		public static void DataReset()
 		{
-			if (SetRider.Lucci > SessionGroup.LucciMax)
-			{
-				SetRider.Lucci = SessionGroup.LucciMax;
-			}
+			SetRider.Lucci = Math.Min(SetRider.Lucci, SessionGroup.LucciMax);
 			GameDataReset.RandomTrack_DataReset();
 			GameDataReset.GameType_DataReset();
 			GameDataReset.StartGame_DataReset();
@@ -173,7 +171,7 @@ namespace KartRider
 			V2Spec.Reset_V2Parts_SpecData();
 			V2Spec.Reset_V2Level_SpecData();
 			SpeedPatch.SpeedPatcData();
-			//GameSupport.PrLogin();
+			// GameSupport.PrLogin();
 			Console.WriteLine("Login...OK");
 		}
 	}

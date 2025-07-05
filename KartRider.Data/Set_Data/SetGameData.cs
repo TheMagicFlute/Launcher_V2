@@ -53,7 +53,7 @@ namespace Set_Data
 			}
 		}
 
-		// 存Lucci和经验
+		// 存Lucci和RP
 		public static void Save_RewardTimeAttack()
 		{
 			using (StreamWriter streamWriter = new StreamWriter(FileName.SetRider_LoadFile + FileName.SetRider_Lucci + FileName.Extension, false))

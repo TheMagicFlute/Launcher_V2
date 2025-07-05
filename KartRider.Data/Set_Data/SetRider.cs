@@ -7,7 +7,7 @@ namespace Set_Data
 	public static class SetRider
 	{
 		public static int ClubCode = 10000;
-		public static int ClubMark_LOGO = 0;//343 베로
+		public static int ClubMark_LOGO = 0; // 343 Vero  343 베로
 		public static int ClubMark_LINE = 0;
 		public static string ClubName = "GitHub-Riders";
 		public static string UserID = "yanygm";
@@ -20,10 +20,10 @@ namespace Set_Data
 		public static uint Lucci = 1000000;
 		public static uint RP = 2000000000;
 		public static uint Koin = 10000;
-		public static int Premium = 5;//100
+		public static int Premium = 5; // 100
 		public static byte Ranker = 0;
 		public static ushort SlotChanger = 65535;
-		public static uint pmap = 0;//3130 //1068 //2520
+		public static uint pmap = 0; // 3130 // 1068 // 2520
 		public static byte IdentificationType = 1;
 
 		public static void Save_SetRider()

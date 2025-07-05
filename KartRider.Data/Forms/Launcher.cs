@@ -18,6 +18,7 @@ using KartLibrary.File;
 using static KartRider.Common.Data.PINFile;
 using System.Collections;
 using System.Reflection;
+using System.Drawing;
 
 namespace KartRider
 {

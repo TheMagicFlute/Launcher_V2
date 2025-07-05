@@ -8,7 +8,7 @@ namespace KartRider
 		public static uint TimeAttack_Lucci = 0;
 		public static byte RewardType = 0;
 
-		//Time
+		// Time
 		public static int min = 0;
 		public static int sec = 0;
 		public static int mil = 0;

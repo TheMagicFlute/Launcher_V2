@@ -38,8 +38,8 @@ namespace RiderData
 			NewRider.items();
 			NewRider.NewKart1();
 			NewRider.NewKart2();
-			NewRider.NewRiderData();//라이더 인식
-		}
+			NewRider.NewRiderData(); // Rider recognition 라이더 인식 
+        }
 
 		public static void NewRiderData()
 		{
@@ -67,7 +67,7 @@ namespace RiderData
 		{
 			
 			short sn = 1;
-			int range = 100;//分批次数
+			int range = 100; // 分批次数
 			if (KartExcData.items.TryGetValue(3, out Dictionary<short, string> resultDict))
 			{
 				List<short> kart = new List<short>(resultDict.Keys);
@@ -85,7 +85,7 @@ namespace RiderData
 							outPacket.WriteShort(3);
 							outPacket.WriteShort(Kart);
 							outPacket.WriteShort(sn);
-							outPacket.WriteShort(1);//数量
+							outPacket.WriteShort(1); // 数量
 							outPacket.WriteShort(0);
 							outPacket.WriteShort(-1);
 							outPacket.WriteShort(0);
@@ -100,7 +100,7 @@ namespace RiderData
 
 		public static void NewKart2()
 		{
-			int range = 100;//分批次数
+			int range = 100; // 分批次数
 			int times = KartExcData.NewKart.Count / range + (KartExcData.NewKart.Count % range > 0 ? 1 : 0);
 			for (int i = 0; i < times; i++)
 			{
@@ -115,7 +115,7 @@ namespace RiderData
 						outPacket.WriteShort(3);
 						outPacket.WriteShort(Kart[0]);
 						outPacket.WriteShort(Kart[1]);
-						outPacket.WriteShort(1);//数量
+						outPacket.WriteShort(1); // 数量
 						outPacket.WriteShort(0);
 						outPacket.WriteShort(-1);
 						outPacket.WriteShort(0);
@@ -385,8 +385,8 @@ namespace RiderData
 				oPacket.WriteInt(1);
 				oPacket.WriteInt(40);
 				byte Grade = 1;
-				//-----------------------------------------------------------------X 유니크 파츠
-				for (short i = 1053; i <= 1080; i += 3)
+                //----------------------------------------------------------------- Gen X Unique Parts  X 유니크 파츠 
+                for (short i = 1053; i <= 1080; i += 3)
 				{
 					oPacket.WriteShort(63);
 					oPacket.WriteShort(1);
@@ -454,8 +454,8 @@ namespace RiderData
 				oPacket.WriteInt(1);
 				oPacket.WriteInt(40);
 				byte Grade = 2;
-				//-----------------------------------------------------------------X 레전드 파츠
-				for (short i = 1005; i <= 1050; i += 5)
+                //----------------------------------------------------------------- Gen X Legend Parts  X 레전드 파츠
+                for (short i = 1005; i <= 1050; i += 5)
 				{
 					oPacket.WriteShort(63);
 					oPacket.WriteShort(1);
@@ -523,7 +523,7 @@ namespace RiderData
 				oPacket.WriteInt(1);
 				oPacket.WriteInt(40);
 				byte Grade = 3;
-				//-----------------------------------------------------------------X 레어 파츠
+				//----------------------------------------------------------------- Gen X Rear Parts  X 레어 파츠
 				for (short i = 910; i <= 1000; i += 10)
 				{
 					oPacket.WriteShort(63);
@@ -592,7 +592,7 @@ namespace RiderData
 				oPacket.WriteInt(1);
 				oPacket.WriteInt(40);
 				byte Grade = 4;
-				//-----------------------------------------------------------------X 일반 파츠
+				//----------------------------------------------------------------- Gen X General Parts  X 일반 파츠
 				for (short i = 810; i <= 900; i += 10)
 				{
 					oPacket.WriteShort(63);
@@ -653,7 +653,7 @@ namespace RiderData
 			}
 		}
 
-		//-----------------------------------------------------------------------------------------------V1 파츠 관련
+		//----------------------------------------------------------------------------------------------- Gen V1 Parts Related  V1 파츠 관련
 		public static void V1UniquePartsData()
 		{
 			using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
@@ -662,7 +662,7 @@ namespace RiderData
 				oPacket.WriteInt(1);
 				oPacket.WriteInt(40);
 				byte Grade = 1;
-				//-----------------------------------------------------------------V1 유니크 파츠
+				//----------------------------------------------------------------- V1 Unique Parts  V1 유니크 파츠
 				for (short i = 1153; i <= 1180; i += 3)
 				{
 					oPacket.WriteShort(63);
@@ -731,7 +731,7 @@ namespace RiderData
 				oPacket.WriteInt(1);
 				oPacket.WriteInt(40);
 				byte Grade = 2;
-				//-----------------------------------------------------------------V1 레전드 파츠
+				//----------------------------------------------------------------- Gen V1 Legend Parts  V1 레전드 파츠
 				for (short i = 1105; i <= 1150; i += 5)
 				{
 					oPacket.WriteShort(63);
@@ -800,7 +800,7 @@ namespace RiderData
 				oPacket.WriteInt(1);
 				oPacket.WriteInt(40);
 				byte Grade = 3;
-				//-----------------------------------------------------------------V1 레어 파츠
+				//----------------------------------------------------------------- Gen V1 Rear Parts  V1 레어 파츠
 				for (short i = 1010; i <= 1100; i += 10)
 				{
 					oPacket.WriteShort(63);
@@ -869,7 +869,7 @@ namespace RiderData
 				oPacket.WriteInt(1);
 				oPacket.WriteInt(40);
 				byte Grade = 4;
-				//-----------------------------------------------------------------V1 일반 파츠
+				//----------------------------------------------------------------- Gen V1 General Parts  V1 일반 파츠
 				for (short i = 910; i <= 1000; i += 10)
 				{
 					oPacket.WriteShort(63);
@@ -932,7 +932,7 @@ namespace RiderData
 
 		public static void LoRpGetRiderItemPacket(short itemCat, List<List<ushort>> item)
 		{
-			int range = 100;//分批次数
+			int range = 100; // 分批次数
 			int times = item.Count / range + (item.Count % range > 0 ? 1 : 0);
 			for (int i = 0; i < times; i++)
 			{
