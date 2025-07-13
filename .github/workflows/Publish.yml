@@ -12,7 +12,7 @@ on:
       - patch
 
 jobs:
-  build:
+  publish-and-archive:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,14 +22,118 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Publish_x64
+    - name: Publish x64
       run: dotnet publish Launcher.csproj --runtime win-x64 -p:PublishSingleFile=true -p:AssemblyName=Launcher -o PublishedWinExe -c Release --no-self-contained
 
-    - name: Publish_x86
+    - name: Publish x86
       run: dotnet publish Launcher.csproj --runtime win-x86 -p:PublishSingleFile=true -p:AssemblyName=Launcher_x86 -o PublishedWinExe -c Release --no-self-contained
 
-    - name: Archive Artifacts
+    - name: Archive build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: Launcher
-        path: PublishedWinExe/
+        path: PublishedWinExe
+
+  tag-and-release:
+    needs: publish-and-archive
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get tag name
+        id: get_tag
+        run: |
+          TAG_NAME=$(date +'%y%m%d')
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+
+      - name: Create Git tag
+        run: |
+          if git rev-parse ${{ steps.get_tag.outputs.tag_name }} >/dev/null 2>&1; then
+            echo "Tag ${{ steps.get_tag.outputs.tag_name }} already exists, skip create and push."
+          else
+            git tag ${{ steps.get_tag.outputs.tag_name }}
+            git push origin ${{ steps.get_tag.outputs.tag_name }}
+          fi
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: Launcher
+          path: PublishedWinExe
+
+      - name: Zip x64
+        run: |
+          cd PublishedWinExe
+          zip -j ../Launcher.zip Launcher.exe
+        shell: bash
+
+      - name: Zip x86
+        run: |
+          cd PublishedWinExe
+          zip -j ../Launcher_x86.zip Launcher_x86.exe
+        shell: bash
+
+      - Create Release
+        uses: MaLuns/add-release@v1
+        with:
+          tag_name: ${{ steps.get_tag.outputs.tag_name }}
+          draft: true
+          prerelease: false
+          files: |
+            Launcher.zip
+            Launcher_x86.zip
+          target_commitish: ${{ github.ref_name }}
+          generate_release_notes_by_commit: true
+          generate_release_notes_by_commit_rules: |
+            [
+                {
+                    "title": "🚀 Features",
+                    "rule": "feat:"
+                },
+                {
+                    "title": "🐞 Bug Fixes",
+                    "rule": "fix:"
+                },
+                {
+                    "title": "📝 Documentation",
+                    "rule": "docs:"
+                },
+                {
+                    "title": "🎨 Styles",
+                    "rule": "style:"
+                },
+                {
+                    "title": "♻️ Refactoring",
+                    "rule": "refactor:"
+                },
+                {
+                    "title": "🚨 CI/CD",
+                    "rule": "ci:"
+                }
+                {
+                    "title": "🔧 Chores",
+                    "rule": "chore:"
+                },
+                {
+                    "title": "🔧 Other",
+                    "rule": ".*"
+                },
+            ]
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_tag.outputs.tag_name }}
+          name: ${{ steps.get_tag.outputs.tag_name }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          files: |
+            Launcher.zip
+            Launcher_x86.zip
+          overwrite: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
