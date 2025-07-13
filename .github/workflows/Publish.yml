@@ -54,8 +54,9 @@ jobs:
 
       - name: Create Git tag
         run: |
-          if git rev-parse ${{ steps.get_tag.outputs.tag_name }} >/dev/null 2>&1; then
-            echo "Tag ${{ steps.get_tag.outputs.tag_name }} already exists, skip create and push."
+          if git rev-parse ${{ steps.get_tag.outputs.tag_name }} >/dev/null 2>&1 || \
+             git ls-remote --tags origin | grep "refs/tags/${{ steps.get_tag.outputs.tag_name }}$" >/dev/null; then
+            echo "Tag ${{ steps.get_tag.outputs.tag_name }} already exists locally or remotely, skip create and push."
           else
             git tag ${{ steps.get_tag.outputs.tag_name }}
             git push origin ${{ steps.get_tag.outputs.tag_name }}
@@ -80,7 +81,7 @@ jobs:
         shell: bash
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2.3.2
         with:
           draft: false
           prerelease: false
@@ -91,8 +92,6 @@ jobs:
           name: Release ${{ steps.get_tag.outputs.tag_name }}
           tag_name: ${{ steps.get_tag.outputs.tag_name }}
           generate_release_notes: true
-          append_body: false
           make_latest: true
-          repository: TheMagicFlute/Launcher_V2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
