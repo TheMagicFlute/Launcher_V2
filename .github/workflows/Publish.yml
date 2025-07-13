@@ -80,60 +80,19 @@ jobs:
         shell: bash
 
       - name: Create Release
-        uses: MaLuns/add-release@v1
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.get_tag.outputs.tag_name }}
-          draft: true
+          draft: false
           prerelease: false
           files: |
             Launcher.zip
             Launcher_x86.zip
-          target_commitish: ${{ github.ref_name }}
-          generate_release_notes_by_commit: true
-          generate_release_notes_by_commit_rules: |
-            [
-                {
-                    "title": "🚀 Features",
-                    "rule": "feat:"
-                },
-                {
-                    "title": "🐞 Bug Fixes",
-                    "rule": "fix:"
-                },
-                {
-                    "title": "📝 Documentation",
-                    "rule": "docs:"
-                },
-                {
-                    "title": "🎨 Styles",
-                    "rule": "style:"
-                },
-                {
-                    "title": "♻️ Refactoring",
-                    "rule": "refactor:"
-                },
-                {
-                    "title": "🚨 CI/CD",
-                    "rule": "ci:"
-                }
-                {
-                    "title": "🔧 Chores",
-                    "rule": "chore:"
-                },
-                {
-                    "title": "🔧 Other",
-                    "rule": ".*"
-                },
-            ]
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
+          overwrite_files: true
+          name: Release ${{ steps.get_tag.outputs.tag_name }}
           tag_name: ${{ steps.get_tag.outputs.tag_name }}
-          name: ${{ steps.get_tag.outputs.tag_name }}
-          body: ${{ steps.changelog.outputs.changelog }}
-          files: |
-            Launcher.zip
-            Launcher_x86.zip
-          overwrite: true
+          generate_release_notes: true
+          append_body: false
+          make_latest: true
+          repository: TheMagicFlute/Launcher_V2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
