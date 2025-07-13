@@ -3,7 +3,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
+	<Nullable>enable</Nullable>
+	<UseWindowsForms>true</UseWindowsForms>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
+	<ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
 
     <!--PublishAot>true</PublishAot-->
     <PublishSingleFile>true</PublishSingleFile>

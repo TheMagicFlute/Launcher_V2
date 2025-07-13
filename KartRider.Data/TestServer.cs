@@ -15,10 +15,10 @@ namespace KartRider
 			{
 				outPacket.WriteByte(1);
 				outPacket.WriteInt(1);
-				outPacket.WriteShort(TestServer.Type);
-				outPacket.WriteShort(TestServer.ItemID);
+				outPacket.WriteShort(Type);
+				outPacket.WriteShort(ItemID);
 				outPacket.WriteShort(0);
-				outPacket.WriteShort(TestServer.Amount);
+				outPacket.WriteShort(Amount);
 				outPacket.WriteShort(0);
 				outPacket.WriteShort(-1);
 				outPacket.WriteShort(0);
@@ -26,9 +26,9 @@ namespace KartRider
 				outPacket.WriteShort(0);
 				RouterListener.MySession.Client.Send(outPacket);
 			}
-			TestServer.Type = 0;
-			TestServer.ItemID = 0;
-			TestServer.Amount = 0;
+			Type = 0;
+			ItemID = 0;
+			Amount = 0;
 		}
 	}
 }

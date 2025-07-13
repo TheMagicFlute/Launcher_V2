@@ -44,7 +44,7 @@ namespace ExcData
 
 		public static void Tune_ExcData()
 		{
-			int range = 26;//分批次数
+			int range = 26; // 分批次数
 			int times = TuneList.Count / range + (TuneList.Count % range > 0 ? 1 : 0);
 			for (int i = 0; i < times; i++)
 			{
@@ -95,7 +95,7 @@ namespace ExcData
 
 		public static void Plant_ExcData()
 		{
-			int range = 26;//分批次数
+			int range = 26; // 分批次数
 			int times = PlantList.Count / range + (PlantList.Count % range > 0 ? 1 : 0);
 			for (int i = 0; i < times; i++)
 			{
@@ -145,7 +145,7 @@ namespace ExcData
 
 		public static void Level_ExcData()
 		{
-			int range = 26;//分批次数
+			int range = 26; // 分批次数
 			int times = LevelList.Count / range + (LevelList.Count % range > 0 ? 1 : 0);
 			for (int i = 0; i < times; i++)
 			{
@@ -193,7 +193,7 @@ namespace ExcData
 
 		public static void Parts_ExcData()
 		{
-			int range = 26;//分批次数
+			int range = 26; // 分批次数
 			int times = PartsList.Count / range + (PartsList.Count % range > 0 ? 1 : 0);
 			for (int i = 0; i < times; i++)
 			{
@@ -255,7 +255,7 @@ namespace ExcData
 
 		public static void Level12_ExcData()
 		{
-			int range = 26;//分批次数
+			int range = 26; // 分批次数
 			int times = Level12List.Count / range + (Level12List.Count % range > 0 ? 1 : 0);
 			for (int i = 0; i < times; i++)
 			{
@@ -308,7 +308,7 @@ namespace ExcData
 
 		public static void Parts12_ExcData()
 		{
-			int range = 26;//分批次数
+			int range = 26; // 分批次数
 			int times = Parts12List.Count / range + (Parts12List.Count % range > 0 ? 1 : 0);
 			for (int i = 0; i < times; i++)
 			{

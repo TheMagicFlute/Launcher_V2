@@ -15,19 +15,24 @@ namespace KartRider
 {
     internal static class Update
     {
-        public static string formattedDate = GetCurrentVersion();
+        public static string currentVersion = GetCurrentVersion();
 
-        public static string owner = "yanygm"; // GitHub Repo Owner
-        public static string repo = "Launcher_V2"; // GitHub Repo ID
+        public static string owner = "TheMagicFlute"; // GitHub Repo Owner
+        public static string repo = "Launcher_V2"; // GitHub Repo Name
 
         public static async Task<bool> UpdateDataAsync()
         {
             Console.WriteLine("正在检查更新...");
-            
+            Console.WriteLine("当前Branch: {0}/{1}", ThisAssembly.Git.RepositoryUrl, ThisAssembly.Git.Branch);
+            Console.WriteLine("当前Commit: {0}", ThisAssembly.Git.Commit);
+            Console.WriteLine("当前Commit SHA: {0}", ThisAssembly.Git.Sha);
+            Console.WriteLine("当前Commit日期: {0}", ThisAssembly.Git.CommitDate);
+            Console.WriteLine("当前Tag: {0}", ThisAssembly.Git.Tag);
+
             string tag_name = await GetTag_name();
             string update_info = await GetUpdate_Info();
-            Console.WriteLine($"当前版本为: {formattedDate}");
-            if (tag_name != "" && int.Parse(formattedDate) < int.Parse(tag_name))
+            Console.WriteLine($"当前版本为: {currentVersion}");
+            if (tag_name != "" && int.Parse(currentVersion) < int.Parse(tag_name))
             {
                 // 询问是否需要更新
                 Console.WriteLine($"发现新版本: {tag_name}");
@@ -90,10 +95,12 @@ namespace KartRider
             }
             else
             {
+                Console.WriteLine("当前已是最新版本。");
                 return false;
             }
         }
-        public static string GetCurrentVersion()
+
+        public static string GetCompileDate()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             AssemblyName assemblyName = assembly.GetName();
@@ -101,6 +108,20 @@ namespace KartRider
             DateTime compilationDate = File.GetLastWriteTime(AppDomain.CurrentDomain.BaseDirectory + simpleName);
             string formattedDate = compilationDate.ToString("yyMMdd");
             return formattedDate;
+        }
+
+        public static string GetCurrentDate()
+        {
+            return DateTime.Now.ToString("yyMMdd");
+        }
+
+        public static string GetCurrentVersion()
+        {
+#if DEBUG
+            return GetCurrentDate();
+#else
+            return ThisAssembly.Git.CommitDate.Substring(0, 10).Replace("-", "").Substring(2, 6);
+#endif
         }
 
         public static async Task<bool> DownloadUpdate(string UpdatePackageUrl)
@@ -210,7 +231,7 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + "\""}
             }
         }
 
-        public static async Task<HttpResponseMessage> GetReleaseInfoAsync(string owner, string repo)
+        public static async Task<HttpResponseMessage> GetReleaseInfoAsync()
         {
             string url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
             try
@@ -230,9 +251,9 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + "\""}
             }
         }
 
-        public static async Task<string> GetTag_name(string owner = "yanygm", string repo = "Launcher_V2")
+        public static async Task<string> GetTag_name()
         {
-            HttpResponseMessage responseMsg = await GetReleaseInfoAsync(owner, repo);
+            HttpResponseMessage responseMsg = await GetReleaseInfoAsync();
             if (responseMsg == null) return ""; // fail to get response
             if (responseMsg.IsSuccessStatusCode)
             {
@@ -248,9 +269,9 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + "\""}
             }
         }
 
-        public static async Task<string> GetUpdate_Info(string owner = "yanygm", string repo = "Launcher_V2")
+        public static async Task<string> GetUpdate_Info()
         {
-            HttpResponseMessage responseMsg = await GetReleaseInfoAsync(owner, repo);
+            HttpResponseMessage responseMsg = await GetReleaseInfoAsync();
             if (responseMsg == null) return ""; // fail to get response
             if (responseMsg.IsSuccessStatusCode)
             {

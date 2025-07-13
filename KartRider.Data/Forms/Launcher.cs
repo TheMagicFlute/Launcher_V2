@@ -229,6 +229,11 @@ namespace KartRider
             PerformLayout();
         }
 
+        public static void WarnGameRunning()
+        {
+            MessageBox.Show("跑跑卡丁车正在运行，请结束跑跑卡丁车后再退出该程序！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
             if (File.Exists(this.kartRiderDirectory + "KartRider-bak.pin"))
@@ -238,7 +243,7 @@ namespace KartRider
             }
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                LauncherSystem.MessageBoxType1();
+                WarnGameRunning();
                 e.Cancel = true;
             }
         }
@@ -275,7 +280,8 @@ namespace KartRider
         {
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                LauncherSystem.MessageBoxType2();
+                WarnGameRunning();
+                return;
             }
             else
             {
@@ -293,7 +299,7 @@ namespace KartRider
                     foreach (AuthMethod authMethod in val.AuthMethods)
                     {
                         Console.WriteLine("Changing IP Addr to local... {0}", authMethod.Name);
-                        foreach(IPEndPoint loginServer in authMethod.LoginServers)
+                        foreach (IPEndPoint loginServer in authMethod.LoginServers)
                         {
                             Console.WriteLine("Old IP Addr: {0}", loginServer.ToString());
                         }

@@ -62,9 +62,9 @@ namespace KartRider
             AllocConsole();
             Console.OutputEncoding = Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
-            if (!await Update.UpdateDataAsync())
+            if (!await Update.UpdateDataAsync()) // check for update
             {
-                // check update
+                // current version is up to date
                 string Load_CC = AppDomain.CurrentDomain.BaseDirectory + "Profile\\CountryCode.ini";
                 if (File.Exists(Load_CC))
                 {
@@ -98,7 +98,7 @@ namespace KartRider
                     else
                     {// game not found
                         Console.WriteLine("Error: 未找到游戏!");
-                        LauncherSystem.MessageBoxType3();
+                        MsgErrorFileNotFound();
                         return;
                     }
                     if (!string.IsNullOrEmpty(RootDirectory))
@@ -193,6 +193,12 @@ namespace KartRider
                 }
             }
         }
+
+        public static void MsgErrorFileNotFound()
+		{
+			MessageBox.Show(Launcher.KartRider + " 或 " + Launcher.pinFile + " 找不到文件！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			Environment.Exit(1);
+		}
 
         private static void encodea(string input, string output)
         {
