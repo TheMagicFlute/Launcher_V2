@@ -79,8 +79,7 @@ jobs:
           zip -j ../Launcher_x86.zip Launcher_x86.exe
         shell: bash
 
-      - Create Release
-      - name: Generate changelog
+      - name: Create Release
         uses: MaLuns/add-release@v1
         with:
           tag_name: ${{ steps.get_tag.outputs.tag_name }}
