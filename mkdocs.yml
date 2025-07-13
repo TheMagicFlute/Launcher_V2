@@ -1,13 +1,13 @@
 # Project Information
 site_name: 中国跑跑卡丁车单机启动器
 site_description: 中国跑跑卡丁车单机版启动器的使用说明文档，以及一些信息
-site_url: https://yanygm.github.io/Launcher_V2
+site_url: https://TheMagicFlute.github.io/Launcher_V2
 strict: true
 
 # Repository Information
-repo_name: 'yanygm/Launcher_V2'
-repo_url: 'https://github.com/yanygm/Launcher_V2'
-edit_uri: 'https://github.com/yanygm/Launcher_V2/edit/main/docs/{path}'
+repo_name: 'TheMagicFlute/Launcher_V2'
+repo_url: 'https://github.com/TheMagicFlute/Launcher_V2'
+edit_uri: 'https://github.com/TheMagicFlute/Launcher_V2/edit/main/docs/{path}'
 
 theme:
   name: 'material'
@@ -45,4 +45,3 @@ nav:
   - 安装: installation.md
   - 使用: how-to-use.md
   - 常见问题及解答: FAQ.md
-  - 更新日志: changelog.md
