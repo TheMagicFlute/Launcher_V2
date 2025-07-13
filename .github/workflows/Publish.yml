@@ -56,10 +56,10 @@ jobs:
         run: |
           if git rev-parse ${{ steps.get_tag.outputs.tag_name }} >/dev/null 2>&1; then
             echo "Tag ${{ steps.get_tag.outputs.tag_name }} already exists, skip create and push."
-          else
-            git tag ${{ steps.get_tag.outputs.tag_name }}
-            git push origin ${{ steps.get_tag.outputs.tag_name }}
+            exit 0
           fi
+          git tag ${{ steps.get_tag.outputs.tag_name }}
+          git push origin ${{ steps.get_tag.outputs.tag_name }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
