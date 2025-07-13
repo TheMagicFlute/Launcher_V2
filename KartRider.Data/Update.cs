@@ -27,7 +27,7 @@ namespace KartRider
             Console.WriteLine("当前Commit: {0}", ThisAssembly.Git.Commit);
             Console.WriteLine("当前Commit SHA: {0}", ThisAssembly.Git.Sha);
             Console.WriteLine("当前Commit日期: {0}", ThisAssembly.Git.CommitDate);
-            Console.WriteLine("当前Tag: {0}", ThisAssembly.Git.Tag);
+            Console.WriteLine("当前Tag: {0}", ThisAssembly.Git.BaseTag);
 
             string tag_name = await GetTag_name();
             string update_info = await GetUpdate_Info();
@@ -120,7 +120,8 @@ namespace KartRider
 #if DEBUG
             return GetCurrentDate();
 #else
-            return ThisAssembly.Git.CommitDate.Substring(0, 10).Replace("-", "").Substring(2, 6);
+            return ThisAssembly.Git.BaseTag;
+            // return ThisAssembly.Git.BaseTag ?? ThisAssembly.Git.CommitDate.Substring(0, 10).Replace("-", "").Substring(2, 6);
 #endif
         }
 
