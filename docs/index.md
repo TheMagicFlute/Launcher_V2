@@ -17,11 +17,11 @@
 
 [跑跑資訊站](https://kartinfo.me/thread-9369-1-1.html)论坛关于该启动器的链接
 
-**新增复古频道** 初级/L1(老S1)/L2(老S2)/L3(老S3)/Pro
+上面 badge 数据均源自 [yanygm/Launcher_V2](https://github.com/yanygm/Launcher_V2)
 
 ## 简介
 
-这是一个基于C#的中国跑跑卡丁车游戏启动器，修改自[LAON](https://github.com/MyPuppy)制作的启动器
+这是一个基于 C# 的中国跑跑卡丁车游戏启动器，修改自 [LAON](https://github.com/MyPuppy) 制作的国服启动器，并 fork 自 [Yany](https://github.com/yanygm) 大佬，修改并添加了新功能。
 
 本单机没有病毒，请放心使用。
 
@@ -32,5 +32,3 @@
 - [使用方法](./how-to-use.md)
 
 如果在使用过程中出现问题，请见[常见问题及解答](./FAQ.md)。
-
-[更新日志](./changelog.md)
