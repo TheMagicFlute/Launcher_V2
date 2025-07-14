@@ -14,6 +14,8 @@ on:
 jobs:
   tag:
     runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.get_tag.outputs.tag_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -61,7 +63,7 @@ jobs:
         path: PublishedWinExe
 
   release:
-    needs: publish-and-archive
+    needs: [publish-and-archive, tag]
     runs-on: ubuntu-latest
     steps:
       - name: Download build artifacts
@@ -91,8 +93,8 @@ jobs:
             Launcher.zip
             Launcher_x86.zip
           overwrite_files: true
-          name: ${{ steps.get_tag.outputs.tag_name }}
-          tag_name: ${{ steps.get_tag.outputs.tag_name }}
+          name: ${{ needs.tag.outputs.tag_name }}
+          tag_name: ${{ needs.tag.outputs.tag_name }}
           generate_release_notes: true
           make_latest: true
         env:
