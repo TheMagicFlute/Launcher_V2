@@ -28,7 +28,7 @@ jobs:
       - name: Get tag name
         id: get_tag
         run: |
-          TAG_NAME=$(date +'%y%m%d')
+          TAG_NAME=$(TZ='Asia/Shanghai' date +'%y%m%d')
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
 
       - name: Create Git tag
@@ -92,7 +92,7 @@ jobs:
           files: |
             Launcher.zip
             Launcher_x86.zip
-          overwrite_files: true
+          overwrite: true
           name: ${{ needs.tag.outputs.tag_name }}
           tag_name: ${{ needs.tag.outputs.tag_name }}
           generate_release_notes: true
