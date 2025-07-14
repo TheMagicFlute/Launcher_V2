@@ -12,30 +12,7 @@ on:
       - patch
 
 jobs:
-  publish-and-archive:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-
-    - name: Publish x64
-      run: dotnet publish Launcher.csproj --runtime win-x64 -p:PublishSingleFile=true -p:AssemblyName=Launcher -o PublishedWinExe -c Release --no-self-contained
-
-    - name: Publish x86
-      run: dotnet publish Launcher.csproj --runtime win-x86 -p:PublishSingleFile=true -p:AssemblyName=Launcher_x86 -o PublishedWinExe -c Release --no-self-contained
-
-    - name: Archive build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: Launcher
-        path: PublishedWinExe
-
-  tag-and-release:
-    needs: publish-and-archive
+  tag:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -62,6 +39,31 @@ jobs:
             git push origin ${{ steps.get_tag.outputs.tag_name }}
           fi
 
+  publish-and-archive:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Publish x64
+      run: dotnet publish Launcher.csproj --runtime win-x64 -p:PublishSingleFile=true -p:AssemblyName=Launcher -o PublishedWinExe -c Release --no-self-contained
+
+    - name: Publish x86
+      run: dotnet publish Launcher.csproj --runtime win-x86 -p:PublishSingleFile=true -p:AssemblyName=Launcher_x86 -o PublishedWinExe -c Release --no-self-contained
+
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: Launcher
+        path: PublishedWinExe
+
+  release:
+    needs: publish-and-archive
+    runs-on: ubuntu-latest
+    steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
