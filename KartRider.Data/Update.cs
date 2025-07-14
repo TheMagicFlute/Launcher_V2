@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace KartRider
 {
@@ -19,6 +20,8 @@ namespace KartRider
 
         public static string owner = "TheMagicFlute"; // GitHub Repo Owner
         public static string repo = "Launcher_V2"; // GitHub Repo Name
+        public static string simpleName = "Launcher" + (Environment.Is64BitProcess ? "" : "_x86");
+        public static string fileName = simpleName + ".zip";
 
         public static async Task<bool> UpdateDataAsync()
         {
@@ -27,16 +30,17 @@ namespace KartRider
             Console.WriteLine("当前Commit: {0}", ThisAssembly.Git.Commit);
             Console.WriteLine("当前Commit SHA: {0}", ThisAssembly.Git.Sha);
             Console.WriteLine("当前Commit日期: {0}", ThisAssembly.Git.CommitDate);
-            Console.WriteLine("当前Tag: {0}", ThisAssembly.Git.BaseTag);
+            Console.WriteLine($"当前版本为: {currentVersion}");
 
             string tag_name = await GetTag_name();
             string update_info = await GetUpdate_Info();
-            Console.WriteLine($"当前版本为: {currentVersion}");
             if (tag_name != "" && int.Parse(currentVersion) < int.Parse(tag_name))
             {
-                // 询问是否需要更新
+                // ask user whether to update
                 Console.WriteLine($"发现新版本: {tag_name}");
+                Console.WriteLine("-------------------------");
                 Console.WriteLine($"更新信息: \n{update_info}");
+                Console.WriteLine("-------------------------");
                 Console.Write("请问是否需要更新? (Y/n): ");
                 string usrInput = null;
                 while (usrInput != "y" && usrInput != "Y" && usrInput != "n" && usrInput != "N")
@@ -48,7 +52,7 @@ namespace KartRider
                     }
                     else if (usrInput != "y" && usrInput != "Y")
                     {
-                        // usrInput is not valid, ask again
+                        // usrInput is invalid, ask again
                         Console.Write("请输入 (Y for yes / n for no): ");
                     }
                 }
@@ -57,10 +61,10 @@ namespace KartRider
                 try
                 {
                     string country = await GetCountryAsync();
-                    string url = $"https://github.com/{owner}/{repo}/releases/download/" + tag_name + "/Launcher.zip";
-                    // 中国大陆需要使用代理下载，处理 url
+                    string url = $"https://github.com/{owner}/{repo}/releases/download/{tag_name}/{fileName}";
                     if (country != "" && country == "CN")
                     {
+                        // 中国大陆需要使用代理下载，处理 url
                         List<string> urls = new List<string>() { "https://ghproxy.net/", "https://gh-proxy.com/", "https://hub.myany.uk/", "http://kra.myany.uk:2233/", "http://krb.myany.uk:2233/" };
                         Console.WriteLine("Using proxy.");
                         foreach (string url_ in urls)
@@ -89,7 +93,7 @@ namespace KartRider
                 catch (Exception ex)
                 {
                     Console.WriteLine($"下载过程中出现错误: {ex.Message}");
-                    Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载新版本");
+                    Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
                     return false;
                 }
             }
@@ -110,18 +114,12 @@ namespace KartRider
             return formattedDate;
         }
 
-        public static string GetCurrentDate()
-        {
-            return DateTime.Now.ToString("yyMMdd");
-        }
-
         public static string GetCurrentVersion()
         {
 #if DEBUG
-            return GetCurrentDate();
+            return DateTime.Now.ToString("yyMMdd");
 #else
-            return ThisAssembly.Git.BaseTag;
-            // return ThisAssembly.Git.BaseTag ?? ThisAssembly.Git.CommitDate.Substring(0, 10).Replace("-", "").Substring(2, 6);
+            return ThisAssembly.Git.CommitDate.Substring(0, 10).Replace("-", "").Substring(2, 6);
 #endif
         }
 
@@ -143,7 +141,7 @@ namespace KartRider
                                 Directory.CreateDirectory(folderPath);
                             }
                             long? totalBytes = response.Content.Headers.ContentLength;
-                            using (FileStream fileStream = new FileStream(AppDomain.CurrentDomain.BaseDirectory + "Update\\Launcher.zip", FileMode.Create, FileAccess.Write, FileShare.None))
+                            using (FileStream fileStream = new FileStream(AppDomain.CurrentDomain.BaseDirectory + "Update\\" + fileName, FileMode.Create, FileAccess.Write, FileShare.None))
                             {
                                 byte[] buffer = new byte[4096];
                                 int bytesRead;
@@ -155,8 +153,21 @@ namespace KartRider
                                     double progress = totalBytes.HasValue ? (double)totalRead / totalBytes.Value * 100 : 0;
                                     Console.Write($"\r下载进度: {progress:F2}%");
                                 }
+                                Console.WriteLine();
                             }
                         }
+                    }
+                    string expectedHash = await GetSHA256Async(fileName);
+                    Console.WriteLine($"期望 SHA256 为: {expectedHash}");
+                    if (!CheckFileHash(AppDomain.CurrentDomain.BaseDirectory + "Update\\" + fileName, expectedHash))
+                    {
+                        Console.WriteLine($"文件 SHA256 校验失败，下载可能不完整或被篡改。");
+                        Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
+                        return false;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"文件 SHA256 校验成功。");
                     }
                     return ApplyUpdate();
                 }
@@ -164,23 +175,20 @@ namespace KartRider
             catch (Exception ex)
             {
                 Console.WriteLine($"下载过程中出现错误: {ex.Message}");
-                Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载新版本");
+                Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
                 return false;
             }
         }
 
         public static bool ApplyUpdate()
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            AssemblyName assemblyName = assembly.GetName();
-            string simpleName = assemblyName.Name + ".exe";
             try
             {
-                System.IO.Compression.ZipFile.ExtractToDirectory(AppDomain.CurrentDomain.BaseDirectory + "Update\\Launcher.zip", AppDomain.CurrentDomain.BaseDirectory + "Update\\");
+                System.IO.Compression.ZipFile.ExtractToDirectory(AppDomain.CurrentDomain.BaseDirectory + "Update\\" + fileName, AppDomain.CurrentDomain.BaseDirectory + "Update\\");
                 string script = @$"@echo off
 timeout /t 3 /nobreak
-move {"\"" + AppDomain.CurrentDomain.BaseDirectory + "Update\\" + simpleName + "\""} {"\"" + AppDomain.CurrentDomain.BaseDirectory + "\""}
-start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + "\""}
+move {"\"" + AppDomain.CurrentDomain.BaseDirectory + "Update\\" + simpleName + ".exe" + "\""} {"\"" + AppDomain.CurrentDomain.BaseDirectory + "\""}
+start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + ".exe" + "\""}
 ";
                 string filePath = AppDomain.CurrentDomain.BaseDirectory + "Update.bat";
                 try
@@ -199,8 +207,53 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + "\""}
             catch (Exception ex)
             {
                 Console.WriteLine($"\n应用更新时出错: {ex.Message}");
-                Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载新版本");
+                Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
                 return false;
+            }
+        }
+
+        public static async Task<string> GetSHA256Async(string filename)
+        {
+            HttpResponseMessage responseMsg = await GetReleaseInfoAsync();
+            if (responseMsg == null) return ""; // fail to get response
+            if (responseMsg.IsSuccessStatusCode)
+            {
+                // parse JSON
+                string json = await responseMsg.Content.ReadAsStringAsync();
+                dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                // find the asset with the same name
+                foreach (var asset in data.assets)
+                {
+                    if (asset.name == filename)
+                    {
+                        string digest = asset.digest;
+                        digest = digest.Substring("sha256:".Length);
+                        return digest;
+                    }
+                }
+                return "";
+            }
+            else
+            {
+                Console.WriteLine($"请求更新信息失败，状态码: {responseMsg.StatusCode}");
+                return "";
+            }
+        }
+
+        public static bool CheckFileHash(string filePath, string expectedHash)
+        {
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine($"文件 {filePath} 不存在。");
+                return false;
+            }
+            using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                SHA256 sha256 = new SHA256Managed();
+                byte[] hash = sha256.ComputeHash(fileStream);
+                string actualHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                Console.WriteLine($"文件 SHA256 为：{actualHash}");
+                return actualHash == expectedHash;
             }
         }
 
@@ -220,14 +273,14 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + "\""}
                     }
                     else
                     {
-                        Console.WriteLine($"请求IP地址失败，状态码: {response.StatusCode}");
+                        Console.WriteLine($"请求 IP 地址失败，状态码: {response.StatusCode}");
                         return "";
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"发生异常: {ex.Message}");
+                Console.WriteLine($"请求IP地址时发生异常: {ex.Message}");
                 return "";
             }
         }
@@ -296,18 +349,12 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + "\""}
                 {
                     HttpResponseMessage response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Head, url));
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return response.IsSuccessStatusCode;
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"请求 URL 时发生异常: {ex.Message}");
                 return false;
             }
         }

@@ -19,6 +19,7 @@ using static KartRider.Common.Data.PINFile;
 using System.Collections;
 using System.Reflection;
 using System.Drawing;
+using static KartRider.Update;
 
 namespace KartRider
 {
@@ -638,7 +639,7 @@ namespace KartRider
 
         private void GitHub_Click(object sender, EventArgs e)
         {
-            string url = "https://github.com/yanygm/Launcher_V2/releases";
+            string url = $"https://github.com/{owner}/{repo}/releases";
             try
             {
                 Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });

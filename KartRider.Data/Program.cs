@@ -45,7 +45,9 @@ namespace KartRider
 #else
             Console.Write("中国跑跑卡丁车单机服务器已启动");
 #endif
-            Console.WriteLine($" Git Hash: {ThisAssembly.Git.Commit}");
+            if (Environment.Is64BitProcess) Console.Write(" | x64 | ");
+            else Console.Write(" | x86 | ");
+            Console.WriteLine();
             Console.WriteLine("--------------------------------------------------");
             
             // delete updater
