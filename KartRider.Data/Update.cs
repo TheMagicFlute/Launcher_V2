@@ -18,8 +18,8 @@ namespace KartRider
     {
         public static string currentVersion = GetCurrentVersion();
 
-        public static string owner = "TheMagicFlute"; // GitHub Repo Owner
-        public static string repo = "Launcher_V2"; // GitHub Repo Name
+        public const string owner = "TheMagicFlute";    // GitHub Repo Owner
+        public const string repo = "Launcher_V2";       // GitHub Repo Name
         public static string simpleName = "Launcher" + (Environment.Is64BitProcess ? "" : "_x86");
         public static string fileName = simpleName + ".zip";
 

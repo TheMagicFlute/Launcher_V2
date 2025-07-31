@@ -6,6 +6,6 @@
 
 此仓库Fork自[yanygm/Launcher_V2](https://github.com/yanygm/Launcher_V2)。
 
-更多信息，详见[文档](https://yanygm.github.io/Launcher_V2)
+更多信息，详见[文档](https://TheMagicFlute.github.io/Launcher_V2)
 
-![image](https://raw.githubusercontent.com/yanygm/Launcher_V2/refs/heads/main/Properties/favicon.ico)
+![icon](./Properties/favicon.ico)

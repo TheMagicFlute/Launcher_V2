@@ -28,6 +28,7 @@ namespace KartRider
         [DllImport("user32.dll")]
         public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
         const int SW_HIDE = 0;
+        const int SW_SHOW = 5;
         public static Launcher LauncherDlg;
         public static GetKart GetKartDlg;
         public static bool SpeedPatch;
@@ -40,16 +41,13 @@ namespace KartRider
         {
             string input;
             string output;
-#if DEBUG
-            Console.Write("中国跑跑卡丁车单机服务器已启动 [DEBUG]");
-#else
             Console.Write("中国跑跑卡丁车单机服务器已启动");
+            Console.Write("| {0} |", Environment.Is64BitProcess ? "x64" : "x86");
+#if DEBUG
+            Console.Write(" [DEBUG]");
 #endif
-            if (Environment.Is64BitProcess) Console.Write(" | x64 | ");
-            else Console.Write(" | x86 | ");
             Console.WriteLine();
             Console.WriteLine("--------------------------------------------------");
-            
             // delete updater
             string Update_File = AppDomain.CurrentDomain.BaseDirectory + "Update.bat";
             string Update_Folder = AppDomain.CurrentDomain.BaseDirectory + "Update";
@@ -115,7 +113,7 @@ namespace KartRider
                         {
                             Console.WriteLine($"读取Data文件时出错: {ex.Message}");
                         }
-                        
+
                         string Load_Console = AppDomain.CurrentDomain.BaseDirectory + "Profile\\Console.ini";
                         IntPtr consoleHandle = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
                         if (!File.Exists(Load_Console))
@@ -128,14 +126,14 @@ namespace KartRider
                         string textValue = System.IO.File.ReadAllText(Load_Console);
                         if (textValue == "0")
                         {
-                            ShowWindow(consoleHandle, SW_HIDE);
+                            ShowWindow(consoleHandle, SW_SHOW);
                         }
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);
                         Launcher StartLauncher = new Launcher();
                         Program.LauncherDlg = StartLauncher;
                         Program.LauncherDlg.kartRiderDirectory = RootDirectory;
-                        Application.Run(StartLauncher); 
+                        Application.Run(StartLauncher);
                     }
                     input = "";
                     output = "";
@@ -197,10 +195,10 @@ namespace KartRider
         }
 
         public static void MsgErrorFileNotFound()
-		{
-			MessageBox.Show(Launcher.KartRider + " 或 " + Launcher.pinFile + " 找不到文件！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
-			Environment.Exit(1);
-		}
+        {
+            MessageBox.Show(Launcher.KartRider + " 或 " + Launcher.pinFile + " 找不到文件！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            Environment.Exit(1);
+        }
 
         private static void encodea(string input, string output)
         {

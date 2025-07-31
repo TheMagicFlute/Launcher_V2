@@ -45,7 +45,7 @@ namespace KartRider
 				uint hash = iPacket.ReadUInt();
 				if (hash != 1950550337) // PqServerSideUdpBindCheck
 				{
-					Console.WriteLine((PacketName)hash + "：" + BitConverter.ToString(iPacket.ToArray()).Replace("-", ""));
+					Console.WriteLine((PacketName)hash + ": " + BitConverter.ToString(iPacket.ToArray()).Replace("-", ""));
 				}
 				if (hash == Adler32Helper.GenerateAdler32_ASCII("PqCnAuthenLogin", 0))
 				{
@@ -403,7 +403,7 @@ namespace KartRider
 						using (OutPacket outPacket = new OutPacket("PcSlaveNotice"))
 						{
                             // Login Notice
-                            outPacket.WriteString("单机版完全免费，跑跑資訊站：https://kartinfo.me/thread-9369-1-1.html 源代码仓库地址：https://github.com/yanygm/Launcher_V2");
+                            outPacket.WriteString($"欢迎使用单机版。本单机版完全免费！源代码仓库地址：https://github.com/{Update.owner}/{Update.repo}");
 							this.Parent.Client.Send(outPacket);
 						}
 						return;

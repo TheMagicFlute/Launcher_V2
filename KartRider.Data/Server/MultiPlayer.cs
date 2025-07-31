@@ -25,9 +25,11 @@ namespace KartRider
         static uint track = Adler32Helper.GenerateAdler32_UNICODE("village_R01", 0); // First = 
         public static uint BootTicksPrev, BootTicksNow;
         public static uint StartTicks = 0;
-        static uint FinishTime = 0;
-        static string AiXmlFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\AI.xml";
+        public static uint FinishTime = 0;
+        public static string AiXmlFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\AI.xml";
         public static Dictionary<int, uint> AiTimeData = new Dictionary<int, uint>();
+
+        private const uint itemIncreaseValue = 10000;
 
         [DllImport("kernel32")]
         extern static UInt32 GetTickCount();
@@ -77,16 +79,18 @@ namespace KartRider
                 {
                     outPacket.WriteUInt(FinishTime);
                 }
+                SetRider.RP += itemIncreaseValue;
+                SetRider.Lucci += itemIncreaseValue;
                 outPacket.WriteByte();
                 outPacket.WriteShort(SetRiderItem.Set_Kart);
                 outPacket.WriteShort();
                 outPacket.WriteShort();
                 outPacket.WriteShort();
                 outPacket.WriteByte();
-                outPacket.WriteUInt(SetRider.RP += 10000);
-                outPacket.WriteInt(10000); // Earned RP
-                outPacket.WriteInt(10000); // Earned Lucci
-                outPacket.WriteUInt(SetRider.Lucci += 10000);
+                outPacket.WriteUInt(SetRider.RP);
+                outPacket.WriteInt((int)itemIncreaseValue); // Earned RP
+                outPacket.WriteInt((int)itemIncreaseValue); // Earned Lucci
+                outPacket.WriteUInt(SetRider.Lucci);
                 outPacket.WriteBytes(new byte[46]);
                 outPacket.WriteInt(1);
                 outPacket.WriteBytes(new byte[52]);
@@ -166,7 +170,10 @@ namespace KartRider
             }
             else if (hash == Adler32Helper.GenerateAdler32_ASCII("GameControlPacket"))
             {
-                var state = iPacket.ReadByte();
+                byte state = iPacket.ReadByte();
+                Console.WriteLine("----------------------------------------------");
+                Console.WriteLine("GameControlPacket, state = {0}", state);
+                Console.WriteLine("----------------------------------------------");
                 // start
                 if (state == 0)
                 {
@@ -185,7 +192,7 @@ namespace KartRider
                         oPacket.WriteUInt(StartTicks);
                         RouterListener.MySession.Client.Send(oPacket);
                     }
-                    AiTimeData = new Dictionary<int, uint>();
+                    AiTimeData.Clear();
                     FinishTime = 0;
                     Console.WriteLine("GameControlPacket, Start. Ticks = {0}", StartTicks);
                 }
