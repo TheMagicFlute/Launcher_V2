@@ -30,6 +30,7 @@ namespace KartRider
         public string kartRiderDirectory = null;
         public static string KartRider = "KartRider.exe";
         public static string pinFile = "KartRider.pin";
+        public static string executablePath = Process.GetCurrentProcess().MainModule.FileName;
         private Button Start_Button;
         private Button GetKart_Button;
         private Label label_Client;
@@ -251,10 +252,6 @@ namespace KartRider
 
         private void OnLoad(object sender, EventArgs e)
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            AssemblyName assemblyName = assembly.GetName();
-            string simpleName = assemblyName.Name + ".exe";
-
             Console.WriteLine("读取配置文件");
             Load_KartExcData();
             Console.WriteLine("读取完成");
@@ -263,6 +260,7 @@ namespace KartRider
             PINFile val = new PINFile(this.kartRiderDirectory + "KartRider.pin");
             SetGameOption.Version = val.Header.MinorVersion;
             SetGameOption.Save_SetGameOption();
+            ClientVersion.Text = SetGameOption.Version.ToString();
 
             foreach (string key in SpeedType.speedNames.Keys)
             {
@@ -270,7 +268,7 @@ namespace KartRider
             }
 
             ClientVersion.Text = $"P{SetGameOption.Version.ToString()}";
-            DateTime compilationDate = File.GetLastWriteTime(AppDomain.CurrentDomain.BaseDirectory + "Launcher.exe");
+            DateTime compilationDate = File.GetLastWriteTime(executablePath);
             string formattedDate = compilationDate.ToString("yyMMdd");
             VersionLabel.Text = formattedDate;
             Console.WriteLine("Process: {0}", this.kartRiderDirectory + Launcher.KartRider);

@@ -403,7 +403,7 @@ namespace KartRider
 						using (OutPacket outPacket = new OutPacket("PcSlaveNotice"))
 						{
                             // Login Notice
-                            outPacket.WriteString($"欢迎使用单机版。本单机版完全免费！源代码仓库地址：https://github.com/{Update.owner}/{Update.repo}");
+                            outPacket.WriteString($"欢迎使用单机版. 本单机版完全免费! 源代码仓库地址: https://github.com/{Update.owner}/{Update.repo}");
 							this.Parent.Client.Send(outPacket);
 						}
 						return;
@@ -824,7 +824,7 @@ namespace KartRider
 						using (OutPacket outPacket = new OutPacket("PcSlaveNotice"))
 						{
 							// Mod Notice
-							outPacket.WriteString("使用粒子激活器R直接获得启变佳！");
+							outPacket.WriteString("使用粒子激活器R, 以直接获得启变佳!");
 							this.Parent.Client.Send(outPacket);
 						}
 						KartExcData.AddTuneList(Kart, KartSN, 0, 0, 0, -1, 0, -1, 0);
