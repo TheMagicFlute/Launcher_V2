@@ -1,0 +1,31 @@
+name: Check Build
+on:
+  push:
+    branches-ignore:
+      - gh-pages
+    paths:
+      - 'KartRider.Data/**'
+      - 'KartriderLibrary/**'
+      - 'Properties/**'
+      - 'Launcher.csproj'
+  pull_request:
+    branches-ignore:
+      - gh-pages
+    paths:
+      - 'KartRider.Data/**'
+      - 'KartriderLibrary/**'
+      - 'Properties/**'
+      - 'Launcher.csproj'
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build win-x64
+        run: dotnet build Launcher.sln --configuration Release --runtime win-x64
+      - name: Build win-x86
+        run: dotnet build Launcher.sln --configuration Release --runtime win-x86

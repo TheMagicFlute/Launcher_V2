@@ -2,14 +2,11 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
-      - dev
       - patch
-  pull_request:
-    branches:
-      - main
-      - dev
-      - patch
+    paths:
+      - 'docs/**'
+      - '.github/workflows/build-docs.yml'
+      - 'mkdocs.yml'
     
 jobs:
   deploy:
