@@ -8,6 +8,7 @@ on:
       - 'KartriderLibrary/**'
       - 'Properties/**'
       - 'Launcher.csproj'
+      - '.github/workflows/check.yml'
   pull_request:
     branches-ignore:
       - gh-pages
@@ -16,6 +17,9 @@ on:
       - 'KartriderLibrary/**'
       - 'Properties/**'
       - 'Launcher.csproj'
+      - '.github/workflows/check.yml'
+  workflow_dispatch:
+
 jobs:
   check:
     runs-on: ubuntu-latest
