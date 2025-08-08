@@ -5,36 +5,36 @@ namespace Set_Data
 {
 	public static class SetGameOption
 	{
-		public static ushort Version;
-		public static float Set_BGM = 1f;
-		public static float Set_Sound = 1f;
-		public static byte Main_BGM = 0;
-		public static byte Sound_effect = 1;
-		public static byte Full_screen = 1;
-		public static byte Unk1 = 1;
-		public static byte Unk2 = 1;
-		public static byte Unk3 = 1;
-		public static byte Unk4 = 1;
-		public static byte Unk5 = 0;
-		public static byte Unk6 = 0;
-		public static byte Unk7 = 0;
-		public static byte Unk8 = 1;
-		public static byte Unk9 = 1;
-		public static byte Unk10 = 1;
-		public static byte Unk11 = 14; // 录像质量 녹화 품질
-		public static byte BGM_Check = 1;
-		public static byte Sound_Check = 1;
-		public static byte Unk12 = 1;
-		public static byte Unk13 = 1;
-		public static byte GameType = 0;
-		public static byte SetGhost = 1;
-		public static byte SpeedType = 7;
-		public static byte Unk14 = 1;
-		public static byte Unk15 = 1;
-		public static byte Unk16 = 1;
-		public static byte Unk17 = 1;
-		public static byte Set_screen = 0;
-		public static byte Unk18 = 0;
+		public static ushort Version;			// 当前版本 (pXXXX)
+		public static float Set_BGM = 0.5f;		// 背景音乐音量 (0f-1f)
+		public static float Set_Sound = 0.5f;   // 音效音量 (0f-1f)
+        public static byte Main_BGM = 0;		// 背景音乐 (主题默认为0)
+		public static byte Sound_effect = 1;    // 是否开启环境音效 0: off; 1:on
+		public static byte Full_screen = 1;		// 窗口模式 0: 全屏; 1: 窗口; 3: 无边框
+		public static byte Unk1 = 1;			// 驾驶中是否显示后视镜 0: off; 1:on
+		public static byte Unk2 = 1;			// 是否显示轮廓线 0: off; 1:on
+		public static byte Unk3 = 1;			// ?
+		public static byte Unk4 = 1;			// ?
+		public static byte Unk5 = 0;			// 是否显示高级道具效果 0: off; 1:on
+		public static byte Unk6 = 0;			// 是否显示加速模糊效果 0: off; 1:on
+		public static byte Unk7 = 0;			// 是否显示加速屈折效果 0: off; 1:on
+		public static byte Unk8 = 1;			// 是否开启高端配置最佳化 0: off; 1:on
+		public static byte Unk9 = 1;			// 是否开启自动准备 0: off; 1:on
+		public static byte Unk10 = 1;			// 是否提示使用道具/EX 0: off; 1:on
+		public static byte Unk11 = 14; 			// 录像质量 녹화 품질 高: 14; 中: 3; 低: 2
+		public static byte BGM_Check = 1;		// 是否开启背景音乐 0: off; 1:on
+		public static byte Sound_Check = 1;		// 是否开启音效 0: off; 1: on
+		public static byte Unk12 = 1;			// 是否显示被攻击 0: off; 1:on
+		public static byte Unk13 = 1;			// 是否开启自动二段 0: off; 1:on
+		public static byte GameType = 0;		// ?
+		public static byte SetGhost = 1;		// 是否显示影子 0: off; 1:on
+		public static byte SpeedType = 7;		// S1.5: 7; inf: 4;
+		public static byte Unk14 = 1;			// 是否查看房间内聊天内容 0: off; 1:on
+		public static byte Unk15 = 1;			// 是否查看行驶中聊天内容 0: off; 1:on
+		public static byte Unk16 = 1;			// 是否显示全体被攻击 0: off; 1:on
+		public static byte Unk17 = 1;			// 是否显示团队颜色图标 0: off; 1:on
+		public static byte Set_screen = 1;		// 分辨率设置, 0: 1600x900; 1: 1920x1080
+		public static byte Unk18 = 0;			// 是否隐藏等级赛段位
 
 		public static void Save_SetGameOption()
 		{

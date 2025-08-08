@@ -41,7 +41,7 @@ namespace ExcData
 
 		public static void SpeedTypeData()
 		{
-			if (config.SpeedType == 3) // S0 慢速 보통
+			if (Config.SpeedType == 3) // S0 慢速 보통
 			{
 				SpeedType.AddSpec_SteerConstraint = -0.3f;
 				SpeedType.AddSpec_DriftEscapeForce = -350f;
@@ -61,7 +61,7 @@ namespace ExcData
 				SpeedType.StartForwardAccelForceSpeed = -950f;
 				Console.WriteLine("SpeedType:低速 S0");
 			}
-			else if (config.SpeedType == 0) // S1 普通 빠름
+			else if (Config.SpeedType == 0) // S1 普通 빠름
 			{
 				SpeedType.AddSpec_SteerConstraint = 1.7f;
 				SpeedType.AddSpec_DriftEscapeForce = 150f;
@@ -81,7 +81,7 @@ namespace ExcData
 				SpeedType.StartForwardAccelForceSpeed = -360f;
 				Console.WriteLine("SpeedType:普通 S1");
 			}
-			else if (config.SpeedType == 1) // S2 快速 매우빠름
+			else if (Config.SpeedType == 1) // S2 快速 매우빠름
 			{
 				SpeedType.AddSpec_SteerConstraint = 2.2f;
 				SpeedType.AddSpec_DriftEscapeForce = 1100f;
@@ -101,7 +101,7 @@ namespace ExcData
 				SpeedType.StartForwardAccelForceSpeed = 360f;
 				Console.WriteLine("SpeedType:快速 S2");
 			}
-			else if (config.SpeedType == 2) // S3 高速 가장빠름
+			else if (Config.SpeedType == 2) // S3 高速 가장빠름
 			{
 				SpeedType.AddSpec_SteerConstraint = 2.7f;
 				SpeedType.AddSpec_DriftEscapeForce = 1500f;
@@ -121,7 +121,7 @@ namespace ExcData
 				SpeedType.StartForwardAccelForceSpeed = 1350f;
 				Console.WriteLine("SpeedType:高速 S3");
 			}
-			else if (config.SpeedType == 4 || config.SpeedType == 6 || config.SpeedType == 7) // S1.5 统合 무부, 통합
+			else if (Config.SpeedType == 4 || Config.SpeedType == 6 || Config.SpeedType == 7) // S1.5 统合 무부, 통합
 			{
 				SpeedType.AddSpec_SteerConstraint = 1.95f;
 				SpeedType.AddSpec_DriftEscapeForce = 400f;
@@ -141,7 +141,7 @@ namespace ExcData
 				SpeedType.StartForwardAccelForceSpeed = 0f;
 				Console.WriteLine("SpeedType:统合 S1.5");
 			}
-			else if (config.SpeedType == 10) // 初级
+			else if (Config.SpeedType == 10) // 初级
 			{
 				SpeedType.AddSpec_SteerConstraint = 0f;
 				SpeedType.AddSpec_DriftEscapeForce = 0f;
@@ -160,7 +160,7 @@ namespace ExcData
 				SpeedType.StartForwardAccelForceItem = -270f;
 				SpeedType.StartForwardAccelForceSpeed = -270f;
 			}
-			else if (config.SpeedType == 11)// 老S1 L3
+			else if (Config.SpeedType == 11)// 老S1 L3
 			{
 				SpeedType.AddSpec_SteerConstraint = 0f;
 				SpeedType.AddSpec_DriftEscapeForce = 0f;
@@ -179,7 +179,7 @@ namespace ExcData
 				SpeedType.StartForwardAccelForceItem = 450f;
 				SpeedType.StartForwardAccelForceSpeed = 450f;
 			}
-			else if (config.SpeedType == 12) // 老S2 L2
+			else if (Config.SpeedType == 12) // 老S2 L2
 			{
 				SpeedType.AddSpec_SteerConstraint = 0f;
 				SpeedType.AddSpec_DriftEscapeForce = 0f;
@@ -198,7 +198,7 @@ namespace ExcData
 				SpeedType.StartForwardAccelForceItem = 400f;
 				SpeedType.StartForwardAccelForceSpeed = 400f;
 			}
-			else if (config.SpeedType == 13) // 老S3 L1
+			else if (Config.SpeedType == 13) // 老S3 L1
 			{
 				SpeedType.AddSpec_SteerConstraint = 0f;
 				SpeedType.AddSpec_DriftEscapeForce = 0f;
@@ -217,7 +217,7 @@ namespace ExcData
 				SpeedType.StartForwardAccelForceItem = 1350f;
 				SpeedType.StartForwardAccelForceSpeed = 1350f;
 			}
-			else if (config.SpeedType == 14) // Pro
+			else if (Config.SpeedType == 14) // Pro
 			{
 				SpeedType.AddSpec_SteerConstraint = 0f;
 				SpeedType.AddSpec_DriftEscapeForce = 0f;

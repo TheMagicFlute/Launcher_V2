@@ -4,7 +4,7 @@ using KartRider;
 
 namespace Set_Data
 {
-	public static class config
+	public static class Config
 	{
 		public static byte PreventItem_Use = 0;
 		public static byte SpeedPatch_Use = 0;
@@ -16,16 +16,16 @@ namespace Set_Data
 			if (File.Exists(Load_PreventItem))
 			{
 				string textValue = System.IO.File.ReadAllText(Load_PreventItem);
-				config.PreventItem_Use = byte.Parse(textValue);
+				Config.PreventItem_Use = byte.Parse(textValue);
 			}
 			else
 			{
 				using (StreamWriter streamWriter = new StreamWriter(Load_PreventItem, false))
 				{
-					streamWriter.Write(config.PreventItem_Use);
+					streamWriter.Write(Config.PreventItem_Use);
 				}
 			}
-			config.Check_PreventItem();
+			Config.Check_PreventItem();
 		}
 
 		public static void Load_SpeedPatch()
@@ -34,21 +34,21 @@ namespace Set_Data
 			if (File.Exists(Load_SpeedPatch))
 			{
 				string textValue = System.IO.File.ReadAllText(Load_SpeedPatch);
-				config.SpeedPatch_Use = byte.Parse(textValue);
+				Config.SpeedPatch_Use = byte.Parse(textValue);
 			}
 			else
 			{
 				using (StreamWriter streamWriter = new StreamWriter(Load_SpeedPatch, false))
 				{
-					streamWriter.Write(config.SpeedPatch_Use);
+					streamWriter.Write(Config.SpeedPatch_Use);
 				}
 			}
-			config.Check_SpeedPatch();
+			Config.Check_SpeedPatch();
 		}
 
 		public static void Check_PreventItem()
 		{
-			if (config.PreventItem_Use == 0)
+			if (Config.PreventItem_Use == 0)
 			{
 				Program.PreventItem = false;
 			}
@@ -60,7 +60,7 @@ namespace Set_Data
 
 		public static void Check_SpeedPatch()
 		{
-			if (config.SpeedPatch_Use == 0)
+			if (Config.SpeedPatch_Use == 0)
 			{
 				Program.SpeedPatch = false;
 				Program.LauncherDlg.Text = "Launcher";
@@ -74,8 +74,8 @@ namespace Set_Data
 
 		public static void Load_ALL()
 		{
-			config.Load_PreventItem();
-			config.Load_SpeedPatch();
+			Config.Load_PreventItem();
+			Config.Load_SpeedPatch();
 		}
 	}
 }

@@ -36,7 +36,7 @@ namespace Set_Data
 			SetMyRoom.Load_SetMyRoom();
 			SetGameOption.Load_SetGameOption();
 			Set_ETC.Load_ALL();
-			config.Load_ALL();
+			Config.Load_ALL();
 		}
 	}
 }
