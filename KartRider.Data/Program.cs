@@ -53,7 +53,7 @@ namespace KartRider
             }
             string input;
             string output;
-            Console.Write("中国跑跑卡丁车单机服务器已启动");
+            Console.Write("中国跑跑卡丁车单机启动器");
             Console.Write(" | {0} |", Environment.Is64BitProcess ? "x64" : "x86");
 #if DEBUG
             Console.Write(" [DEBUG]");
@@ -72,8 +72,8 @@ namespace KartRider
                 Directory.Delete(Update_Folder, true);
             }
             AllocConsole();
-            Console.OutputEncoding = Encoding.UTF8;
-            Console.InputEncoding = Encoding.UTF8;
+            Console.OutputEncoding = Encoding.Unicode;
+            Console.InputEncoding = Encoding.Unicode;
 
             if (!await Update.UpdateDataAsync()) // check for update
             {
