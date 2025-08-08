@@ -1,25 +1,27 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
-using Set_Data;
 using System.Xml;
-using ExcData;
-using Launcher.Properties;
-using KartRider.Common.Data;
 using System.Xml.Linq;
-using RHOParser;
-using KartRider;
-using KartRider.IO.Packet;
-using KartRider.Common.Utilities;
+using ExcData;
 using KartLibrary.File;
+using KartRider;
+using KartRider.Common.Data;
+using KartRider.Common.Utilities;
+using KartRider.IO.Packet;
+using Launcher.Properties;
+using RHOParser;
+using Set_Data;
 using static KartRider.Common.Data.PINFile;
-using System.Collections;
-using System.Reflection;
-using System.Drawing;
 using static KartRider.Update;
+using static KartRider.Program;
 
 namespace KartRider
 {
@@ -125,7 +127,7 @@ namespace KartRider
             // 
             // Speed_comboBox
             // 
-            Speed_comboBox.ForeColor = System.Drawing.Color.Red;
+            Speed_comboBox.ForeColor = Color.Red;
             Speed_comboBox.FormattingEnabled = true;
             Speed_comboBox.Sorted = false;
             Speed_comboBox.Location = new System.Drawing.Point(54, 78);
@@ -223,8 +225,11 @@ namespace KartRider
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "Launcher";
+            StartPosition = FormStartPosition.Manual;
+            Rectangle screen = Screen.PrimaryScreen.WorkingArea;
+            Location = new Point(screen.Width - Width, screen.Height - Height);
+            TopMost = true;
             Text = "Launcher";
-            StartPosition = FormStartPosition.CenterScreen;
             FormClosing += OnFormClosing;
             Load += OnLoad;
             ResumeLayout(false);
@@ -252,10 +257,7 @@ namespace KartRider
 
         private void OnLoad(object sender, EventArgs e)
         {
-            Console.WriteLine("读取配置文件");
             Load_KartExcData();
-            Console.WriteLine("读取完成");
-
             StartingLoad_ALL.StartingLoad();
             PINFile val = new PINFile(this.kartRiderDirectory + "KartRider.pin");
             SetGameOption.Version = val.Header.MinorVersion;
@@ -268,9 +270,8 @@ namespace KartRider
             }
 
             ClientVersion.Text = $"P{SetGameOption.Version.ToString()}";
-            DateTime compilationDate = File.GetLastWriteTime(executablePath);
-            string formattedDate = compilationDate.ToString("yyMMdd");
-            VersionLabel.Text = formattedDate;
+            VersionLabel.Text = currentVersion;
+
             Console.WriteLine("Process: {0}", this.kartRiderDirectory + Launcher.KartRider);
             RouterListener.Start();
         }
@@ -297,10 +298,10 @@ namespace KartRider
                     PINFile val = new PINFile(this.kartRiderDirectory + "KartRider.pin");
                     foreach (AuthMethod authMethod in val.AuthMethods)
                     {
-                        Console.WriteLine("Changing IP Addr to local... {0}", authMethod.Name);
+                        Console.WriteLine("Changing IP Address to local... {0}", authMethod.Name);
                         foreach (IPEndPoint loginServer in authMethod.LoginServers)
                         {
-                            Console.WriteLine("Old IP Addr: {0}", loginServer.ToString());
+                            Console.WriteLine("Old IP Address: {0}", loginServer.ToString());
                         }
                         authMethod.LoginServers.Clear();
                         authMethod.LoginServers.Add(new IPEndPoint
@@ -326,7 +327,6 @@ namespace KartRider
                         }
                     }
                     File.WriteAllBytes(this.kartRiderDirectory + "KartRider.pin", val.GetEncryptedData());
-                    Start_Button.Enabled = true;
                     Launcher.GetKart = false;
                     // origin passport:aHR0cHM6Ly9naXRodWIuY29tL3lhbnlnbS9MYXVuY2hlcl9WMi9yZWxlYXNlcw==
                     ProcessStartInfo startInfo = new ProcessStartInfo(Launcher.KartRider, "TGC -region:3 -passport:OFFLINE")
@@ -339,13 +339,13 @@ namespace KartRider
                     {
                         Process.Start(startInfo);
                         Thread.Sleep(1000);
-                        //Start_Button.Enabled = true;
                         Launcher.GetKart = true;
                     }
                     catch (System.ComponentModel.Win32Exception ex)
                     {
                         // 用户取消了UAC提示或没有权限
-                        Console.WriteLine(ex.Message);
+                        // Console.WriteLine(ex.Message);
+                        Console.WriteLine("用户积极取消操作, 或者没有Administer权限.");
                     }
                 })).Start();
             }
@@ -355,15 +355,14 @@ namespace KartRider
         {
             if (Launcher.GetKart)
             {
-                //GetKart_Button.Enabled = false;
                 Program.GetKartDlg = new GetKart();
                 Program.GetKartDlg.ShowDialog();
-                //GetKart_Button.Enabled = true;
             }
         }
 
         public void Load_KartExcData()
         {
+            Console.WriteLine("正在读取配置文件");
             if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"Profile\ModelMax.xml"))
             {
                 string ModelMax = Resources.ModelMax;
@@ -381,6 +380,7 @@ namespace KartRider
             KartExcData.PartsList = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\PartsData.xml", LoadPartsData);
             KartExcData.Parts12List = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\Parts12Data.xml", LoadParts12Data);
             KartExcData.Level12List = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\Level12Data.xml", LoadLevel12Data);
+            Console.WriteLine("读取完成");
         }
 
         private void EnsureDefaultDataFileExists(string filePath, Action createDefaultData)
@@ -625,7 +625,7 @@ namespace KartRider
                 string selectedSpeed = Speed_comboBox.SelectedItem.ToString();
                 if (SpeedType.speedNames.ContainsKey(selectedSpeed))
                 {
-                    config.SpeedType = SpeedType.speedNames[selectedSpeed];
+                    Config.SpeedType = SpeedType.speedNames[selectedSpeed];
                     Console.WriteLine($"速度更改为: {selectedSpeed}");
                 }
                 else
@@ -644,7 +644,7 @@ namespace KartRider
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"错误: {ex.Message}");
+                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
             }
         }
 
@@ -657,7 +657,7 @@ namespace KartRider
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"错误: {ex.Message}");
+                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
             }
         }
 
@@ -670,7 +670,7 @@ namespace KartRider
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"错误: {ex.Message}");
+                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
             }
         }
 
@@ -683,7 +683,7 @@ namespace KartRider
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"错误: {ex.Message}");
+                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
             }
         }
 

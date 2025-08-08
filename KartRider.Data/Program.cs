@@ -27,8 +27,14 @@ namespace KartRider
 
         [DllImport("user32.dll")]
         public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-        const int SW_HIDE = 0;
-        const int SW_SHOW = 5;
+
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetConsoleWindow();
+
+        public const int SW_HIDE = 0;
+        public const int SW_SHOW = 5;
+        
+        public static int consoleStatus = SW_SHOW;
         public static Launcher LauncherDlg;
         public static GetKart GetKartDlg;
         public static bool SpeedPatch;
@@ -48,7 +54,7 @@ namespace KartRider
             string input;
             string output;
             Console.Write("中国跑跑卡丁车单机服务器已启动");
-            Console.Write("| {0} |", Environment.Is64BitProcess ? "x64" : "x86");
+            Console.Write(" | {0} |", Environment.Is64BitProcess ? "x64" : "x86");
 #if DEBUG
             Console.Write(" [DEBUG]");
 #endif
@@ -68,6 +74,7 @@ namespace KartRider
             AllocConsole();
             Console.OutputEncoding = Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
+
             if (!await Update.UpdateDataAsync()) // check for update
             {
                 // current version is up to date
@@ -132,7 +139,7 @@ namespace KartRider
                         string textValue = System.IO.File.ReadAllText(Load_Console);
                         if (textValue == "0")
                         {
-                            ShowWindow(consoleHandle, SW_SHOW);
+                            ShowWindow(consoleHandle, SW_HIDE);
                         }
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);
@@ -485,7 +492,24 @@ namespace KartRider
 
         private static void AAAC(string input, string[] files)
         {
-            string[] whitelist = { "_I04_sn", "_I05_sn", "_R01_sn", "_R02_sn", "_I02_sn", "_I01_sn", "_I03_sn", "_L01_", "_L02_", "_L03_03_", "_L03_", "_L04_", "bazzi_", "arthur_", "bero_", "brodi_", "camilla_", "chris_", "contender_", "crowdr_", "CSO_", "dao_", "dizni_", "erini_", "ethi_", "Guazi_", "halloween_", "homrunDao_", "innerWearSonogong_", "innerWearWonwon_", "Jianbing_", "kephi_", "kero_", "kwanwoo_", "Lingling_", "lodumani_", "mabi_", "Mahua_", "marid_", "mobi_", "mos_", "narin_", "neoul_", "neo_", "nymph_", "olympos_", "panda_", "referee_", "ren_", "Reto_", "run_", "zombie_", "santa_", "sophi_", "taki_", "tiera_", "tutu_", "twoTop_", "twotop_", "uni_", "wonwon_", "zhindaru_", "zombie_", "flyingBook_", "flyingMechanic_", "flyingRedlight_", "crow_", "dragonBoat_", "GiLin_", "maple_", "beach_", "village_", "china_", "factory_", "ice_", "mine_", "nemo_", "world_", "forest_", "_I", "_R", "_S", "_F", "_P", "_K", "_D", "_jp" };
+            string[] whitelist =
+            {
+                "_I04_sn", "_I05_sn",
+                "_R01_sn", "_R02_sn",
+                "_I02_sn", "_I01_sn", "_I03_sn",
+                "_L01_", "_L02_", "_L03_03_", "_L03_", "_L04_",
+                "bazzi_", "arthur_", "bero_", "brodi_", "camilla_", "chris_", "contender_", "crowdr_",
+                "CSO_", "dao_", "dizni_", "erini_", "ethi_", "Guazi_", "halloween_", "homrunDao_",
+                "innerWearSonogong_", "innerWearWonwon_",
+                "Jianbing_", "kephi_", "kero_", "kwanwoo_", "Lingling_", "lodumani_", "mabi_", "Mahua_",
+                "marid_", "mobi_", "mos_", "narin_", "neoul_", "neo_", "nymph_", "olympos_", "panda_",
+                "referee_", "ren_", "Reto_", "run_", "zombie_", "santa_", "sophi_", "taki_", "tiera_",
+                "tutu_", "twoTop_", "twotop_", "uni_", "wonwon_", "zhindaru_", "zombie_",
+                "flyingBook_", "flyingMechanic_", "flyingRedlight_",
+                "crow_", "dragonBoat_", "GiLin_",
+                "maple_", "beach_", "village_", "china_", "factory_", "ice_", "mine_", "nemo_", "world_", "forest_",
+                "_I", "_R", "_S", "_F", "_P", "_K", "_D", "_jp"
+            };
             string[] blacklist = { "character_" };
             string Whitelist = AppDomain.CurrentDomain.BaseDirectory + "Profile\\Whitelist.ini";
             string Blacklist = AppDomain.CurrentDomain.BaseDirectory + "Profile\\Blacklist.ini";
