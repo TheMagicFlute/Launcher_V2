@@ -1,4 +1,4 @@
-# 跑跑卡丁车启动器
+# 跑跑卡丁车单机启动器
 
 [![Watch on Github](https://img.shields.io/github/watchers/yanygm/Launcher_V2.svg?style=social)](https://github.com/yanygm/Launcher_V2/watchers)
 [![Star on Github](https://img.shields.io/github/stars/yanygm/Launcher_V2.svg?style=social)](https://github.com/yanygm/Launcher_V2/stargazers)
@@ -19,9 +19,13 @@
 
 上面 badge 数据均源自 [yanygm/Launcher_V2](https://github.com/yanygm/Launcher_V2)
 
+## 最新功能
+
+支持了道具频道！可在多人对战->道具频道中创建房间，并与 AI 对战。
+
 ## 简介
 
-这是一个基于 C# 的中国跑跑卡丁车游戏启动器，修改自 [LAON](https://github.com/MyPuppy) 制作的国服启动器，并 fork 自 [Yany](https://github.com/yanygm) 大佬，修改并添加了新功能。
+这是一个基于 [.NET 8.0](https://dotnet.microsoft.com/download/dotnet/8.0) 的中国跑跑卡丁车单机启动器，修改自 [LAON](https://github.com/MyPuppy) 制作的国服启动器，并 fork 自 [Yany](https://github.com/yanygm) 大佬，修改并添加了新功能。
 
 本单机没有病毒，请放心使用。
 
