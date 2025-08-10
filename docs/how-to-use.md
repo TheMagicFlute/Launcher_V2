@@ -11,11 +11,11 @@
 
 运行前，请确保
 
-- 已经安装了[.NET 8.0](https://dotnet.microsoft.com/download/dotnet/8.0 ".Net 8.0 Runtime")
+- 已经安装了[.NET 8.0 运行时](https://dotnet.microsoft.com/download/dotnet/8.0 ".Net 8.0 Runtime")
 - 通过 TCGAME 安装了[中国跑跑卡丁车 游戏文件](https://popkart.tiancity.com/homepage/v3/ "KartRider CN") 或 安装了指定版本
 
 1. 选择 `速度模式`，可选择你想要的速度频道，默认为S1.5，现已支持复古速度频道；
 2. 点击 `添加道具`，即可添加想要的车辆，人物等；
 3. 点击 `启动游戏`，并确认UAC提示，即可开始游戏。
 
-有疑问，请至[常见问题及解答](./RuntimeFAQ.md "FAQ")。
+有疑问，请至[常见问题及解答](./FAQ.md "FAQ")。
