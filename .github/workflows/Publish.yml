@@ -48,6 +48,9 @@ jobs:
     - name: Publish x86
       run: dotnet publish Launcher.csproj --runtime win-x86 -p:PublishSingleFile=true -p:AssemblyName=Launcher_x86 -o PublishedWinExe -c Release --no-self-contained
 
+    - name: Publish arm64
+      run: dotnet publish Launcher.csproj --runtime win-arm64 -p:PublishSingleFile=true -p:AssemblyName=Launcher_arm64 -o PublishedWinExe -c Release --no-self-contained
+
     - name: Archive build artifacts
       uses: actions/upload-artifact@v4
       with:

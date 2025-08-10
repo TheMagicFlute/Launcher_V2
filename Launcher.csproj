@@ -13,14 +13,15 @@
     <PublishSingleFile>true</PublishSingleFile>
     <PublishReadyToRun>true</PublishReadyToRun>
 
-    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
 
     <RootNamespace>Launcher</RootNamespace>
     <ApplicationIcon>Properties\favicon.ico</ApplicationIcon>
 
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <NuGetAudit>False</NuGetAudit>
 
     <!-- Versioning & Assembly Information -->
     <AssemblyName>Launcher</AssemblyName>
@@ -32,7 +33,7 @@
     <InformationalVersion>$(Version)</InformationalVersion>
     <Authors>Yanygm, LAON, TheMagicFlute</Authors>
     <Copyright>$(Authors)</Copyright>
-    <RepositoryUrl>https://github.com/yanygm/Launcher_V2</RepositoryUrl>
+    <RepositoryUrl>https://github.com/TheMagicFlute/Launcher_V2</RepositoryUrl>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage>zh-CN</NeutralLanguage>
@@ -40,7 +41,7 @@
     <PackageIcon>favicon.ico</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-    <Platforms>AnyCPU;x64;x86</Platforms>
+    <Platforms>AnyCPU;x64;x86;arm64</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>0</WarningLevel>
@@ -57,6 +58,12 @@
     <PublishDir>.\</PublishDir>
     <DebugType>none</DebugType>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">
+    <WarningLevel>0</WarningLevel>
+    <PublishDir>.\</PublishDir>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+	
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <WarningLevel>0</WarningLevel>
     <PublishDir>.\</PublishDir>
@@ -68,6 +75,11 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <WarningLevel>0</WarningLevel>
+    <PublishDir>.\</PublishDir>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
     <WarningLevel>0</WarningLevel>
     <PublishDir>.\</PublishDir>
     <DebugType>none</DebugType>
