@@ -41,6 +41,9 @@ namespace KartRider
         public static bool PreventItem;
         public static string RootDirectory;
         public static CountryCode CC = CountryCode.CN;
+        
+        // 当前系统架构 小写字符串 目前仅有 x64 x86 arm64
+        public static string architecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
 
         [STAThread]
         private static async Task Main(string[] args)
@@ -57,7 +60,7 @@ namespace KartRider
             string input;
             string output;
             Console.Write("中国跑跑卡丁车单机启动器");
-            Console.Write(" | {0} |", Environment.Is64BitProcess ? "x64" : "x86");
+            Console.Write($" | {architecture} |");
 #if DEBUG
             Console.Write(" [DEBUG]");
 #endif
