@@ -1,4 +1,3 @@
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,21 +6,26 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Security.Cryptography;
+using Newtonsoft.Json.Linq;
 
 namespace KartRider
 {
     internal static class Update
     {
-        public static string currentVersion = GetCurrentVersion();
-
         public const string owner = "TheMagicFlute";    // GitHub Repo Owner
         public const string repo = "Launcher_V2";       // GitHub Repo Name
         public static string simpleName = "Launcher" + (Environment.Is64BitProcess ? "" : "_x86");
         public static string fileName = simpleName + ".zip";
+        public static string currentVersion = GetCurrentVersion();
+
+        private static string update_url = "";
+        private static string tag_name = "";
+        private static string update_info = "";
 
         public static async Task<bool> UpdateDataAsync()
         {
@@ -32,8 +36,9 @@ namespace KartRider
             Console.WriteLine("当前Commit日期: {0}", ThisAssembly.Git.CommitDate);
             Console.WriteLine($"当前版本为: {currentVersion}");
 
-            string tag_name = await GetTag_name();
-            string update_info = await GetUpdate_Info();
+            tag_name = await GetTag_name();
+            update_info = await GetUpdate_Info();
+
             if (tag_name != "" && int.Parse(currentVersion) < int.Parse(tag_name))
             {
                 // ask user whether to update
@@ -58,50 +63,51 @@ namespace KartRider
                 }
                 // 尝试下载最新的版本
                 Console.WriteLine($"正在下载 {tag_name}...");
-                try
-                {
-                    string country = await GetCountryAsync();
-                    string url = $"https://github.com/{owner}/{repo}/releases/download/{tag_name}/{fileName}";
-                    if (country != "" && country == "CN")
-                    {
-                        // 中国大陆需要使用代理下载，处理 url
-                        List<string> urls = new List<string>() { "https://ghproxy.net/", "https://gh-proxy.com/", "https://hub.myany.uk/", "http://kra.myany.uk:2233/", "http://krb.myany.uk:2233/" };
-                        Console.WriteLine("Using proxy.");
-                        foreach (string url_ in urls)
-                        {
-                            if (url_ == "https://ghproxy.net/" || url_ == "https://hub.myany.uk/")
-                            {
-                                url = url_ + url;
-                            }
-                            else
-                            {
-                                url = url_ + url.Replace("https://", "");
-                            }
-                            if (await GetUrl(url))
-                            {
-                                return await DownloadUpdate(url);
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        return await DownloadUpdate(url);
-                    }
-                    return false;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"下载过程中出现错误: {ex.Message}");
-                    Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
-                    return false;
-                }
+                update_url = await ProcessUrl();
+                return await DownloadUpdate(update_url);
             }
             else
             {
                 Console.WriteLine("当前已是最新版本。");
                 return false;
             }
+        }
+
+        public static async Task<string> ProcessUrl()
+        {
+            try
+            {
+                string country = await GetCountryAsync();
+                string url = $"https://github.com/{owner}/{repo}/releases/download/{tag_name}/{fileName}";
+                // 中国大陆需要使用代理下载，处理 url
+                if (country != "" && country == "CN")
+                {
+                    List<string> urls = new List<string>() { "https://ghproxy.net/", "https://gh-proxy.com/", "https://hub.myany.uk/", "http://kra.myany.uk:2233/", "http://krb.myany.uk:2233/" };
+                    Console.WriteLine("Using proxy.");
+                    foreach (string url_ in urls)
+                    {
+                        if (url_ == "https://ghproxy.net/" || url_ == "https://hub.myany.uk/")
+                        {
+                            url = url_ + url;
+                        }
+                        else
+                        {
+                            url = url_ + url.Replace("https://", "");
+                        }
+                        if (await GetUrl(url))
+                        {
+                            break;
+                        }
+                    }
+                }
+                // 代理网址处理完成/无需处理，返回。
+                return url;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"获取下载地址时出现错误: {ex.Message}");
+            }
+            return "";
         }
 
         public static string GetCompileDate()
@@ -355,6 +361,7 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + ".exe" +
             catch (Exception ex)
             {
                 Console.WriteLine($"请求 URL 时发生异常: {ex.Message}");
+                Console.WriteLine($"请检查你的网络是否连接正常。如连接正常，请在 https://github.com/{owner}/{repo}/issues 提问。");
                 return false;
             }
         }

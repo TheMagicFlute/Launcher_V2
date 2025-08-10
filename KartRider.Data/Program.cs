@@ -45,6 +45,9 @@ namespace KartRider
         [STAThread]
         private static async Task Main(string[] args)
         {
+#if DEBUG
+            AllocConsole(); // Allocate a console for debugging purposes
+#endif
             // Prevent multiple instances exist
             if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
             {
@@ -71,7 +74,7 @@ namespace KartRider
             {
                 Directory.Delete(Update_Folder, true);
             }
-            AllocConsole();
+
             Console.OutputEncoding = Encoding.Unicode;
             Console.InputEncoding = Encoding.Unicode;
 

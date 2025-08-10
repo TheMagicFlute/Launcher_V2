@@ -25,6 +25,7 @@
 
     <!-- Versioning & Assembly Information -->
     <AssemblyName>Launcher</AssemblyName>
+	  <AssemblyTitle>Launcher</AssemblyTitle>
     <Description>CN Kart Offline Launcher</Description>
     <GitVersion>false</GitVersion>
     <Version>1.0.0</Version>
