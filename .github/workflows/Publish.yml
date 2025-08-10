@@ -43,7 +43,7 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Publish x64
-      run: dotnet publish Launcher.csproj --runtime win-x64 -p:PublishSingleFile=true -p:AssemblyName=Launcher -o PublishedWinExe -c Release --no-self-contained
+      run: dotnet publish Launcher.csproj --runtime win-x64 -p:PublishSingleFile=true -p:AssemblyName=Launcher_x64 -o PublishedWinExe -c Release --no-self-contained
 
     - name: Publish x86
       run: dotnet publish Launcher.csproj --runtime win-x86 -p:PublishSingleFile=true -p:AssemblyName=Launcher_x86 -o PublishedWinExe -c Release --no-self-contained
@@ -70,13 +70,19 @@ jobs:
       - name: Zip x64
         run: |
           cd PublishedWinExe
-          zip -j ../Launcher.zip Launcher.exe
+          zip -j ../Launcher_x64.zip Launcher_x64.exe
         shell: bash
 
       - name: Zip x86
         run: |
           cd PublishedWinExe
           zip -j ../Launcher_x86.zip Launcher_x86.exe
+        shell: bash
+      
+      - name: Zip arm64
+        run: |
+          cd PublishedWinExe
+          zip -j ../Launcher_arm64.zip Launcher_arm64.exe
         shell: bash
 
       - name: Create Release
@@ -85,8 +91,9 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            Launcher.zip
+            Launcher_x64.zip
             Launcher_x86.zip
+            Launcher_arm64.zip
           name: ${{ needs.tag.outputs.tag_name }}
           tag_name: ${{ needs.tag.outputs.tag_name }}
           generate_release_notes: true
