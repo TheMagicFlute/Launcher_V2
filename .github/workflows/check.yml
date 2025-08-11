@@ -30,6 +30,8 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Build win-x64
-        run: dotnet build Launcher.csproj --configuration Release --runtime win-x64
+        run: dotnet build Launcher.csproj --configuration Debug --runtime win-x64
       - name: Build win-x86
-        run: dotnet build Launcher.csproj --configuration Release --runtime win-x86
+        run: dotnet build Launcher.csproj --configuration Debug --runtime win-x86
+      - name: Build win-arm64
+        run: dotnet build Launcher.csproj --configuration Debug --runtime win-arm64
