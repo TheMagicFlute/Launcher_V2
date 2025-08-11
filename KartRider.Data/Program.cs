@@ -51,12 +51,6 @@ namespace KartRider
 #if DEBUG
             AllocConsole(); // Allocate a console for debugging purposes
 #endif
-            // Prevent multiple instances exist
-            if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
-            {
-                MessageBox.Show("已经有一个启动器在运行了。\n不可以同时运行多个启动器，因为通常每个套接字地址只允许使用一次", "警告", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
             string input;
             string output;
             Console.Write("中国跑跑卡丁车单机启动器");
