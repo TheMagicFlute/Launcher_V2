@@ -312,7 +312,7 @@ namespace KartRider
                     }
                     File.Copy(this.kartRiderDirectory + "KartRider.pin", this.kartRiderDirectory + "KartRider-bak.pin");
                     PINFile val = new PINFile(this.kartRiderDirectory + "KartRider.pin");
-                    foreach (AuthMethod authMethod in val.AuthMethods)
+                    foreach (PINFile.AuthMethod authMethod in val.AuthMethods)
                     {
                         Console.WriteLine("Changing IP Address to local... {0}", authMethod.Name);
                         foreach (IPEndPoint loginServer in authMethod.LoginServers)
@@ -320,7 +320,7 @@ namespace KartRider
                             Console.WriteLine("Old IP Address: {0}", loginServer.ToString());
                         }
                         authMethod.LoginServers.Clear();
-                        authMethod.LoginServers.Add(new IPEndPoint
+                        authMethod.LoginServers.Add(new PINFile.IPEndPoint
                         {
                             IP = "127.0.0.1",
                             Port = 39312
