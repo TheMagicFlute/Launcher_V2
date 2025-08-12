@@ -18,23 +18,23 @@ namespace KartLibrary.IO
 
         public byte ReadByte()
         {
-            if (_pos+1 > _baseData.Length)
+            if (_pos + 1 > _baseData.Length)
                 throw new IndexOutOfRangeException();
             return _baseData[_pos++];
         }
 
         public sbyte ReadSByte()
         {
-            if (_pos+1 >= _baseData.Length)
+            if (_pos + 1 >= _baseData.Length)
                 throw new IndexOutOfRangeException();
             return (sbyte)_baseData[_pos++];
         }
 
         public short ReadInt16()
         {
-            if (_pos+2 >= _baseData.Length)
+            if (_pos + 2 >= _baseData.Length)
                 throw new IndexOutOfRangeException();
-            fixed(byte *ptr = &(_baseData[_pos]))
+            fixed (byte* ptr = &(_baseData[_pos]))
             {
                 _pos += 2;
                 return *((short*)ptr);

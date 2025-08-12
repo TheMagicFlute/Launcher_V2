@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using KartLibrary.Xml;
-using System.IO;
-using System.ComponentModel;
-using KartLibrary.Data;
 using KartLibrary.Consts;
+using KartLibrary.Data;
+using KartLibrary.Xml;
 
 namespace KartLibrary.File
 {
@@ -25,7 +25,7 @@ namespace KartLibrary.File
             public PackFolderInfo Parent;
         }
 
-        public PackFolderManager() {}
+        public PackFolderManager() { }
 
         //private List<PackFolderInfo> RootFolder { get; init; } = new List<PackFolderInfo>();
 

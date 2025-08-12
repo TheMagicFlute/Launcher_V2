@@ -1,9 +1,3 @@
-using ExcData;
-using KartLibrary.IO;
-using KartRider.Common.Utilities;
-using KartRider.IO.Packet;
-using KartRider_PacketName;
-using Set_Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +10,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
+using ExcData;
+using KartLibrary.IO;
+using KartRider.Common.Utilities;
+using KartRider.IO.Packet;
+using KartRider_PacketName;
+using Set_Data;
 
 namespace KartRider
 {
@@ -33,7 +33,7 @@ namespace KartRider
         public static string AiXmlFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\AI.xml";
         public static Dictionary<int, uint> AiTimeData = new Dictionary<int, uint>();
         public static Dictionary<int, uint> TimeData = new Dictionary<int, uint>();
-        
+
         private const uint itemIncreaseValue = 10000;
 
         /// <summary>
@@ -431,7 +431,7 @@ namespace KartRider
                     }
                     using (OutPacket oPacket = new OutPacket("GameControlPacket"))
                     {
-                        EndTicks = GetUpTime() + 15000;;
+                        EndTicks = GetUpTime() + 15000;
                         oPacket.WriteInt(3);
                         oPacket.WriteByte(0);
                         oPacket.WriteLong(GetUpTime() + 10000);

@@ -1,12 +1,12 @@
 ﻿using System;
-using KartRider.IO.Packet;
-using System.Threading;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using ExcData;
-using System.Linq;
-using System.Collections.Generic;
+using KartRider.IO.Packet;
 
 namespace KartRider
 {

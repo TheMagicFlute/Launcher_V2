@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using KartLibrary.Text;
-using KartLibrary.IO;
-using System.Xml;
 using System.Dynamic;
+using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
+using System.Text;
 using System.Text.Json.Nodes;
+using System.Threading.Tasks;
+using System.Xml;
+using KartLibrary.IO;
+using KartLibrary.Text;
 
 namespace KartLibrary.Xml
 {
-    public class BinaryXmlTag: DynamicObject
+    public class BinaryXmlTag : DynamicObject
     {
         #region Members
         private string _name;
@@ -26,7 +26,7 @@ namespace KartLibrary.Xml
         #region Properties
         public string Name
         {
-            get => _name; 
+            get => _name;
             set => _name = value;
         }
 
@@ -36,12 +36,12 @@ namespace KartLibrary.Xml
             set => _text = value;
         }
 
-        public IReadOnlyDictionary<string,string> Attributes => _attributes;
+        public IReadOnlyDictionary<string, string> Attributes => _attributes;
 
         public IList<BinaryXmlTag> Children => _children;
 
         public IEnumerable<BinaryXmlTag> this[string t] => _children.Where(x => x.Name == t);
-        
+
         #endregion
 
         #region Constructor
@@ -53,18 +53,18 @@ namespace KartLibrary.Xml
             _text = "";
         }
 
-        public BinaryXmlTag(string name): this()
+        public BinaryXmlTag(string name) : this()
         {
             _name = name;
         }
 
-        public BinaryXmlTag(string name, string text): this()
+        public BinaryXmlTag(string name, string text) : this()
         {
             _name = name;
             _text = text;
         }
 
-        public BinaryXmlTag(string name, params BinaryXmlTag[] children): this()
+        public BinaryXmlTag(string name, params BinaryXmlTag[] children) : this()
         {
             _name = name;
             _children.AddRange(children);
@@ -78,7 +78,7 @@ namespace KartLibrary.Xml
             return new BinaryXmlAttributeValue(Attributes[Attribute]);
         }
 
-        public void SetAttribute(string name,string value)
+        public void SetAttribute(string name, string value)
         {
             if (!Attributes.ContainsKey(name))
                 _attributes.Add(name, value);
@@ -117,7 +117,7 @@ namespace KartLibrary.Xml
             return tf.StartFormat();
         }
 
-        public void ToString(ref TextFormater formater,int nowLevel)
+        public void ToString(ref TextFormater formater, int nowLevel)
         {
             bool HaveText = Text != null && Text != "";
             bool HaveAttributes = Attributes.Count > 0;
@@ -127,7 +127,7 @@ namespace KartLibrary.Xml
             string End = "";
             string addition = "";
             bool OneLine = true;
-            if((HaveText || HaveSubTag))
+            if ((HaveText || HaveSubTag))
             {
                 End = $"</{Name}>";
                 OneLine = !HaveSubTag;
@@ -138,19 +138,19 @@ namespace KartLibrary.Xml
                 OneLine = true;
                 addition = "/";
             }
-            if(HaveAttributes)
+            if (HaveAttributes)
             {
                 List<string> attFormat = new List<string>();
-                foreach(KeyValuePair<string,string> KeyPair in Attributes)
+                foreach (KeyValuePair<string, string> KeyPair in Attributes)
                 {
                     attFormat.Add($"{KeyPair.Key}=\"{KeyPair.Value}\"");
                 }
-                Att =$" {String.Join(" ",attFormat)}";
+                Att = $" {String.Join(" ", attFormat)}";
             }
             Start = $"<{Name}{Att}{addition}>";
             if (OneLine)
             {
-                formater.AddString(nowLevel, TextAlign.Top,$"{Start}{Text??""}{End}");
+                formater.AddString(nowLevel, TextAlign.Top, $"{Start}{Text ?? ""}{End}");
             }
             else
             {
@@ -168,10 +168,10 @@ namespace KartLibrary.Xml
         {
 
             string attributeName = binder.Name;
-            if(!_attributes.ContainsKey(attributeName))
-            { 
+            if (!_attributes.ContainsKey(attributeName))
+            {
                 result = null;
-                return false; 
+                return false;
             }
             else
             {
@@ -229,17 +229,17 @@ namespace KartLibrary.Xml
 
         public static implicit operator sbyte(BinaryXmlAttributeValue value)
         {
-            return sbyte.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return sbyte.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator short(BinaryXmlAttributeValue value)
         {
-            return short.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return short.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator int(BinaryXmlAttributeValue value)
         {
-            return int.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return int.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator long(BinaryXmlAttributeValue value)
@@ -249,52 +249,52 @@ namespace KartLibrary.Xml
 
         public static implicit operator Int128(BinaryXmlAttributeValue value)
         {
-            return Int128.Parse(value._value,  System.Globalization.NumberStyles.Number);
+            return Int128.Parse(value._value, System.Globalization.NumberStyles.Number);
         }
 
         public static implicit operator byte(BinaryXmlAttributeValue value)
         {
-            return byte.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return byte.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator ushort(BinaryXmlAttributeValue value)
         {
-            return ushort.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return ushort.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator uint(BinaryXmlAttributeValue value)
         {
-            return uint.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return uint.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator ulong(BinaryXmlAttributeValue value)
         {
-            return ulong.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return ulong.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator UInt128(BinaryXmlAttributeValue value)
         {
-            return UInt128.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return UInt128.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator BigInteger(BinaryXmlAttributeValue value)
         {
-            return BigInteger.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return BigInteger.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator float(BinaryXmlAttributeValue value)
         {
-            return float.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return float.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator double(BinaryXmlAttributeValue value)
         {
-            return double.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return double.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator decimal(BinaryXmlAttributeValue value)
         {
-            return decimal.Parse(value._value,  System.Globalization.NumberStyles.Any);
+            return decimal.Parse(value._value, System.Globalization.NumberStyles.Any);
         }
 
         public static implicit operator bool(BinaryXmlAttributeValue value)

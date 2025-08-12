@@ -15,7 +15,7 @@ namespace KartLibrary.IO
                 throw new Exception("buffer is small.");
             uint a = adler & 0xFFFFu;
             uint b = (adler >> 16) & 0xFFFFu;
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 a = (a + buffer[offset + i]) % AdlerModulo;
                 b = (b + a) % AdlerModulo;

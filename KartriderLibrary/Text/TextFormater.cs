@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace KartLibrary.Text
 {
@@ -13,11 +13,11 @@ namespace KartLibrary.Text
 
         private List<TextFormat> TextFormats = new List<TextFormat>();
 
-        
-        public void AddString(int Level, TextAlign align,string Text)
+
+        public void AddString(int Level, TextAlign align, string Text)
         {
             string[] Lines = Regex.Split(Text, "\\r\\n");
-            foreach(string Line in Lines)
+            foreach (string Line in Lines)
             {
                 TextFormats.Add(new TextFormat()
                 {
@@ -32,12 +32,12 @@ namespace KartLibrary.Text
         {
             List<string> TopLine = new List<string>();
             List<string> BottomLine = new List<string>();
-            foreach(TextFormat tf in TextFormats)
+            foreach (TextFormat tf in TextFormats)
             {
                 switch (tf.Align)
                 {
                     case TextAlign.Top:
-                        TopLine.Add($"{"".PadLeft(LevelDelta*tf.Level,' ')}{tf.Text}");
+                        TopLine.Add($"{"".PadLeft(LevelDelta * tf.Level, ' ')}{tf.Text}");
                         break;
                     case TextAlign.Bottom:
                         BottomLine.Add($"{"".PadLeft(LevelDelta * tf.Level, ' ')}{tf.Text}");
@@ -45,7 +45,7 @@ namespace KartLibrary.Text
                 }
             }
             List<string> output = new List<string>();
-            foreach(string tl in TopLine)
+            foreach (string tl in TopLine)
             {
                 output.Add(tl);
             }
@@ -71,6 +71,6 @@ namespace KartLibrary.Text
 
     public enum TextAlign
     {
-        Top,Bottom
+        Top, Bottom
     }
 }

@@ -16,8 +16,8 @@ namespace KartLibrary.IO
         public static void Initialize()
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach(Assembly assembly in assemblies)
-                foreach (TypeInfo type in 
+            foreach (Assembly assembly in assemblies)
+                foreach (TypeInfo type in
                     assembly.GetTypes().Select(x => x).Where(x => x.IsSubclassOf(typeof(KartObject)) && x.GetCustomAttribute(typeof(KartObjectImplementAttribute)) is not null))
                     RegisterClass(type);
         }
@@ -31,7 +31,7 @@ namespace KartLibrary.IO
         public static void RegisterClass(Type type)
         {
             Type? baseType = type.BaseType;
-            while(baseType != null && baseType != typeof(KartObject))
+            while (baseType != null && baseType != typeof(KartObject))
                 baseType = baseType.BaseType;
             if (baseType is null)
                 throw new Exception("");
@@ -86,9 +86,9 @@ namespace KartLibrary.IO
         public bool CanbeConvertTo(Type targetType)
         {
             Type? superType = targetType;
-            while(superType != null)
+            while (superType != null)
             {
-                if(superType == targetType)
+                if (superType == targetType)
                     return true;
                 superType = superType.BaseType;
             }

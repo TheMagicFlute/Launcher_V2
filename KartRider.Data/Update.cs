@@ -208,7 +208,8 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + ".exe" +
                     Console.WriteLine($"\n写入文件时出错: {ex.Message}");
                 }
                 Process.Start(filePath);
-                Process.GetCurrentProcess().Kill();
+                // Process.GetCurrentProcess().Kill();
+                Environment.Exit(0);
                 return true;
             }
             catch (Exception ex)
@@ -297,7 +298,7 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + ".exe" +
             string url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
             try
             {
-                
+
                 using (HttpClient client = new HttpClient())
                 {
                     client.DefaultRequestHeaders.Add("User-Agent", repo);

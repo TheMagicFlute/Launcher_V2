@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using KartLibrary.Xml;
-using KartLibrary.Record;
-using KartLibrary.Consts;
 using System.Numerics;
+using System.Text;
+using KartLibrary.Consts;
+using KartLibrary.Record;
+using KartLibrary.Xml;
 
 namespace KartLibrary.IO
 {
@@ -54,7 +54,7 @@ namespace KartLibrary.IO
             if (wideString)
             {
                 char ch;
-                while((ch = (char)br.ReadInt16()) != '\0')
+                while ((ch = (char)br.ReadInt16()) != '\0')
                     stringBuilder.Append(ch);
             }
             else
@@ -232,7 +232,7 @@ namespace KartLibrary.IO
             if (decodedObjectMap is not null)
             {
                 int isnull = br.ReadUInt16();
-                if(isnull == 0x47BB)
+                if (isnull == 0x47BB)
                 {
                     short objIndex = br.ReadInt16();
                     if (!decodedObjectMap.ContainsKey(objIndex))
@@ -269,7 +269,7 @@ namespace KartLibrary.IO
                     short objIndex = br.ReadInt16();
                     if (!decodedObjectMap.ContainsKey(objIndex))
                         throw new IndexOutOfRangeException();
-                    if(decodedObjectMap[objIndex] is TBase decTBase)
+                    if (decodedObjectMap[objIndex] is TBase decTBase)
                         output = decTBase;
                     else
                         throw new InvalidCastException();
@@ -295,7 +295,7 @@ namespace KartLibrary.IO
         // AA27 BB27
         public static T ReadField<T>(this BinaryReader br, Dictionary<short, KartObject>? decodedObjectMap, Dictionary<short, object>? decodedFieldMap, DecodeFieldFunc<T> decodeFieldFunc)
         {
-            if(decodedFieldMap is not null)
+            if (decodedFieldMap is not null)
             {
                 ushort token = br.ReadUInt16();
                 if (token == 0x27AA)

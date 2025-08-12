@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using ExcData;
 using KartLibrary.File;
 using KartRider;
@@ -20,10 +22,8 @@ using Launcher.Properties;
 using RHOParser;
 using Set_Data;
 using static KartRider.Common.Data.PINFile;
-using static KartRider.Update;
 using static KartRider.Program;
-using System.Linq;
-using System.Xml.XPath;
+using static KartRider.Update;
 
 namespace KartRider
 {

@@ -1,3 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Linq;
 using KartLibrary.Consts;
 using KartLibrary.Data;
 using KartLibrary.File;
@@ -6,17 +17,6 @@ using KartRider.IO.Packet;
 using Microsoft.Win32;
 using RHOParser;
 using Set_Data;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Windows.Forms;
-using System.Xml;
-using System.Linq;
-using System.Xml.Linq;
-using System.Threading.Tasks;
 
 namespace KartRider
 {
@@ -33,7 +33,7 @@ namespace KartRider
 
         public const int SW_HIDE = 0;
         public const int SW_SHOW = 5;
-        
+
         public static int consoleStatus = SW_SHOW;
         public static Launcher LauncherDlg;
         public static GetKart GetKartDlg;
@@ -41,7 +41,7 @@ namespace KartRider
         public static bool PreventItem;
         public static string RootDirectory;
         public static CountryCode CC = CountryCode.CN;
-        
+
         // 当前系统架构 小写字符串 目前仅有 x64 x86 arm64
         public static string architecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
 

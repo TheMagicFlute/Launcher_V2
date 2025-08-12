@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using KartLibrary.IO;
 using KartLibrary.Data;
+using KartLibrary.IO;
 
 namespace KartLibrary.Record
 {
@@ -27,7 +27,7 @@ namespace KartLibrary.Record
 
         public static KSVInfo ReadKSVFromBytes(byte[] data)
         {
-            MemoryStream dataMS= new MemoryStream(data);
+            MemoryStream dataMS = new MemoryStream(data);
             BinaryReader reader = new BinaryReader(dataMS);
             int FileSize = reader.ReadInt32();
             byte[] originalData = reader.ReadKRData(FileSize);
@@ -43,7 +43,7 @@ namespace KartLibrary.Record
         {
             if (!System.IO.File.Exists(FileName))
                 throw new FileNotFoundException(FileName);
-            using(FileStream fileStream = new FileStream(FileName, FileMode.Open))
+            using (FileStream fileStream = new FileStream(FileName, FileMode.Open))
             {
                 BinaryReader reader = new BinaryReader(fileStream);
                 int totalLen = reader.ReadInt32();
@@ -57,7 +57,7 @@ namespace KartLibrary.Record
             }
         }
 
-        public static void SaveKSVFile(string FileName,KSVInfo ksvFile)
+        public static void SaveKSVFile(string FileName, KSVInfo ksvFile)
         {
             using (FileStream fileStream = new FileStream(FileName, FileMode.Create))
             {

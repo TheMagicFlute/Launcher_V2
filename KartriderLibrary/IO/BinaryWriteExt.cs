@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using KartLibrary.Xml;
+using System.Text;
 using KartLibrary.Record;
+using KartLibrary.Xml;
 
 namespace KartLibrary.IO
 {
     public static class BinaryWriterExt
     {
-        public static void WriteString(this BinaryWriter br, Encoding encoding,string Text)
+        public static void WriteString(this BinaryWriter br, Encoding encoding, string Text)
         {
             byte[] data = encoding.GetBytes(Text);
             br.Write(Text.Length);
@@ -17,10 +17,10 @@ namespace KartLibrary.IO
             data = null;
         }
 
-        public static void Write(this BinaryWriter br, Encoding encoding, string Key,string Value)
+        public static void Write(this BinaryWriter br, Encoding encoding, string Key, string Value)
         {
             br.WriteString(encoding, Key);
-            br.WriteString(encoding,Value);
+            br.WriteString(encoding, Value);
         }
 
         public static void WriteNullTerminatedText(this BinaryWriter br, string text, bool wideString)

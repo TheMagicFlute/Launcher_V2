@@ -1,7 +1,4 @@
-﻿using KartLibrary.Consts;
-using KartLibrary.Encrypt;
-using KartLibrary.IO;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,6 +8,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using KartLibrary.Consts;
+using KartLibrary.Encrypt;
+using KartLibrary.IO;
 
 namespace KartLibrary.File
 {
