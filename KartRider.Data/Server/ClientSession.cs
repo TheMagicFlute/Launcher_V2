@@ -117,8 +117,8 @@ namespace KartRider
                         }
                         var manager = new CompetitiveDataManager();
                         CompleteTrackScoreCalculator calculator = new CompleteTrackScoreCalculator();
-						var Scores = calculator.CalculateTrackScoreDetails(Track, Time, Booster, Crash, FavoriteItem.TrackDictionary);
-						var data = new CompetitiveData
+                        var Scores = calculator.CalculateTrackScoreDetails(Track, Time, Booster, Crash, FavoriteItem.TrackDictionary);
+                        var data = new CompetitiveData
                         {
                             Track = Track,
                             Kart = Kart,
@@ -142,11 +142,11 @@ namespace KartRider
                                 outPacket.WriteUInt(competitive.Time);
                                 outPacket.WriteHexString("FF FF FF FF");
                                 outPacket.WriteShort(competitive.Booster);
-								outPacket.WriteInt(competitive.BoosterPoint);
-								outPacket.WriteShort(competitive.Crash);
-								outPacket.WriteInt(competitive.CrashPoint);
-								outPacket.WriteInt(competitive.Point);
-								outPacket.WriteInt(0);
+                                outPacket.WriteInt(competitive.BoosterPoint);
+                                outPacket.WriteShort(competitive.Crash);
+                                outPacket.WriteInt(competitive.CrashPoint);
+                                outPacket.WriteInt(competitive.Point);
+                                outPacket.WriteInt(0);
                             }
                             this.Parent.Client.Send(outPacket);
                         }
@@ -491,8 +491,8 @@ namespace KartRider
                         {
                             outPacket.WriteUInt(SetRider.UserNO);
                             outPacket.WriteEndPoint(IPAddress.Parse(RouterListener.client.Address.ToString()), (ushort)RouterListener.client.Port);
-							outPacket.WriteInt();
-							outPacket.WriteShort();
+                            outPacket.WriteInt();
+                            outPacket.WriteShort();
                             outPacket.WriteString(SetRider.Nickname);
                             GameSupport.GetRider(outPacket);
                             outPacket.WriteShort(0);

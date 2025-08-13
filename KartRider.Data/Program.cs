@@ -22,6 +22,12 @@ namespace KartRider
 {
     internal static class Program
     {
+#if DEBUG
+        public const bool DBG = true;
+#elif RELEASE
+        public const bool DBG = false;
+#endif
+
         [DllImport("kernel32.dll")]
         public static extern bool AllocConsole();
 
@@ -43,21 +49,20 @@ namespace KartRider
         public static CountryCode CC = CountryCode.CN;
 
         // 当前系统架构 小写字符串 目前仅有 x64 x86 arm64
-        public static string architecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString().ToLower();
+        public static string architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
 
         [STAThread]
         private static async Task Main(string[] args)
         {
-#if DEBUG
-            AllocConsole(); // Allocate a console for debugging purposes
-#endif
-            string input;
-            string output;
-            Console.Write("中国跑跑卡丁车单机启动器");
-            Console.Write($" | {architecture} |");
-#if DEBUG
-            Console.Write(" [DEBUG]");
-#endif
+            string input = "";
+            string output = "";
+
+            Console.OutputEncoding = Encoding.Unicode;
+            Console.InputEncoding = Encoding.Unicode;
+            AllocConsole();
+
+            Console.Write($"中国跑跑卡丁车单机启动器 | {architecture} | ");
+            if (DBG) Console.Write("[DEBUG]");
             Console.WriteLine();
             Console.WriteLine("--------------------------------------------------");
             // delete updater
@@ -71,145 +76,138 @@ namespace KartRider
             {
                 Directory.Delete(Update_Folder, true);
             }
-
-            Console.OutputEncoding = Encoding.Unicode;
-            Console.InputEncoding = Encoding.Unicode;
-
-            if (!await Update.UpdateDataAsync()) // check for update
+            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Profile"))
             {
-                // current version is up to date
-                string Load_CC = AppDomain.CurrentDomain.BaseDirectory + "Profile\\CountryCode.ini";
-                if (File.Exists(Load_CC))
-                {
-                    string textValue = System.IO.File.ReadAllText(Load_CC);
-                    Program.CC = (CountryCode)Enum.Parse(typeof(CountryCode), textValue);
-                }
-                else
-                {
-                    if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Profile"))
-                    {
-                        Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "Profile");
-                    }
-                    using (StreamWriter streamWriter = new StreamWriter(Load_CC, false))
-                    {
-                        streamWriter.Write(Program.CC.ToString());
-                    }
-                }
-                if (args == null || args.Length == 0)
-                {
-                    string regPth = "HKEY_CURRENT_USER\\SOFTWARE\\TCGame\\kart";
-                    RootDirectory = (string)Registry.GetValue(regPth, "gamepath", null);
-                    if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "KartRider.pin") && File.Exists(AppDomain.CurrentDomain.BaseDirectory + "KartRider.exe"))
-                    {// working directory
-                        RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                        Console.WriteLine("使用当前目录下的游戏");
-                    }
-                    else if (File.Exists(RootDirectory + "KartRider.pin") && File.Exists(RootDirectory + "KartRider.exe"))
-                    {// TCGame registered directory
-                        Console.WriteLine("使用TCGame注册的游戏目录下的游戏");
-                    }
-                    else
-                    {// game not found
-                        Console.WriteLine("Error: 未找到游戏!");
-                        MsgErrorFileNotFound();
-                        return;
-                    }
-                    if (!string.IsNullOrEmpty(RootDirectory))
-                    {
-                        try
-                        {
-                            Console.WriteLine("读取Data文件");
-                            KartRhoFile.Dump(RootDirectory + "Data\\aaa.pk");
-                            KartRhoFile.packFolderManager.Reset();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"读取Data文件时出错: {ex.Message}");
-                        }
+                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "Profile");
+            }
 
-                        string Load_Console = AppDomain.CurrentDomain.BaseDirectory + "Profile\\Console.ini";
-                        IntPtr consoleHandle = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
-                        if (!File.Exists(Load_Console))
-                        {
-                            using (StreamWriter streamWriter = new StreamWriter(Load_Console, false))
-                            {
-                                streamWriter.Write("0");
-                            }
-                        }
-                        string textValue = System.IO.File.ReadAllText(Load_Console);
-                        if (textValue == "0")
-                        {
-                            ShowWindow(consoleHandle, SW_HIDE);
-                        }
-                        Application.EnableVisualStyles();
-                        Application.SetCompatibleTextRenderingDefault(false);
-                        Launcher StartLauncher = new Launcher();
-                        Program.LauncherDlg = StartLauncher;
-                        Program.LauncherDlg.kartRiderDirectory = RootDirectory;
-                        Application.Run(StartLauncher);
-                    }
-                    input = "";
-                    output = "";
-                }
-                else if (args.Length == 1)
+            // check for update
+            if (await Update.UpdateDataAsync()) return;
+            
+            if (File.Exists(FileName.Load_CC + FileName.Extension))
+            {
+                string textValue = System.IO.File.ReadAllText(FileName.Load_CC + FileName.Extension);
+                Program.CC = (CountryCode)Enum.Parse(typeof(CountryCode), textValue);
+            }
+            else
+            {
+                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_CC + FileName.Extension, false))
                 {
-                    input = args[0];
-                    output = args[0];
+                    streamWriter.Write(Program.CC.ToString());
                 }
-                else
+            }
+            if (args == null || args.Length == 0)
+            {
+                string regPth = @"HKEY_CURRENT_USER\SOFTWARE\TCGame\kart";
+                RootDirectory = (string)Registry.GetValue(regPth, "gamepath", null);
+                if (CheckGameAvailability(AppDomain.CurrentDomain.BaseDirectory))
                 {
-                    if (args.Length != 2)
-                        return;
-                    input = args[0];
-                    output = args[1];
+                    // working directory
+                    RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                    Console.WriteLine("使用当前目录下的游戏");
                 }
-                if (input.EndsWith(".rho") || input.EndsWith(".rho5"))
+                else if (CheckGameAvailability(RootDirectory))
                 {
-                    Program.decode(input, output);
-                }
-                else if (input.EndsWith("aaa.xml"))
-                {
-                    Program.AAAD(input);
-                }
-                else if (input.EndsWith(".xml"))
-                {
-                    Program.XtoB(input);
-                }
-                else if (input.EndsWith(".bml"))
-                {
-                    Program.BtoX(input);
-                }
-                else if (input.EndsWith(".pk"))
-                {
-                    Program.AAAR(input);
+                    // TCGame registered directory
+                    Console.WriteLine("使用TCGame注册的游戏目录下的游戏");
                 }
                 else
                 {
-                    if (!Directory.Exists(input))
-                        return;
-                    if (input.Contains("_0"))
+                    // game not found
+                    MsgErrorFileNotFound();
+                    return;
+                }
+                if (!string.IsNullOrEmpty(RootDirectory))
+                {
+                    try
                     {
-                        Program.encode(input, output);
+                        Console.WriteLine("读取Data文件");
+                        KartRhoFile.Dump(RootDirectory + @"Data\aaa.pk");
+                        KartRhoFile.packFolderManager.Reset();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"读取Data文件时出错: {ex.Message}");
+                    }
+
+                    IntPtr consoleHandle = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
+                    if (!DBG)
+                    {
+                        ShowWindow(consoleHandle, SW_HIDE);
+                    }
+
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    LauncherDlg = new Launcher();
+                    LauncherDlg.kartRiderDirectory = RootDirectory;
+                    Application.Run(LauncherDlg);
+                }
+            }
+            else if (args.Length == 1)
+            {
+                input = args[0];
+                output = args[0];
+            }
+            else
+            {
+                if (args.Length != 2)
+                    return;
+                input = args[0];
+                output = args[1];
+            }
+
+            if (input.EndsWith(".rho") || input.EndsWith(".rho5"))
+            {
+                Program.decode(input, output);
+            }
+            else if (input.EndsWith("aaa.xml"))
+            {
+                AAAD(input);
+            }
+            else if (input.EndsWith(".xml"))
+            {
+                XtoB(input);
+            }
+            else if (input.EndsWith(".bml"))
+            {
+                BtoX(input);
+            }
+            else if (input.EndsWith(".pk"))
+            {
+                AAAR(input);
+            }
+            else
+            {
+                if (!Directory.Exists(input))
+                    return;
+                if (input.Contains("_0"))
+                {
+                    encode(input, output);
+                }
+                else
+                {
+                    string[] files = Directory.GetFiles(input, "*.rho");
+                    if (files.Length > 0)
+                    {
+                        AAAC(input, files);
                     }
                     else
                     {
-                        string[] files = Directory.GetFiles(input, "*.rho");
-                        if (files.Length > 0)
-                        {
-                            Program.AAAC(input, files);
-                        }
-                        else
-                        {
-                            Program.encodea(input, output);
-                        }
+                        encodea(input, output);
                     }
                 }
             }
         }
 
+        public static bool CheckGameAvailability(string gamePath)
+        {
+            return File.Exists(gamePath + Launcher.KartRider) && File.Exists(gamePath + Launcher.PinFile);
+        }
+
         public static void MsgErrorFileNotFound()
         {
-            MessageBox.Show(Launcher.KartRider + " 或 " + Launcher.pinFile + " 找不到文件！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            Console.WriteLine("Error: 未找到游戏!");
+            MessageBox.Show($"找不到 {Launcher.KartRider} 或 {Launcher.PinFile} !\n请检查游戏是否正确安装.\n如使用特定版本游戏, 请检查启动器处在的位置是否与该版本安装在同一目录下. ", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Environment.Exit(1);
         }
 

@@ -28,6 +28,8 @@ namespace KartRider
         private static string tag_name = "";
         private static string update_info = "";
 
+        /// <summary>check and try to apply update</summary>
+        /// <returns>true if update should be applied</returns>
         public static async Task<bool> UpdateDataAsync()
         {
             Console.WriteLine("正在检查更新...");
@@ -49,32 +51,34 @@ namespace KartRider
                 Console.WriteLine("-------------------------");
                 Console.Write("请问是否需要更新? (Y/n): ");
                 string usrInput = null;
-                while (usrInput != "y" && usrInput != "Y" && usrInput != "n" && usrInput != "N")
+                while (usrInput != "y" && usrInput != "n")
                 {
                     usrInput = Console.ReadLine();
-                    if (usrInput == "n" || usrInput == "N")
+                    usrInput = usrInput.ToLower();
+                    if (usrInput == "n")
                     {
                         return false; // cancel update
                     }
-                    else if (usrInput != "y" && usrInput != "Y")
+                    else if (usrInput == "y")
                     {
-                        // usrInput is invalid, ask again
-                        Console.Write("请输入 (Y for yes / n for no): ");
+                        break;
                     }
+                    // usrInput is invalid, ask again.
+                    Console.Write("请输入 (Y for yes / n for no): ");
                 }
                 // 尝试下载最新的版本
-                Console.WriteLine($"正在下载 {tag_name}...");
-                update_url = await ProcessUrl();
-                return await DownloadUpdate(update_url);
+                update_url = await ProcessUrlAsync();
+                Console.WriteLine($"正在 从 {update_url} 下载 {tag_name}...");
+                return await DownloadUpdateAsync(update_url);
             }
             else
             {
-                Console.WriteLine("当前已是最新版本。");
+                Console.WriteLine("当前已是最新版本. ");
                 return false;
             }
         }
 
-        public static async Task<string> ProcessUrl()
+        public static async Task<string> ProcessUrlAsync()
         {
             try
             {
@@ -83,7 +87,14 @@ namespace KartRider
                 // 中国大陆需要使用代理下载，处理 url
                 if (country != "" && country == "CN")
                 {
-                    List<string> urls = new List<string>() { "https://ghproxy.net/", "https://gh-proxy.com/", "https://hub.myany.uk/", "http://kra.myany.uk:2233/", "http://krb.myany.uk:2233/" };
+                    List<string> urls = new List<string>()
+                    {
+                        "https://ghproxy.net/",
+                        "https://hub.myany.uk/",
+                        "https://gh-proxy.com/",
+                        "http://kra.myany.uk:2233/",
+                        "http://krb.myany.uk:2233/"
+                    };
                     Console.WriteLine("Using proxy.");
                     foreach (string url_ in urls)
                     {
@@ -113,10 +124,11 @@ namespace KartRider
 
         public static string GetCompileDate()
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            AssemblyName assemblyName = assembly.GetName();
-            string simpleName = assemblyName.Name + ".exe";
-            DateTime compilationDate = File.GetLastWriteTime(AppDomain.CurrentDomain.BaseDirectory + simpleName);
+            // Assembly assembly = Assembly.GetExecutingAssembly();
+            // AssemblyName assemblyName = assembly.GetName();
+            // string simpleName = assemblyName.Name + ".exe";
+            string fileName = Process.GetCurrentProcess().MainModule.FileName;
+            DateTime compilationDate = File.GetLastWriteTime(AppDomain.CurrentDomain.BaseDirectory + fileName);
             string formattedDate = compilationDate.ToString("yyMMdd");
             return formattedDate;
         }
@@ -130,7 +142,7 @@ namespace KartRider
 #endif
         }
 
-        public static async Task<bool> DownloadUpdate(string UpdatePackageUrl)
+        public static async Task<bool> DownloadUpdateAsync(string UpdatePackageUrl)
         {
             try
             {

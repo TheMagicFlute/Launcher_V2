@@ -33,8 +33,10 @@ namespace KartRider
         public static short KartSN = 0;
         public string kartRiderDirectory = null;
         public const string KartRider = "KartRider.exe";
-        public const string pinFile = "KartRider.pin";
+        public const string PinFile = "KartRider.pin";
+        public const string PinFileBak = "KartRider-bak.pin";
         public static string executablePath;
+
         private Button Start_Button;
         private Button GetKart_Button;
         private Label label_Client;
@@ -46,11 +48,12 @@ namespace KartRider
         private Label ClientVersion;
         private Label label_Docs;
         private Label label_TimeAttackLog;
+        private Button button_KillGameProcesses;
         private Label VersionLabel;
 
         public Launcher()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private void InitializeComponent()
@@ -61,20 +64,21 @@ namespace KartRider
             label_Client = new Label();
             ClientVersion = new Label();
             VersionLabel = new Label();
+            Launcher_label = new Label();
             Speed_comboBox = new ComboBox();
             Speed_label = new Label();
             GitHub = new Label();
             KartInfo = new Label();
-            Launcher_label = new Label();
             label_Docs = new Label();
             label_TimeAttackLog = new Label();
+            button_KillGameProcesses = new Button();
             SuspendLayout();
             // 
             // Start_Button
             // 
             Start_Button.Location = new Point(19, 20);
             Start_Button.Name = "Start_Button";
-            Start_Button.Size = new Size(114, 23);
+            Start_Button.Size = new Size(135, 23);
             Start_Button.TabIndex = 364;
             Start_Button.Text = "启动游戏";
             Start_Button.UseVisualStyleBackColor = true;
@@ -82,9 +86,9 @@ namespace KartRider
             // 
             // GetKart_Button
             // 
-            GetKart_Button.Location = new Point(19, 49);
+            GetKart_Button.Location = new Point(19, 78);
             GetKart_Button.Name = "GetKart_Button";
-            GetKart_Button.Size = new Size(114, 23);
+            GetKart_Button.Size = new Size(135, 23);
             GetKart_Button.TabIndex = 365;
             GetKart_Button.Text = "添加道具";
             GetKart_Button.UseVisualStyleBackColor = true;
@@ -96,9 +100,9 @@ namespace KartRider
             label_Client.BackColor = SystemColors.Control;
             label_Client.Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label_Client.ForeColor = Color.Blue;
-            label_Client.Location = new Point(2, 144);
+            label_Client.Location = new Point(2, 172);
             label_Client.Name = "label_Client";
-            label_Client.Size = new Size(53, 12);
+            label_Client.Size = new Size(59, 12);
             label_Client.TabIndex = 367;
             label_Client.Text = "游戏版本:";
             label_Client.Click += label_Client_Click;
@@ -109,7 +113,7 @@ namespace KartRider
             ClientVersion.BackColor = SystemColors.Control;
             ClientVersion.Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             ClientVersion.ForeColor = Color.Red;
-            ClientVersion.Location = new Point(70, 144);
+            ClientVersion.Location = new Point(0, 0);
             ClientVersion.Name = "ClientVersion";
             ClientVersion.Size = new Size(0, 12);
             ClientVersion.TabIndex = 367;
@@ -121,20 +125,30 @@ namespace KartRider
             VersionLabel.BackColor = SystemColors.Control;
             VersionLabel.Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             VersionLabel.ForeColor = Color.Red;
-            VersionLabel.Location = new Point(70, 160);
+            VersionLabel.Location = new Point(0, 0);
             VersionLabel.Name = "VersionLabel";
             VersionLabel.Size = new Size(0, 12);
             VersionLabel.TabIndex = 373;
             VersionLabel.Click += GitHub_Click;
             // 
+            // Launcher_label
+            // 
+            Launcher_label.AutoSize = true;
+            Launcher_label.ForeColor = Color.Blue;
+            Launcher_label.Location = new Point(2, 190);
+            Launcher_label.Name = "Launcher_label";
+            Launcher_label.Size = new Size(71, 12);
+            Launcher_label.TabIndex = 373;
+            Launcher_label.Text = "启动器版本:";
+            Launcher_label.Click += GitHub_Click;
+            // 
             // Speed_comboBox
             // 
             Speed_comboBox.ForeColor = Color.Red;
             Speed_comboBox.FormattingEnabled = true;
-            Speed_comboBox.Sorted = false;
-            Speed_comboBox.Location = new System.Drawing.Point(54, 78);
+            Speed_comboBox.Location = new Point(54, 131);
             Speed_comboBox.Name = "Speed_comboBox";
-            Speed_comboBox.Size = new System.Drawing.Size(100, 20);
+            Speed_comboBox.Size = new Size(100, 20);
             Speed_comboBox.TabIndex = 368;
             Speed_comboBox.Text = "统合S1.5";
             Speed_comboBox.SelectedIndexChanged += Speed_comboBox_SelectedIndexChanged;
@@ -143,7 +157,7 @@ namespace KartRider
             // 
             Speed_label.AutoSize = true;
             Speed_label.ForeColor = Color.Blue;
-            Speed_label.Location = new Point(19, 82);
+            Speed_label.Location = new Point(19, 134);
             Speed_label.Name = "Speed_label";
             Speed_label.Size = new Size(35, 12);
             Speed_label.TabIndex = 369;
@@ -153,7 +167,7 @@ namespace KartRider
             // 
             GitHub.AutoSize = true;
             GitHub.ForeColor = Color.Blue;
-            GitHub.Location = new Point(213, 144);
+            GitHub.Location = new Point(191, 178);
             GitHub.Name = "GitHub";
             GitHub.Size = new Size(41, 12);
             GitHub.TabIndex = 371;
@@ -164,29 +178,18 @@ namespace KartRider
             // 
             KartInfo.AutoSize = true;
             KartInfo.ForeColor = Color.Blue;
-            KartInfo.Location = new Point(201, 160);
+            KartInfo.Location = new Point(179, 190);
             KartInfo.Name = "KartInfo";
             KartInfo.Size = new Size(53, 12);
             KartInfo.TabIndex = 372;
             KartInfo.Text = "KartInfo";
             KartInfo.Click += KartInfo_Click;
             // 
-            // Launcher_label
-            // 
-            Launcher_label.AutoSize = true;
-            Launcher_label.ForeColor = Color.Blue;
-            Launcher_label.Location = new Point(2, 160);
-            Launcher_label.Name = "Launcher_label";
-            Launcher_label.Size = new Size(71, 12);
-            Launcher_label.TabIndex = 373;
-            Launcher_label.Text = "启动器版本:";
-            Launcher_label.Click += GitHub_Click;
-            // 
             // label_Docs
             // 
             label_Docs.AutoSize = true;
             label_Docs.ForeColor = Color.Blue;
-            label_Docs.Location = new Point(177, 132);
+            label_Docs.Location = new Point(155, 166);
             label_Docs.Name = "label_Docs";
             label_Docs.Size = new Size(77, 12);
             label_Docs.TabIndex = 374;
@@ -197,19 +200,30 @@ namespace KartRider
             // 
             label_TimeAttackLog.AutoSize = true;
             label_TimeAttackLog.ForeColor = Color.Blue;
-            label_TimeAttackLog.Location = new Point(177, 120);
+            label_TimeAttackLog.Location = new Point(155, 154);
             label_TimeAttackLog.Name = "label_TimeAttackLog";
             label_TimeAttackLog.Size = new Size(77, 12);
             label_TimeAttackLog.TabIndex = 375;
             label_TimeAttackLog.Text = "查看计时记录";
             label_TimeAttackLog.Click += label_TimeAttackLog_Click;
             // 
+            // button_KillGameProcesses
+            // 
+            button_KillGameProcesses.Location = new Point(19, 49);
+            button_KillGameProcesses.Name = "button_KillGameProcesses";
+            button_KillGameProcesses.Size = new Size(135, 23);
+            button_KillGameProcesses.TabIndex = 376;
+            button_KillGameProcesses.Text = "强制关闭游戏";
+            button_KillGameProcesses.UseVisualStyleBackColor = true;
+            button_KillGameProcesses.Click += button_KillGameProcesses_Click;
+            // 
             // Launcher
             // 
             AutoScaleDimensions = new SizeF(6F, 12F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(257, 180);
+            ClientSize = new Size(244, 211);
+            Controls.Add(button_KillGameProcesses);
             Controls.Add(label_TimeAttackLog);
             Controls.Add(label_Docs);
             Controls.Add(VersionLabel);
@@ -227,33 +241,27 @@ namespace KartRider
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "Launcher";
-            StartPosition = FormStartPosition.Manual;
-            Rectangle screen = Screen.PrimaryScreen.WorkingArea;
-            Location = new Point(screen.Width - Width, screen.Height - Height);
-            TopMost = true;
             Text = "Launcher";
+            Location = new Point(0, 0);
+            TopMost = true;
             FormClosing += OnFormClosing;
             Load += OnLoad;
             ResumeLayout(false);
             PerformLayout();
         }
 
-        public static void WarnGameRunning()
-        {
-            MessageBox.Show("跑跑卡丁车正在运行，请结束跑跑卡丁车后再退出该程序！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            if (File.Exists(this.kartRiderDirectory + "KartRider-bak.pin"))
+            if (File.Exists(this.kartRiderDirectory + PinFileBak))
             {
-                File.Delete(this.kartRiderDirectory + "KartRider.pin");
-                File.Move(this.kartRiderDirectory + "KartRider-bak.pin", this.kartRiderDirectory + "KartRider.pin");
+                File.Delete(this.kartRiderDirectory + PinFile);
+                File.Move(this.kartRiderDirectory + PinFileBak, this.kartRiderDirectory + PinFile);
             }
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                WarnGameRunning();
+                MessageBox.Show("跑跑卡丁车正在运行，请结束跑跑卡丁车后再退出该程序！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 e.Cancel = true;
+                return;
             }
         }
 
@@ -262,20 +270,26 @@ namespace KartRider
             executablePath = Process.GetCurrentProcess().MainModule.FileName;
             Load_KartExcData();
             StartingLoad_ALL.StartingLoad();
-            PINFile val = new PINFile(this.kartRiderDirectory + "KartRider.pin");
+            PINFile val = new PINFile(this.kartRiderDirectory + PinFile);
             SetGameOption.Version = val.Header.MinorVersion;
             SetGameOption.Save_SetGameOption();
-            ClientVersion.Text = SetGameOption.Version.ToString();
 
+            // ----------
             foreach (string key in SpeedType.speedNames.Keys)
             {
                 Speed_comboBox.Items.Add(key);
             }
-
             ClientVersion.Text = $"P{SetGameOption.Version.ToString()}";
             VersionLabel.Text = currentVersion;
+            VersionLabel.Location = new Point(Launcher_label.Location.X + 75, Launcher_label.Location.Y);
+            ClientVersion.Location = new Point(label_Client.Location.X + 75, label_Client.Location.Y);
 
-            Console.WriteLine("Process: {0}", this.kartRiderDirectory + Launcher.KartRider);
+            StartPosition = FormStartPosition.Manual;
+            Rectangle screen = Screen.PrimaryScreen.WorkingArea;
+            Location = new Point(screen.Width - Width, screen.Height - Height);
+            // ----------
+
+            Console.WriteLine($"Process: {this.kartRiderDirectory + Launcher.KartRider}");
             try
             {
                 RouterListener.Start();
@@ -296,89 +310,88 @@ namespace KartRider
         {
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                WarnGameRunning();
+                MessageBox.Show("跑跑卡丁车已经在运行了！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            else
+            if (!CheckGameAvailability(kartRiderDirectory))
             {
-                (new Thread(() =>
-                {
-                    Console.WriteLine("Backing up old PinFile...");
-                    Console.WriteLine(this.kartRiderDirectory + "KartRider-bak.pin");
-                    if (File.Exists(this.kartRiderDirectory + "KartRider-bak.pin"))
-                    {
-                        File.Delete(this.kartRiderDirectory + "KartRider.pin");
-                        File.Move(this.kartRiderDirectory + "KartRider-bak.pin", this.kartRiderDirectory + "KartRider.pin");
-                    }
-                    File.Copy(this.kartRiderDirectory + "KartRider.pin", this.kartRiderDirectory + "KartRider-bak.pin");
-                    PINFile val = new PINFile(this.kartRiderDirectory + "KartRider.pin");
-                    foreach (PINFile.AuthMethod authMethod in val.AuthMethods)
-                    {
-                        Console.WriteLine("Changing IP Address to local... {0}", authMethod.Name);
-                        foreach (IPEndPoint loginServer in authMethod.LoginServers)
-                        {
-                            Console.WriteLine("Old IP Address: {0}", loginServer.ToString());
-                        }
-                        authMethod.LoginServers.Clear();
-                        authMethod.LoginServers.Add(new PINFile.IPEndPoint
-                        {
-                            IP = "127.0.0.1",
-                            Port = 39312
-                        });
-                        Console.WriteLine("Changed!\n");
-                    }
-                    foreach (BmlObject bml in val.BmlObjects)
-                    {
-                        if (bml.Name == "extra")
-                        {
-                            for (int i = bml.SubObjects.Count - 1; i >= 0; i--)
-                            {
-                                Console.WriteLine("Removing {0}", bml.SubObjects[i].Item1);
-                                if (bml.SubObjects[i].Item1 == "NgsOn")
-                                {
-                                    bml.SubObjects.RemoveAt(i);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    File.WriteAllBytes(this.kartRiderDirectory + "KartRider.pin", val.GetEncryptedData());
-                    Launcher.GetKart = false;
-                    // origin passport:aHR0cHM6Ly9naXRodWIuY29tL3lhbnlnbS9MYXVuY2hlcl9WMi9yZWxlYXNlcw==
-                    ProcessStartInfo startInfo = new ProcessStartInfo(Launcher.KartRider, "TGC -region:3 -passport:OFFLINE")
-                    {
-                        WorkingDirectory = this.kartRiderDirectory,
-                        UseShellExecute = true,
-                        Verb = "runas"
-                    };
-                    try
-                    {
-                        Process.Start(startInfo);
-                        Thread.Sleep(1000);
-                        Launcher.GetKart = true;
-                    }
-                    catch (System.ComponentModel.Win32Exception ex)
-                    {
-                        // 用户取消了UAC提示或没有权限
-                        // Console.WriteLine(ex.Message);
-                        Console.WriteLine("用户积极取消操作, 或者没有Administer权限.");
-                    }
-                })).Start();
+                MsgErrorFileNotFound();
+                return;
             }
+            (new Thread(() =>
+            {
+                Console.WriteLine("Backing up old PinFile...");
+                Console.WriteLine(kartRiderDirectory + PinFileBak);
+                if (File.Exists(kartRiderDirectory + PinFileBak))
+                {
+                    File.Delete(kartRiderDirectory + PinFile);
+                    File.Move(kartRiderDirectory + PinFileBak, kartRiderDirectory + PinFile);
+                }
+                File.Copy(kartRiderDirectory + PinFile, kartRiderDirectory + PinFileBak);
+                PINFile val = new PINFile(kartRiderDirectory + PinFile);
+                foreach (PINFile.AuthMethod authMethod in val.AuthMethods)
+                {
+                    Console.WriteLine($"Changing IP Address to local... {authMethod.Name}");
+                    foreach (IPEndPoint loginServer in authMethod.LoginServers)
+                    {
+                        Console.WriteLine($"Found {loginServer.ToString()}");
+                    }
+                    authMethod.LoginServers.Clear();
+                    authMethod.LoginServers.Add(new PINFile.IPEndPoint
+                    {
+                        IP = "127.0.0.1",
+                        Port = 39312
+                    });
+                    Console.WriteLine($"All Changed to {authMethod.LoginServers[0].ToString()} \n");
+                }
+
+                Console.WriteLine("Scanning Bml Objects in PinFile...");
+                foreach (BmlObject bml in val.BmlObjects)
+                {
+                    for (int i = bml.SubObjects.Count - 1; i >= 0; i--)
+                    {
+                        Console.WriteLine($"Found {bml.SubObjects[i].Item1} in {bml.Name}");
+                        if (bml.SubObjects[i].Item1 != "NgsOn") continue;
+                        Console.WriteLine($"Removing {bml.SubObjects[i].Item1}");
+                        bml.SubObjects.RemoveAt(i);
+                    }
+                }
+                Console.WriteLine();
+
+                File.WriteAllBytes(kartRiderDirectory + PinFile, val.GetEncryptedData());
+                Launcher.GetKart = false;
+                // origin passport:aHR0cHM6Ly9naXRodWIuY29tL3lhbnlnbS9MYXVuY2hlcl9WMi9yZWxlYXNlcw==
+                ProcessStartInfo startInfo = new ProcessStartInfo(Launcher.KartRider, "TGC -region:3 -passport:OFFLINE")
+                {
+                    WorkingDirectory = kartRiderDirectory,
+                    UseShellExecute = true,
+                    Verb = "runas"
+                };
+                try
+                {
+                    Process.Start(startInfo);
+                    Thread.Sleep(1000);
+                    Launcher.GetKart = true;
+                }
+                catch (System.ComponentModel.Win32Exception ex)
+                {
+                    // 用户取消了UAC提示或没有权限
+                    // Console.WriteLine(ex.Message);
+                    Console.WriteLine("用户积极取消操作, 或者没有Administer权限.");
+                }
+            })).Start();
         }
 
         private void GetKart_Button_Click(object sender, EventArgs e)
         {
-            if (Launcher.GetKart)
-            {
-                Program.GetKartDlg = new GetKart();
-                Program.GetKartDlg.ShowDialog();
-            }
+            if (!Launcher.GetKart) return;
+            Program.GetKartDlg = new GetKart();
+            Program.GetKartDlg.ShowDialog();
         }
 
         public void Load_KartExcData()
         {
-            Console.WriteLine("正在读取配置文件");
+            Console.WriteLine("正在读取配置文件...");
             string ModelMaxPath = AppDomain.CurrentDomain.BaseDirectory + @"Profile\ModelMax.xml";
             string ModelMax = Resources.ModelMax;
             if (!File.Exists(ModelMaxPath))
@@ -400,7 +413,7 @@ namespace KartRider
             KartExcData.PartsList = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\PartsData.xml", LoadPartsData);
             KartExcData.Parts12List = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\Parts12Data.xml", LoadParts12Data);
             KartExcData.Level12List = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\Level12Data.xml", LoadLevel12Data);
-            Console.WriteLine("读取完成");
+            Console.WriteLine("配置文件读取完成.");
         }
 
         private void EnsureDefaultDataFileExists(string filePath, Action<string> createDefaultData)
@@ -508,7 +521,7 @@ namespace KartRider
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"生成XML文件时出错：{ex.Message}");
+                Console.WriteLine($"生成XML文件时出错: {ex.Message}");
             }
         }
 
@@ -793,7 +806,7 @@ namespace KartRider
             }
             catch (Exception ex)
             {
-                if (ex.GetType() == typeof(System.ComponentModel.Win32Exception))
+                if (ex is System.ComponentModel.Win32Exception)
                 {
                     Console.WriteLine("计时日志文件未找到, 请进行计时后再查看!");
                 }
@@ -801,6 +814,46 @@ namespace KartRider
                 {
                     Console.WriteLine($"错误: {ex.Message}");
                 }
+            }
+        }
+
+        private void button_KillGameProcesses_Click(object sender, EventArgs e)
+        {
+            Process[] gameProcesses = Process.GetProcessesByName("KartRider");
+            if (gameProcesses.Length > 0)
+            {
+
+                if ((int)MessageBox.Show("确认要强制停止所有跑跑卡丁车游戏进程吗？", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) != 1)
+                {
+                    return;
+                }
+                foreach (Process gProcess in gameProcesses)
+                {
+                    try
+                    {
+                        gProcess.Kill();
+                        gProcess.WaitForExit();
+                        Console.WriteLine("成功强制关闭游戏进程!");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"无法强制关闭游戏进程: {ex.Message}");
+                    }
+                }
+                gameProcesses = Process.GetProcessesByName("KartRider");
+                if (gameProcesses.Length == 0)
+                {
+                    MessageBox.Show("所有游戏进程已成功关闭!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("部分游戏进程无法关闭, 请尝试使用任务管理器!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            else
+            {
+                Console.WriteLine("没有找到正在运行的游戏进程!");
+                MessageBox.Show("没有找到正在运行的跑跑卡丁车进程!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }
