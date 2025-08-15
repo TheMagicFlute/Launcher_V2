@@ -26,7 +26,7 @@ namespace KartRider
     {
 #if DEBUG
         public const bool DBG = true;
-#elif RELEASE
+#else
         public const bool DBG = false;
 #endif
 
@@ -95,23 +95,23 @@ namespace KartRider
             {
                 // change country code & write to file
                 CC = ((CountryCode)Enum.Parse(typeof(CountryCode), CountryCode));
-                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_CC + FileName.Extension, false))
+                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_CC, false))
                 {
                     streamWriter.Write(CC.ToString());
                 }
             }
-            else if (!File.Exists(FileName.Load_CC + FileName.Extension)) // no country code file, create default
+            else if (!File.Exists(FileName.Load_CC)) // no country code file, create default
             {
                 // default country code is CN (China)
-                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_CC + FileName.Extension, false))
+                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_CC, false))
                 {
                     streamWriter.Write(CC.ToString());
                 }
             }
 
-            if (File.Exists(FileName.Load_CC + FileName.Extension)) // load country code from file
+            if (File.Exists(FileName.Load_CC)) // load country code from file
             {
-                string textValue = System.IO.File.ReadAllText(FileName.Load_CC + FileName.Extension);
+                string textValue = System.IO.File.ReadAllText(FileName.Load_CC);
                 CC = (CountryCode)Enum.Parse(typeof(CountryCode), textValue);
             }
             Console.WriteLine($"最后一次打开于: {CC.ToString()}");
@@ -121,17 +121,18 @@ namespace KartRider
 
             if (args == null || args.Length == 0)
             {
-                string regPth = @"HKEY_CURRENT_USER\SOFTWARE\TCGame\kart";
-                RootDirectory = (string)Registry.GetValue(regPth, "gamepath", null);
+                string TCGKartRegPth = @"HKEY_CURRENT_USER\SOFTWARE\TCGame\kart";
+                string TCGKartGamePth = (string)Registry.GetValue(TCGKartRegPth, "gamepath", null);
                 if (CheckGameAvailability(AppDomain.CurrentDomain.BaseDirectory))
                 {
                     // working directory
                     RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
                     Console.WriteLine("使用当前目录下的游戏.");
                 }
-                else if (CheckGameAvailability(RootDirectory))
+                else if (CheckGameAvailability(TCGKartGamePth))
                 {
                     // TCGame registered directory
+                    RootDirectory = TCGKartGamePth;
                     Console.WriteLine("使用TCGame注册的游戏目录下的游戏.");
                 }
                 else
@@ -139,10 +140,6 @@ namespace KartRider
                     // game not found
                     MsgErrorFileNotFound();
                     return;
-                }
-                if (string.IsNullOrEmpty(RootDirectory))
-                {
-                    Console.WriteLine("Error: 游戏目录为空目录!"); return;
                 }
 
                 // load Data files
@@ -159,7 +156,15 @@ namespace KartRider
                 }
 
                 // auto hide console window if not in debug mode
-                if (!DBG) ShowWindow(consoleHandle, SW_HIDE);
+                if (!File.Exists(FileName.Load_ConsoleVisibility))
+                {
+                    using (StreamWriter streamWriter = new StreamWriter(FileName.Load_ConsoleVisibility, false))
+                    {
+                        streamWriter.Write((DBG ? "1" : "0"));
+                    }
+                }
+                string isConsoleVisible = File.ReadAllText(FileName.Load_ConsoleVisibility);
+                if (isConsoleVisible == "0") ShowWindow(consoleHandle, SW_HIDE);
 
                 // open launcher form
                 Application.EnableVisualStyles();
@@ -227,24 +232,31 @@ namespace KartRider
 
         public static bool CheckGameAvailability(string gamePath)
         {
-            return File.Exists(gamePath + Launcher.KartRider) && File.Exists(gamePath + Launcher.PinFile);
+            return !string.IsNullOrEmpty(gamePath)
+                && File.Exists(gamePath + Launcher.KartRider)
+                && File.Exists(gamePath + Launcher.PinFile);
         }
 
         public static void MsgErrorFileNotFound()
         {
-            if (!File.Exists(RootDirectory + Launcher.KartRider) && !File.Exists(RootDirectory + Launcher.PinFile))
+            if (string.IsNullOrEmpty(RootDirectory))
             {
-                Console.WriteLine($"Cannot find {Launcher.KartRider} and {Launcher.PinFile}.");
+                Console.WriteLine("Error: 游戏路径为空.");
+                MessageBox.Show("游戏路径为空!", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (!File.Exists(RootDirectory + Launcher.KartRider) && !File.Exists(RootDirectory + Launcher.PinFile))
+            {
+                Console.WriteLine($"Error: Cannot find {Launcher.KartRider} and {Launcher.PinFile}.");
                 MessageBox.Show($"找不到 {Launcher.KartRider} 以及 {Launcher.PinFile} !\n请检查游戏是否正确安装.\n如使用特定版本游戏, 请检查启动器处在的位置是否与该版本安装在同一目录下.\n如错误仍然存在, 请重新安装游戏.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else if (!File.Exists(RootDirectory + Launcher.KartRider))
             {
-                Console.WriteLine($"Cannot find {Launcher.KartRider}.");
+                Console.WriteLine($"Error: Cannot find {Launcher.KartRider}.");
                 MessageBox.Show($"找不到 {RootDirectory + Launcher.KartRider}. 请检查文件是否存在.\n如错误仍然发生, 请尝试重新安装游戏.");
             }
             else if (!File.Exists(RootDirectory + Launcher.PinFile))
             {
-                Console.WriteLine($"Cannot find {Launcher.PinFile}.");
+                Console.WriteLine($"Error: Cannot find {Launcher.PinFile}.");
                 MessageBox.Show($"找不到 {RootDirectory + Launcher.PinFile}. 请检查文件是否存在. \n如错误仍然发生, 请尝试重新安装游戏.");
             }
             Environment.Exit(1);

@@ -56,6 +56,25 @@ namespace KartRider
         public Launcher()
         {
             InitializeComponent();
+            // ----------
+            SetGameOption.Load_SetGameOption();
+            foreach (string key in SpeedType.speedNames.Keys)
+            {
+                Speed_comboBox.Items.Add(key);
+            }
+            KeyValuePair<string, byte> speed = SpeedType.speedNames.FirstOrDefault(a => a.Value == SetGameOption.SpeedType);
+            if (!String.IsNullOrEmpty(speed.Key))
+            {
+                Speed_comboBox.Text = speed.Key;
+            }
+            ClientVersion.Text = $"P{SetGameOption.Version.ToString()}";
+            VersionLabel.Text = currentVersion;
+            VersionLabel.Location = new Point(Launcher_label.Location.X + 70, Launcher_label.Location.Y);
+            ClientVersion.Location = new Point(label_Client.Location.X + 70, label_Client.Location.Y);
+
+            StartPosition = FormStartPosition.Manual;
+            Rectangle screen = Screen.PrimaryScreen.WorkingArea;
+            Location = new Point(screen.Width - Width, screen.Height - Height);
         }
 
         private void InitializeComponent()
@@ -287,7 +306,6 @@ namespace KartRider
             {
                 MessageBox.Show("跑跑卡丁车正在运行，请结束跑跑卡丁车后再退出该程序！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 e.Cancel = true;
-                return;
             }
         }
 
@@ -299,21 +317,6 @@ namespace KartRider
             PINFile val = new PINFile(this.kartRiderDirectory + PinFile);
             SetGameOption.Version = val.Header.MinorVersion;
             SetGameOption.Save_SetGameOption();
-
-            // ----------
-            foreach (string key in SpeedType.speedNames.Keys)
-            {
-                Speed_comboBox.Items.Add(key);
-            }
-            ClientVersion.Text = $"P{SetGameOption.Version.ToString()}";
-            VersionLabel.Text = currentVersion;
-            VersionLabel.Location = new Point(Launcher_label.Location.X + 70, Launcher_label.Location.Y);
-            ClientVersion.Location = new Point(label_Client.Location.X + 70, label_Client.Location.Y);
-
-            StartPosition = FormStartPosition.Manual;
-            Rectangle screen = Screen.PrimaryScreen.WorkingArea;
-            Location = new Point(screen.Width - Width, screen.Height - Height);
-            // ----------
 
             Console.WriteLine($"Process: {this.kartRiderDirectory + Launcher.KartRider}");
             try
@@ -762,7 +765,10 @@ namespace KartRider
                 if (SpeedType.speedNames.ContainsKey(selectedSpeed))
                 {
                     Config.SpeedType = SpeedType.speedNames[selectedSpeed];
-                    Console.WriteLine($"速度更改为: {selectedSpeed}");
+                    Console.Write($"速度更改为: {selectedSpeed}...");
+                    SetGameOption.SpeedType = Config.SpeedType;
+                    SetGameOption.Save_SetGameOption();
+                    Console.WriteLine("已保存.");
                 }
                 else
                 {
@@ -890,8 +896,13 @@ namespace KartRider
 
         private void button_ToggleTerminal_Click(object sender, EventArgs e)
         {
-            bool isTerminalVisible = IsWindowVisible(consoleHandle);
-            ShowWindow(consoleHandle, isTerminalVisible ? SW_HIDE : SW_SHOW);
+            bool isConsoleVisible = IsWindowVisible(consoleHandle);
+            isConsoleVisible = !isConsoleVisible;
+            ShowWindow(consoleHandle, isConsoleVisible ? SW_SHOW : SW_HIDE);
+            using (StreamWriter streamWriter = new StreamWriter(FileName.Load_ConsoleVisibility, false))
+            {
+                streamWriter.Write((isConsoleVisible ? "1" : "0"));
+            }
         }
     }
 }

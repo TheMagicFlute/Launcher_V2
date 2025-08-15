@@ -12,7 +12,8 @@ namespace Set_Data
         public static string SetGameOption_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Launcher\GameOption\";
         public static string config_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Launcher\Config";
 
-        public static string Load_CC = AppDomain.CurrentDomain.BaseDirectory + @"Profile\CountryCode";
+        public static string Load_CC = AppDomain.CurrentDomain.BaseDirectory + @"Profile\CountryCode" + Extension;
+        public static string Load_ConsoleVisibility = AppDomain.CurrentDomain.BaseDirectory + @"Profile\ConsoleVisibility" + Extension;
 
         public static string SetRider_Nickname = "Set_Nickname";
         public static string SetRider_RiderIntro = "Set_RiderIntro";
