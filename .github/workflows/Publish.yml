@@ -23,15 +23,20 @@ jobs:
           TAG_NAME=$(TZ='Asia/Shanghai' date +'%y%m%d')
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
 
-      - name: Create Git tag
+      - name: Create or recreate Git tag
         run: |
-          if git rev-parse ${{ steps.get_tag.outputs.tag_name }} >/dev/null 2>&1 || \
-             git ls-remote --tags origin | grep "refs/tags/${{ steps.get_tag.outputs.tag_name }}$" >/dev/null; then
-            echo "Tag ${{ steps.get_tag.outputs.tag_name }} already exists locally or remotely, skip create and push."
-          else
-            git tag ${{ steps.get_tag.outputs.tag_name }}
-            git push origin ${{ steps.get_tag.outputs.tag_name }}
+          TAG=${{ steps.get_tag.outputs.tag_name }}
+          # Delete local tag if exists
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+        git tag -d "$TAG"
           fi
+          # Delete remote tag if exists
+          if git ls-remote --tags origin | grep "refs/tags/$TAG$" >/dev/null; then
+        git push origin :refs/tags/"$TAG"
+          fi
+          # Create and push new tag
+          git tag "$TAG"
+          git push origin "$TAG"
 
   publish-and-archive:
     runs-on: ubuntu-latest
@@ -90,7 +95,6 @@ jobs:
         with:
           draft: false
           prerelease: false
-          overwrite_files: true
           files: |
             Launcher_x64.zip
             Launcher_x86.zip
