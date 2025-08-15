@@ -25,16 +25,13 @@ jobs:
 
       - name: Create or recreate Git tag
         run: |
-          TAG=${{ steps.get_tag.outputs.tag_name }}
-          # Delete local tag if exists
+          TAG=${{ steps.get_tag.outputs.tag_name }} 
           if git rev-parse "$TAG" >/dev/null 2>&1; then
-        git tag -d "$TAG"
+            git tag -d "$TAG"
           fi
-          # Delete remote tag if exists
           if git ls-remote --tags origin | grep "refs/tags/$TAG$" >/dev/null; then
-        git push origin :refs/tags/"$TAG"
+            git push origin :refs/tags/"$TAG"
           fi
-          # Create and push new tag
           git tag "$TAG"
           git push origin "$TAG"
 
