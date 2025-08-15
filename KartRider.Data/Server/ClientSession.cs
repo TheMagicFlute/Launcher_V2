@@ -108,7 +108,7 @@ namespace KartRider
                         iPacket.ReadShort();
                         using (OutPacket outPacket = new OutPacket("LoRpAddRacingTimePacket"))
                         {
-                            //outPacket.WriteHexString("FF FF FF FF 00 00 00 00 00 00 00 00 00 00");
+                            // outPacket.WriteHexString("FF FF FF FF 00 00 00 00 00 00 00 00 00 00");
                             outPacket.WriteUInt(Time);
                             outPacket.WriteInt(0);
                             outPacket.WriteShort(0);
@@ -142,10 +142,10 @@ namespace KartRider
                                 outPacket.WriteUInt(competitive.Time);
                                 outPacket.WriteHexString("FF FF FF FF");
                                 outPacket.WriteShort(competitive.Booster);
-                                outPacket.WriteInt(competitive.BoosterPoint);
+                                outPacket.WriteUInt(competitive.BoosterPoint);
                                 outPacket.WriteShort(competitive.Crash);
-                                outPacket.WriteInt(competitive.CrashPoint);
-                                outPacket.WriteInt(competitive.Point);
+                                outPacket.WriteUInt(competitive.CrashPoint);
+                                outPacket.WriteUInt(competitive.Point);
                                 outPacket.WriteInt(0);
                             }
                             this.Parent.Client.Send(outPacket);
@@ -1883,10 +1883,10 @@ namespace KartRider
                                 outPacket.WriteUInt(competitive.Time);
                                 outPacket.WriteHexString("FF FF FF FF");
                                 outPacket.WriteShort(competitive.Booster);
-                                outPacket.WriteInt(competitive.BoosterPoint);
+                                outPacket.WriteUInt(competitive.BoosterPoint);
                                 outPacket.WriteShort(competitive.Crash);
-                                outPacket.WriteInt(competitive.CrashPoint);
-                                outPacket.WriteInt(competitive.Point);
+                                outPacket.WriteUInt(competitive.CrashPoint);
+                                outPacket.WriteUInt(competitive.Point);
                                 outPacket.WriteInt(0);
                             }
                             this.Parent.Client.Send(outPacket);
