@@ -33,16 +33,22 @@ namespace KartRider
         public static async Task<bool> UpdateDataAsync()
         {
             Console.WriteLine("正在检查更新...");
-            Console.WriteLine("当前Branch: {0}/{1}", ThisAssembly.Git.RepositoryUrl, ThisAssembly.Git.Branch);
-            Console.WriteLine("当前Commit: {0}", ThisAssembly.Git.Commit);
-            Console.WriteLine("当前Commit SHA: {0}", ThisAssembly.Git.Sha);
-            Console.WriteLine("当前Commit日期: {0}", ThisAssembly.Git.CommitDate);
+            Console.WriteLine($"当前Branch: {ThisAssembly.Git.RepositoryUrl}/{ThisAssembly.Git.Branch}");
+            Console.WriteLine($"当前Commit: {ThisAssembly.Git.Commit}");
+            Console.WriteLine($"当前Commit SHA: {ThisAssembly.Git.Sha}");
+            Console.WriteLine($"当前Commit日期: {ThisAssembly.Git.CommitDate}");
             Console.WriteLine($"当前版本为: {currentVersion}");
 
             tag_name = await GetTag_name();
             update_info = await GetUpdate_Info();
 
-            if (tag_name != "" && int.Parse(currentVersion) < int.Parse(tag_name))
+            if (tag_name == "") // 更新请求失败
+            {
+                Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
+                return false;
+            }
+
+            if (int.Parse(currentVersion) < int.Parse(tag_name))
             {
                 // ask user whether to update
                 Console.WriteLine($"发现新版本: {tag_name}");
@@ -82,11 +88,13 @@ namespace KartRider
         {
             try
             {
-                string country = await GetCountryAsync();
+                // string country = await GetCountryAsync();
+                string country = Program.CC.ToString();
                 string url = $"https://github.com/{owner}/{repo}/releases/download/{tag_name}/{fileName}";
                 // 中国大陆需要使用代理下载，处理 url
                 if (country != "" && country == "CN")
                 {
+                    Console.WriteLine("Using proxy.");
                     List<string> urls = new List<string>()
                     {
                         "https://ghproxy.net/",
@@ -95,7 +103,6 @@ namespace KartRider
                         "http://kra.myany.uk:2233/",
                         "http://krb.myany.uk:2233/"
                     };
-                    Console.WriteLine("Using proxy.");
                     foreach (string url_ in urls)
                     {
                         if (url_ == "https://ghproxy.net/" || url_ == "https://hub.myany.uk/")
@@ -300,7 +307,7 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + ".exe" +
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"请求IP地址时发生异常: {ex.Message}");
+                Console.WriteLine($"请求 IP 地址时发生异常: {ex.Message}");
                 return "";
             }
         }

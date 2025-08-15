@@ -27,7 +27,7 @@ namespace XmlFileUpdater
                 if (localXml == null || resourceXml == null ||
                     localXml.Root == null || resourceXml.Root == null)
                 {
-                    Console.WriteLine("无法加载ModelMax.xml文件或ModelMax.xml结构不完整");
+                    Console.WriteLine("无法加载 ModelMax.xml 文件或 ModelMax.xml 结构不完整.");
                     return;
                 }
 
@@ -38,16 +38,16 @@ namespace XmlFileUpdater
                 if (isUpdated)
                 {
                     localXml.Save(localFilePath);
-                    Console.WriteLine("ModelMax.xml文件已更新");
+                    Console.WriteLine("ModelMax.xml 文件已更新!");
                 }
                 else
                 {
-                    Console.WriteLine("ModelMax.xml文件已是最新，无需更新");
+                    Console.WriteLine("ModelMax.xml 文件已是最新，无需更新!");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"处理ModelMax.xml文件时出错: {ex.Message}");
+                Console.WriteLine($"处理 ModelMax.xml 文件时出错: {ex.Message}");
             }
         }
 

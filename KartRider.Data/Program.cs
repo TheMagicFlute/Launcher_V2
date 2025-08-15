@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -34,6 +36,9 @@ namespace KartRider
         [DllImport("user32.dll")]
         public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+        [DllImport("user32.dll")]
+        public static extern bool IsWindowVisible(IntPtr hWnd);
+
         [DllImport("kernel32.dll")]
         public static extern IntPtr GetConsoleWindow();
 
@@ -41,6 +46,7 @@ namespace KartRider
         public const int SW_SHOW = 5;
 
         public static int consoleStatus = SW_SHOW;
+        public static IntPtr consoleHandle;
         public static Launcher LauncherDlg;
         public static GetKart GetKartDlg;
         public static bool SpeedPatch;
@@ -60,11 +66,13 @@ namespace KartRider
             Console.OutputEncoding = Encoding.Unicode;
             Console.InputEncoding = Encoding.Unicode;
             AllocConsole();
+            consoleHandle = Process.GetCurrentProcess().MainWindowHandle;
 
             Console.Write($"中国跑跑卡丁车单机启动器 | {architecture} | ");
             if (DBG) Console.Write("[DEBUG]");
             Console.WriteLine();
             Console.WriteLine("--------------------------------------------------");
+
             // delete updater
             string Update_File = AppDomain.CurrentDomain.BaseDirectory + "Update.bat";
             string Update_Folder = AppDomain.CurrentDomain.BaseDirectory + "Update";
@@ -81,21 +89,36 @@ namespace KartRider
                 Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "Profile");
             }
 
-            // check for update
-            if (await Update.UpdateDataAsync()) return;
-            
-            if (File.Exists(FileName.Load_CC + FileName.Extension))
+            // get country code
+            string CountryCode = await Update.GetCountryAsync();
+            if (CountryCode != "") // available country code
             {
-                string textValue = System.IO.File.ReadAllText(FileName.Load_CC + FileName.Extension);
-                Program.CC = (CountryCode)Enum.Parse(typeof(CountryCode), textValue);
-            }
-            else
-            {
+                // change country code & write to file
+                CC = ((CountryCode)Enum.Parse(typeof(CountryCode), CountryCode));
                 using (StreamWriter streamWriter = new StreamWriter(FileName.Load_CC + FileName.Extension, false))
                 {
-                    streamWriter.Write(Program.CC.ToString());
+                    streamWriter.Write(CC.ToString());
                 }
             }
+            else if (!File.Exists(FileName.Load_CC + FileName.Extension)) // no country code file, create default
+            {
+                // default country code is CN (China)
+                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_CC + FileName.Extension, false))
+                {
+                    streamWriter.Write(CC.ToString());
+                }
+            }
+
+            if (File.Exists(FileName.Load_CC + FileName.Extension)) // load country code from file
+            {
+                string textValue = System.IO.File.ReadAllText(FileName.Load_CC + FileName.Extension);
+                CC = (CountryCode)Enum.Parse(typeof(CountryCode), textValue);
+            }
+            Console.WriteLine($"最后一次打开于: {CC.ToString()}");
+
+            // check for update
+            if (await Update.UpdateDataAsync()) return;
+
             if (args == null || args.Length == 0)
             {
                 string regPth = @"HKEY_CURRENT_USER\SOFTWARE\TCGame\kart";
@@ -104,12 +127,12 @@ namespace KartRider
                 {
                     // working directory
                     RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                    Console.WriteLine("使用当前目录下的游戏");
+                    Console.WriteLine("使用当前目录下的游戏.");
                 }
                 else if (CheckGameAvailability(RootDirectory))
                 {
                     // TCGame registered directory
-                    Console.WriteLine("使用TCGame注册的游戏目录下的游戏");
+                    Console.WriteLine("使用TCGame注册的游戏目录下的游戏.");
                 }
                 else
                 {
@@ -117,31 +140,34 @@ namespace KartRider
                     MsgErrorFileNotFound();
                     return;
                 }
-                if (!string.IsNullOrEmpty(RootDirectory))
+                if (string.IsNullOrEmpty(RootDirectory))
                 {
-                    try
-                    {
-                        Console.WriteLine("读取Data文件");
-                        KartRhoFile.Dump(RootDirectory + @"Data\aaa.pk");
-                        KartRhoFile.packFolderManager.Reset();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"读取Data文件时出错: {ex.Message}");
-                    }
-
-                    IntPtr consoleHandle = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
-                    if (!DBG)
-                    {
-                        ShowWindow(consoleHandle, SW_HIDE);
-                    }
-
-                    Application.EnableVisualStyles();
-                    Application.SetCompatibleTextRenderingDefault(false);
-                    LauncherDlg = new Launcher();
-                    LauncherDlg.kartRiderDirectory = RootDirectory;
-                    Application.Run(LauncherDlg);
+                    Console.WriteLine("Error: 游戏目录为空目录!"); return;
                 }
+
+                // load Data files
+                try
+                {
+                    Console.WriteLine("读取Data文件...");
+                    KartRhoFile.Dump(RootDirectory + @"Data\aaa.pk");
+                    KartRhoFile.packFolderManager.Reset();
+                    Console.WriteLine("Data文件读取完成!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"读取Data文件时出错: {ex.Message}");
+                }
+
+                // auto hide console window if not in debug mode
+                if (!DBG) ShowWindow(consoleHandle, SW_HIDE);
+
+                // open launcher form
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                LauncherDlg = new Launcher();
+                LauncherDlg.kartRiderDirectory = RootDirectory;
+                Application.Run(LauncherDlg);
+                
             }
             else if (args.Length == 1)
             {

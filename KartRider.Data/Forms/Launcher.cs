@@ -49,6 +49,8 @@ namespace KartRider
         private Label label_Docs;
         private Label label_TimeAttackLog;
         private Button button_KillGameProcesses;
+        private Button button_ToggleTerminal;
+        private Button button_More_Options;
         private Label VersionLabel;
 
         public Launcher()
@@ -72,13 +74,15 @@ namespace KartRider
             label_Docs = new Label();
             label_TimeAttackLog = new Label();
             button_KillGameProcesses = new Button();
+            button_ToggleTerminal = new Button();
+            button_More_Options = new Button();
             SuspendLayout();
             // 
             // Start_Button
             // 
-            Start_Button.Location = new Point(19, 20);
+            Start_Button.Location = new Point(12, 12);
             Start_Button.Name = "Start_Button";
-            Start_Button.Size = new Size(135, 23);
+            Start_Button.Size = new Size(200, 25);
             Start_Button.TabIndex = 364;
             Start_Button.Text = "启动游戏";
             Start_Button.UseVisualStyleBackColor = true;
@@ -86,9 +90,9 @@ namespace KartRider
             // 
             // GetKart_Button
             // 
-            GetKart_Button.Location = new Point(19, 78);
+            GetKart_Button.Location = new Point(12, 105);
             GetKart_Button.Name = "GetKart_Button";
-            GetKart_Button.Size = new Size(135, 23);
+            GetKart_Button.Size = new Size(200, 25);
             GetKart_Button.TabIndex = 365;
             GetKart_Button.Text = "添加道具";
             GetKart_Button.UseVisualStyleBackColor = true;
@@ -100,11 +104,11 @@ namespace KartRider
             label_Client.BackColor = SystemColors.Control;
             label_Client.Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label_Client.ForeColor = Color.Blue;
-            label_Client.Location = new Point(2, 172);
+            label_Client.Location = new Point(2, 239);
             label_Client.Name = "label_Client";
-            label_Client.Size = new Size(59, 12);
+            label_Client.Size = new Size(71, 12);
             label_Client.TabIndex = 367;
-            label_Client.Text = "游戏版本:";
+            label_Client.Text = "游戏版本  :";
             label_Client.Click += label_Client_Click;
             // 
             // ClientVersion
@@ -135,7 +139,7 @@ namespace KartRider
             // 
             Launcher_label.AutoSize = true;
             Launcher_label.ForeColor = Color.Blue;
-            Launcher_label.Location = new Point(2, 190);
+            Launcher_label.Location = new Point(2, 251);
             Launcher_label.Name = "Launcher_label";
             Launcher_label.Size = new Size(71, 12);
             Launcher_label.TabIndex = 373;
@@ -146,9 +150,9 @@ namespace KartRider
             // 
             Speed_comboBox.ForeColor = Color.Red;
             Speed_comboBox.FormattingEnabled = true;
-            Speed_comboBox.Location = new Point(54, 131);
+            Speed_comboBox.Location = new Point(13, 159);
             Speed_comboBox.Name = "Speed_comboBox";
-            Speed_comboBox.Size = new Size(100, 20);
+            Speed_comboBox.Size = new Size(199, 20);
             Speed_comboBox.TabIndex = 368;
             Speed_comboBox.Text = "统合S1.5";
             Speed_comboBox.SelectedIndexChanged += Speed_comboBox_SelectedIndexChanged;
@@ -156,18 +160,19 @@ namespace KartRider
             // Speed_label
             // 
             Speed_label.AutoSize = true;
+            Speed_label.Font = new Font("宋体", 9F);
             Speed_label.ForeColor = Color.Blue;
-            Speed_label.Location = new Point(19, 134);
+            Speed_label.Location = new Point(12, 144);
             Speed_label.Name = "Speed_label";
-            Speed_label.Size = new Size(35, 12);
+            Speed_label.Size = new Size(65, 12);
             Speed_label.TabIndex = 369;
-            Speed_label.Text = "速度:";
+            Speed_label.Text = "速度选择: ";
             // 
             // GitHub
             // 
             GitHub.AutoSize = true;
             GitHub.ForeColor = Color.Blue;
-            GitHub.Location = new Point(191, 178);
+            GitHub.Location = new Point(171, 239);
             GitHub.Name = "GitHub";
             GitHub.Size = new Size(41, 12);
             GitHub.TabIndex = 371;
@@ -178,7 +183,7 @@ namespace KartRider
             // 
             KartInfo.AutoSize = true;
             KartInfo.ForeColor = Color.Blue;
-            KartInfo.Location = new Point(179, 190);
+            KartInfo.Location = new Point(159, 251);
             KartInfo.Name = "KartInfo";
             KartInfo.Size = new Size(53, 12);
             KartInfo.TabIndex = 372;
@@ -189,7 +194,7 @@ namespace KartRider
             // 
             label_Docs.AutoSize = true;
             label_Docs.ForeColor = Color.Blue;
-            label_Docs.Location = new Point(155, 166);
+            label_Docs.Location = new Point(135, 227);
             label_Docs.Name = "label_Docs";
             label_Docs.Size = new Size(77, 12);
             label_Docs.TabIndex = 374;
@@ -200,7 +205,7 @@ namespace KartRider
             // 
             label_TimeAttackLog.AutoSize = true;
             label_TimeAttackLog.ForeColor = Color.Blue;
-            label_TimeAttackLog.Location = new Point(155, 154);
+            label_TimeAttackLog.Location = new Point(135, 215);
             label_TimeAttackLog.Name = "label_TimeAttackLog";
             label_TimeAttackLog.Size = new Size(77, 12);
             label_TimeAttackLog.TabIndex = 375;
@@ -209,20 +214,42 @@ namespace KartRider
             // 
             // button_KillGameProcesses
             // 
-            button_KillGameProcesses.Location = new Point(19, 49);
+            button_KillGameProcesses.Location = new Point(12, 43);
             button_KillGameProcesses.Name = "button_KillGameProcesses";
-            button_KillGameProcesses.Size = new Size(135, 23);
+            button_KillGameProcesses.Size = new Size(200, 25);
             button_KillGameProcesses.TabIndex = 376;
             button_KillGameProcesses.Text = "强制关闭游戏";
             button_KillGameProcesses.UseVisualStyleBackColor = true;
             button_KillGameProcesses.Click += button_KillGameProcesses_Click;
+            // 
+            // button_ToggleTerminal
+            // 
+            button_ToggleTerminal.Location = new Point(12, 74);
+            button_ToggleTerminal.Name = "button_ToggleTerminal";
+            button_ToggleTerminal.Size = new Size(200, 25);
+            button_ToggleTerminal.TabIndex = 377;
+            button_ToggleTerminal.Text = "切换终端";
+            button_ToggleTerminal.UseVisualStyleBackColor = true;
+            button_ToggleTerminal.Click += button_ToggleTerminal_Click;
+            // 
+            // button_More_Options
+            // 
+            button_More_Options.Location = new Point(12, 185);
+            button_More_Options.Name = "button_More_Options";
+            button_More_Options.Size = new Size(200, 25);
+            button_More_Options.TabIndex = 378;
+            button_More_Options.Text = "更多选项";
+            button_More_Options.UseVisualStyleBackColor = true;
+            button_More_Options.Click += button_More_Options_Click;
             // 
             // Launcher
             // 
             AutoScaleDimensions = new SizeF(6F, 12F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(244, 211);
+            ClientSize = new Size(224, 271);
+            Controls.Add(button_More_Options);
+            Controls.Add(button_ToggleTerminal);
             Controls.Add(button_KillGameProcesses);
             Controls.Add(label_TimeAttackLog);
             Controls.Add(label_Docs);
@@ -242,7 +269,6 @@ namespace KartRider
             MaximizeBox = false;
             Name = "Launcher";
             Text = "Launcher";
-            Location = new Point(0, 0);
             TopMost = true;
             FormClosing += OnFormClosing;
             Load += OnLoad;
@@ -281,8 +307,8 @@ namespace KartRider
             }
             ClientVersion.Text = $"P{SetGameOption.Version.ToString()}";
             VersionLabel.Text = currentVersion;
-            VersionLabel.Location = new Point(Launcher_label.Location.X + 75, Launcher_label.Location.Y);
-            ClientVersion.Location = new Point(label_Client.Location.X + 75, label_Client.Location.Y);
+            VersionLabel.Location = new Point(Launcher_label.Location.X + 70, Launcher_label.Location.Y);
+            ClientVersion.Location = new Point(label_Client.Location.X + 70, label_Client.Location.Y);
 
             StartPosition = FormStartPosition.Manual;
             Rectangle screen = Screen.PrimaryScreen.WorkingArea;
@@ -384,7 +410,7 @@ namespace KartRider
 
         private void GetKart_Button_Click(object sender, EventArgs e)
         {
-            if (!Launcher.GetKart) return;
+            if (!GetKart) return;
             Program.GetKartDlg = new GetKart();
             Program.GetKartDlg.ShowDialog();
         }
@@ -413,7 +439,7 @@ namespace KartRider
             KartExcData.PartsList = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\PartsData.xml", LoadPartsData);
             KartExcData.Parts12List = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\Parts12Data.xml", LoadParts12Data);
             KartExcData.Level12List = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\Level12Data.xml", LoadLevel12Data);
-            Console.WriteLine("配置文件读取完成.");
+            Console.WriteLine("配置文件读取完成!");
         }
 
         private void EnsureDefaultDataFileExists(string filePath, Action<string> createDefaultData)
@@ -521,7 +547,7 @@ namespace KartRider
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"生成XML文件时出错: {ex.Message}");
+                Console.WriteLine($"生成 XML 文件时出错: {ex.Message}");
             }
         }
 
@@ -548,7 +574,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\NewKart.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\NewKart.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -574,7 +600,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\TuneData.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\TuneData.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -601,7 +627,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\PlantData.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\PlantData.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -627,7 +653,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\LevelData.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\LevelData.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -660,7 +686,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\PartsData.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\PartsData.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -695,7 +721,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\Parts12Data.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\Parts12Data.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -722,7 +748,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\Level12Data.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\Level12Data.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -855,6 +881,17 @@ namespace KartRider
                 Console.WriteLine("没有找到正在运行的游戏进程!");
                 MessageBox.Show("没有找到正在运行的跑跑卡丁车进程!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private void button_More_Options_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("更多选项功能尚未实现!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void button_ToggleTerminal_Click(object sender, EventArgs e)
+        {
+            bool isTerminalVisible = IsWindowVisible(consoleHandle);
+            ShowWindow(consoleHandle, isTerminalVisible ? SW_HIDE : SW_SHOW);
         }
     }
 }
