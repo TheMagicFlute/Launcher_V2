@@ -90,6 +90,7 @@ jobs:
         with:
           draft: false
           prerelease: false
+          overwrite_files: true
           files: |
             Launcher_x64.zip
             Launcher_x86.zip
@@ -98,6 +99,5 @@ jobs:
           tag_name: ${{ needs.tag.outputs.tag_name }}
           generate_release_notes: true
           make_latest: true
-          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
