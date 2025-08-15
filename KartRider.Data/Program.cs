@@ -232,8 +232,21 @@ namespace KartRider
 
         public static void MsgErrorFileNotFound()
         {
-            Console.WriteLine("Error: 未找到游戏!");
-            MessageBox.Show($"找不到 {Launcher.KartRider} 或 {Launcher.PinFile} !\n请检查游戏是否正确安装.\n如使用特定版本游戏, 请检查启动器处在的位置是否与该版本安装在同一目录下. ", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (!File.Exists(RootDirectory + Launcher.KartRider) && !File.Exists(RootDirectory + Launcher.PinFile))
+            {
+                Console.WriteLine($"Cannot find {Launcher.KartRider} and {Launcher.PinFile}.");
+                MessageBox.Show($"找不到 {Launcher.KartRider} 以及 {Launcher.PinFile} !\n请检查游戏是否正确安装.\n如使用特定版本游戏, 请检查启动器处在的位置是否与该版本安装在同一目录下.\n如错误仍然存在, 请重新安装游戏.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (!File.Exists(RootDirectory + Launcher.KartRider))
+            {
+                Console.WriteLine($"Cannot find {Launcher.KartRider}.");
+                MessageBox.Show($"找不到 {RootDirectory + Launcher.KartRider}. 请检查文件是否存在.\n如错误仍然发生, 请尝试重新安装游戏.");
+            }
+            else if (!File.Exists(RootDirectory + Launcher.PinFile))
+            {
+                Console.WriteLine($"Cannot find {Launcher.PinFile}.");
+                MessageBox.Show($"找不到 {RootDirectory + Launcher.PinFile}. 请检查文件是否存在. \n如错误仍然发生, 请尝试重新安装游戏.");
+            }
             Environment.Exit(1);
         }
 
