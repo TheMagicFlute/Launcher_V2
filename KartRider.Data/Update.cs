@@ -40,7 +40,6 @@ namespace KartRider
             Console.WriteLine($"当前版本为: {currentVersion}");
 
             tag_name = await GetTag_name();
-            update_info = await GetUpdate_Info();
 
             if (tag_name == "") // 更新请求失败
             {
@@ -50,6 +49,7 @@ namespace KartRider
 
             if (int.Parse(currentVersion) < int.Parse(tag_name))
             {
+                update_info = await GetUpdate_Info();
                 // ask user whether to update
                 Console.WriteLine($"发现新版本: {tag_name}");
                 Console.WriteLine("-------------------------");
@@ -73,7 +73,8 @@ namespace KartRider
                     Console.Write("请输入 (Y for yes / n for no): ");
                 }
                 // 尝试下载最新的版本
-                update_url = await ProcessUrlAsync();
+                string update_url = $"https://github.com/{owner}/{repo}/releases/download/{tag_name}/{fileName}";
+                update_url = await ProcessUrlAsync(update_url);
                 Console.WriteLine($"正在 从 {update_url} 下载 {tag_name}...");
                 return await DownloadUpdateAsync(update_url);
             }
@@ -84,17 +85,16 @@ namespace KartRider
             }
         }
 
-        public static async Task<string> ProcessUrlAsync()
+        public static async Task<string> ProcessUrlAsync(string url)
         {
             try
             {
                 // string country = await GetCountryAsync();
                 string country = Program.CC.ToString();
-                string url = $"https://github.com/{owner}/{repo}/releases/download/{tag_name}/{fileName}";
                 // 中国大陆需要使用代理下载，处理 url
                 if (country != "" && country == "CN")
                 {
-                    Console.WriteLine("Using proxy.");
+                    Console.WriteLine("Using proxy...");
                     List<string> urls = new List<string>()
                     {
                         "https://ghproxy.net/",
@@ -105,16 +105,18 @@ namespace KartRider
                     };
                     foreach (string url_ in urls)
                     {
+                        string testUrl = url;
                         if (url_ == "https://ghproxy.net/" || url_ == "https://hub.myany.uk/")
                         {
-                            url = url_ + url;
+                            testUrl = url_ + url;
                         }
                         else
                         {
-                            url = url_ + url.Replace("https://", "");
+                            testUrl = url_ + url.Replace("https://", "");
                         }
-                        if (await GetUrl(url))
+                        if (await GetUrl(testUrl))
                         {
+                            url = testUrl;
                             break;
                         }
                     }
@@ -315,6 +317,7 @@ start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + ".exe" +
         public static async Task<HttpResponseMessage> GetReleaseInfoAsync()
         {
             string url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
+            url = await ProcessUrlAsync(url);
             try
             {
 
