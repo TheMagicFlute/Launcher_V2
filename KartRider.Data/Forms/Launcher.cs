@@ -49,7 +49,7 @@ namespace KartRider
         private Label label_Docs;
         private Label label_TimeAttackLog;
         private Button button_KillGameProcesses;
-        private Button button_ToggleTerminal;
+        private Button button_ToggleConsole;
         private Button button_More_Options;
         private Label VersionLabel;
 
@@ -93,7 +93,7 @@ namespace KartRider
             label_Docs = new Label();
             label_TimeAttackLog = new Label();
             button_KillGameProcesses = new Button();
-            button_ToggleTerminal = new Button();
+            button_ToggleConsole = new Button();
             button_More_Options = new Button();
             SuspendLayout();
             // 
@@ -241,15 +241,15 @@ namespace KartRider
             button_KillGameProcesses.UseVisualStyleBackColor = true;
             button_KillGameProcesses.Click += button_KillGameProcesses_Click;
             // 
-            // button_ToggleTerminal
+            // button_ToggleConsole
             // 
-            button_ToggleTerminal.Location = new Point(12, 74);
-            button_ToggleTerminal.Name = "button_ToggleTerminal";
-            button_ToggleTerminal.Size = new Size(200, 25);
-            button_ToggleTerminal.TabIndex = 377;
-            button_ToggleTerminal.Text = "切换终端";
-            button_ToggleTerminal.UseVisualStyleBackColor = true;
-            button_ToggleTerminal.Click += button_ToggleTerminal_Click;
+            button_ToggleConsole.Location = new Point(12, 74);
+            button_ToggleConsole.Name = "button_ToggleConsole";
+            button_ToggleConsole.Size = new Size(200, 25);
+            button_ToggleConsole.TabIndex = 377;
+            button_ToggleConsole.Text = "切换终端";
+            button_ToggleConsole.UseVisualStyleBackColor = true;
+            button_ToggleConsole.Click += button_ToggleConsole_Click;
             // 
             // button_More_Options
             // 
@@ -268,7 +268,7 @@ namespace KartRider
             BackColor = SystemColors.Control;
             ClientSize = new Size(224, 271);
             Controls.Add(button_More_Options);
-            Controls.Add(button_ToggleTerminal);
+            Controls.Add(button_ToggleConsole);
             Controls.Add(button_KillGameProcesses);
             Controls.Add(label_TimeAttackLog);
             Controls.Add(label_Docs);
@@ -894,7 +894,7 @@ namespace KartRider
             MessageBox.Show("更多选项功能尚未实现!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void button_ToggleTerminal_Click(object sender, EventArgs e)
+        private void button_ToggleConsole_Click(object sender, EventArgs e)
         {
             bool isConsoleVisible = IsWindowVisible(consoleHandle);
             isConsoleVisible = !isConsoleVisible;
