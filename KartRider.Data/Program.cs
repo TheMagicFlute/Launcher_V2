@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -63,9 +64,11 @@ namespace KartRider
             string input = "";
             string output = "";
 
-            Console.OutputEncoding = Encoding.Unicode;
-            Console.InputEncoding = Encoding.Unicode;
             AllocConsole();
+            // 初始化自适应编码
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            SetAdaptiveConsoleEncoding();
+
             consoleHandle = Process.GetCurrentProcess().MainWindowHandle;
 
             Console.Write($"中国跑跑卡丁车单机启动器 | {architecture} | ");
@@ -172,7 +175,6 @@ namespace KartRider
                 LauncherDlg = new Launcher();
                 LauncherDlg.kartRiderDirectory = RootDirectory;
                 Application.Run(LauncherDlg);
-                
             }
             else if (args.Length == 1)
             {
@@ -639,6 +641,52 @@ namespace KartRider
             }
 
             root.Save(input + "\\aaa.xml");
+        }
+
+        public static void SetAdaptiveConsoleEncoding()
+        {
+            try
+            {
+                // 1. 检测操作系统类型
+                bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            
+                // 2. 优先尝试 UTF-8（跨平台通用）
+                Encoding targetEncoding = Encoding.UTF8;
+
+                // 3. Windows 中文环境特殊处理（部分终端默认 GBK）
+                if (isWindows)
+                {
+                    // 获取系统默认区域语言
+                    var systemCulture = CultureInfo.InstalledUICulture;
+                    bool isChineseCulture = systemCulture.Name.StartsWith("zh-");
+
+                    // 中文系统尝试使用 GBK（CP936），避免 UTF-8 在部分老终端乱码
+                    if (isChineseCulture)
+                    {
+                        try
+                        {
+                            targetEncoding = Encoding.GetEncoding(936); // 936 对应 GBK
+                        }
+                        catch (ArgumentException)
+                        {
+                            // 极少数情况系统不支持 GBK，则 fallback 到 UTF-8
+                            targetEncoding = Encoding.UTF8;
+                        }
+                    }
+                }
+
+                // 4. 应用编码设置（输出/输入保持一致）
+                Console.OutputEncoding = targetEncoding;
+                Console.InputEncoding = targetEncoding;
+
+                // 5. 验证编码是否生效（可选）
+                Console.WriteLine($"已适配编码: {targetEncoding.EncodingName}");
+            }
+            catch (Exception ex)
+            {
+                // 异常时使用系统默认编码作为最后保障
+                Console.WriteLine($"编码设置失败，使用默认编码: {ex.Message}");
+            }
         }
     }
 }
