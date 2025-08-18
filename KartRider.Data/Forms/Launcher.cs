@@ -368,7 +368,7 @@ namespace KartRider
                         Console.WriteLine($"Found {loginServer.ToString()}");
                     }
                     authMethod.LoginServers.Clear();
-                    authMethod.LoginServers.Add(new IPEndPoint
+                    authMethod.LoginServers.Add(new PINFile.IPEndPoint
                     {
                         IP = "127.0.0.1",
                         Port = 39312

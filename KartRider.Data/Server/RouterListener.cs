@@ -80,7 +80,7 @@ namespace KartRider
             if (RouterListener.Listener == null || RouterListener.CurrentUDPServer == null)
             {
                 RouterListener.Listener = new TcpListener(IPAddress.Parse(RouterListener.sIP), RouterListener.port);
-                RouterListener.CurrentUDPServer = new System.Net.IPEndPoint(IPAddress.Parse(RouterListener.sIP), 39311);
+                RouterListener.CurrentUDPServer = new IPEndPoint(IPAddress.Parse(RouterListener.sIP), 39311);
             }
             if (!RouterListener.Listener.Server.IsBound)
             {
