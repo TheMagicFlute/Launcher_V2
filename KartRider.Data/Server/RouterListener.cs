@@ -66,7 +66,7 @@ namespace KartRider
                 IPEndPoint clientEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
                 RouterListener.client = clientEndPoint;
                 Console.WriteLine("Client: {0}:{1}", RouterListener.client.Address.ToString(), RouterListener.client.Port.ToString());
-                if (File.Exists(Program.LauncherDlg.kartRiderDirectory + Launcher.PinFile))
+                if (File.Exists(Program.LauncherDlg.kartRiderDirectory + Launcher.PinFileBak))
                 {
                     File.Delete(Program.LauncherDlg.kartRiderDirectory + Launcher.PinFile);
                     File.Move(Program.LauncherDlg.kartRiderDirectory + Launcher.PinFileBak, Program.LauncherDlg.kartRiderDirectory + Launcher.PinFile);
