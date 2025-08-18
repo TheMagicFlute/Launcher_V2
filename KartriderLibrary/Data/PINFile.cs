@@ -61,7 +61,7 @@ namespace KartRider.Common.Data
 
             public override string ToString()
             {
-                return IP + ":" + Port;
+                return $"{IP}:{Port}";
             }
         }
 

@@ -65,6 +65,13 @@ namespace KartRider
             string output = "";
 
             AllocConsole();
+
+            if (!(args == null || args.Length == 0))
+            {
+                // TODO: implement argument handling
+                return;
+            }
+
             // 初始化自适应编码
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             SetAdaptiveConsoleEncoding();
@@ -122,60 +129,69 @@ namespace KartRider
             // check for update
             if (await Update.UpdateDataAsync()) return;
 
-            if (args == null || args.Length == 0)
+            if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                string TCGKartRegPth = @"HKEY_CURRENT_USER\SOFTWARE\TCGame\kart";
-                string TCGKartGamePth = (string)Registry.GetValue(TCGKartRegPth, "gamepath", null);
-                if (CheckGameAvailability(AppDomain.CurrentDomain.BaseDirectory))
-                {
-                    // working directory
-                    RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                    Console.WriteLine("使用当前目录下的游戏.");
-                }
-                else if (CheckGameAvailability(TCGKartGamePth))
-                {
-                    // TCGame registered directory
-                    RootDirectory = TCGKartGamePth;
-                    Console.WriteLine("使用TCGame注册的游戏目录下的游戏.");
-                }
-                else
-                {
-                    // game not found
-                    MsgErrorFileNotFound();
-                    return;
-                }
-
-                // load Data files
-                try
-                {
-                    Console.WriteLine("读取Data文件...");
-                    KartRhoFile.Dump(RootDirectory + @"Data\aaa.pk");
-                    KartRhoFile.packFolderManager.Reset();
-                    Console.WriteLine("Data文件读取完成!");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"读取Data文件时出错: {ex.Message}");
-                }
-
-                // auto hide console window if not in debug mode
-                if (!File.Exists(FileName.Load_ConsoleVisibility))
-                {
-                    using (StreamWriter streamWriter = new StreamWriter(FileName.Load_ConsoleVisibility, false))
-                    {
-                        streamWriter.Write((DBG ? "1" : "0"));
-                    }
-                }
-                string isConsoleVisible = File.ReadAllText(FileName.Load_ConsoleVisibility);
-                if (isConsoleVisible == "0") ShowWindow(consoleHandle, SW_HIDE);
-
-                // open launcher form
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                LauncherDlg = new Launcher();
-                LauncherDlg.kartRiderDirectory = RootDirectory;
-                Application.Run(LauncherDlg);
+                MessageBox.Show("跑跑卡丁车已经在运行了！\n请先关闭跑跑卡丁车，否则无法正常操作相关文件！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
+            string TCGKartRegPth = @"HKEY_CURRENT_USER\SOFTWARE\TCGame\kart";
+            string TCGKartGamePth = (string)Registry.GetValue(TCGKartRegPth, "gamepath", null);
+            if (CheckGameAvailability(AppDomain.CurrentDomain.BaseDirectory))
+            {
+                // working directory
+                RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                Console.WriteLine("使用当前目录下的游戏.");
+            }
+            else if (CheckGameAvailability(TCGKartGamePth))
+            {
+                // TCGame registered directory
+                RootDirectory = TCGKartGamePth;
+                Console.WriteLine("使用TCGame注册的游戏目录下的游戏.");
+            }
+            else
+            {
+                // game not found
+                MsgErrorFileNotFound();
+                return;
+            }
+
+            // load Data files
+            try
+            {
+                Console.WriteLine("读取Data文件...");
+                KartRhoFile.Dump(RootDirectory + @"Data\aaa.pk");
+                KartRhoFile.packFolderManager.Reset();
+                Console.WriteLine("Data文件读取完成!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"读取Data文件时出错: {ex.Message}");
+            }
+
+            // auto hide console window if not in debug mode
+            if (!File.Exists(FileName.Load_ConsoleVisibility))
+            {
+                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_ConsoleVisibility, false))
+                {
+                    streamWriter.Write((DBG ? "1" : "0"));
+                }
+            }
+            string isConsoleVisible = File.ReadAllText(FileName.Load_ConsoleVisibility);
+            if (isConsoleVisible == "0") ShowWindow(consoleHandle, SW_HIDE);
+
+            // open launcher form
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            LauncherDlg = new Launcher();
+            LauncherDlg.kartRiderDirectory = RootDirectory;
+            Application.Run(LauncherDlg);
+
+            return;
+
+            /*
+             * process some files
+             * temporarily disabled
+
             else if (args.Length == 1)
             {
                 input = args[0];
@@ -230,6 +246,7 @@ namespace KartRider
                     }
                 }
             }
+            */
         }
 
         public static bool CheckGameAvailability(string gamePath)
@@ -241,26 +258,8 @@ namespace KartRider
 
         public static void MsgErrorFileNotFound()
         {
-            if (string.IsNullOrEmpty(RootDirectory))
-            {
-                Console.WriteLine("Error: 游戏路径为空.");
-                MessageBox.Show("游戏路径为空!", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else if (!File.Exists(RootDirectory + Launcher.KartRider) && !File.Exists(RootDirectory + Launcher.PinFile))
-            {
-                Console.WriteLine($"Error: Cannot find {Launcher.KartRider} and {Launcher.PinFile}.");
-                MessageBox.Show($"找不到 {Launcher.KartRider} 以及 {Launcher.PinFile} !\n请检查游戏是否正确安装.\n如使用特定版本游戏, 请检查启动器处在的位置是否与该版本安装在同一目录下.\n如错误仍然存在, 请重新安装游戏.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else if (!File.Exists(RootDirectory + Launcher.KartRider))
-            {
-                Console.WriteLine($"Error: Cannot find {Launcher.KartRider}.");
-                MessageBox.Show($"找不到 {RootDirectory + Launcher.KartRider}. 请检查文件是否存在.\n如错误仍然发生, 请尝试重新安装游戏.");
-            }
-            else if (!File.Exists(RootDirectory + Launcher.PinFile))
-            {
-                Console.WriteLine($"Error: Cannot find {Launcher.PinFile}.");
-                MessageBox.Show($"找不到 {RootDirectory + Launcher.PinFile}. 请检查文件是否存在. \n如错误仍然发生, 请尝试重新安装游戏.");
-            }
+            Console.WriteLine($"Error: Cannot find {Launcher.KartRider} or {Launcher.PinFile}.");
+            MessageBox.Show($"找不到 {Launcher.KartRider} 或者 {Launcher.PinFile} !\n请检查游戏是否正确安装.\n如使用特定版本游戏, 请检查启动器处在的位置是否与该版本安装在同一目录下.\n如错误仍然存在, 请重新安装游戏.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Environment.Exit(1);
         }
 
@@ -273,12 +272,12 @@ namespace KartRider
             Program.SaveFolder(input, output);
         }
 
-        private static void SaveFolder(string intput, string output)
+        private static void SaveFolder(string input, string output)
         {
             RhoArchive rhoArchive = new RhoArchive();
-            string lastFolderName = Path.GetFileName(intput);
+            string lastFolderName = Path.GetFileName(input);
             string array = lastFolderName.Replace('_', '\\'); ;
-            GetAllFiles(intput + "\\" + array, new List<string>(), rhoArchive.RootFolder);
+            GetAllFiles(input + "\\" + array, new List<string>(), rhoArchive.RootFolder);
 
             rhoArchive.SaveTo(output);
         }

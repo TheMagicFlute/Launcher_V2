@@ -297,15 +297,16 @@ namespace KartRider
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            if (File.Exists(this.kartRiderDirectory + PinFileBak))
-            {
-                File.Delete(this.kartRiderDirectory + PinFile);
-                File.Move(this.kartRiderDirectory + PinFileBak, this.kartRiderDirectory + PinFile);
-            }
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
                 MessageBox.Show("跑跑卡丁车正在运行，请结束跑跑卡丁车后再退出该程序！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 e.Cancel = true;
+                return;
+            }
+            if (File.Exists(this.kartRiderDirectory + PinFileBak))
+            {
+                File.Delete(this.kartRiderDirectory + PinFile);
+                File.Move(this.kartRiderDirectory + PinFileBak, this.kartRiderDirectory + PinFile);
             }
         }
 
@@ -318,13 +319,14 @@ namespace KartRider
             SetGameOption.Version = val.Header.MinorVersion;
             SetGameOption.Save_SetGameOption();
 
-            Console.WriteLine($"Process: {this.kartRiderDirectory + Launcher.KartRider}");
+            Console.WriteLine($"Process: {this.kartRiderDirectory + KartRider}");
             try
             {
                 RouterListener.Start();
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error: {ex}");
                 if (ex is System.Net.Sockets.SocketException)
                 {
                     Console.WriteLine("This port has been used. Probably there is another launcher starts at the same time.");
@@ -342,7 +344,7 @@ namespace KartRider
                 MessageBox.Show("跑跑卡丁车已经在运行了！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            if (!CheckGameAvailability(kartRiderDirectory))
+            if (!CheckGameAvailability(this.kartRiderDirectory))
             {
                 MsgErrorFileNotFound();
                 return;
@@ -350,15 +352,15 @@ namespace KartRider
             (new Thread(() =>
             {
                 Console.WriteLine("Backing up old PinFile...");
-                Console.WriteLine(kartRiderDirectory + PinFileBak);
-                if (File.Exists(kartRiderDirectory + PinFileBak))
+                Console.WriteLine(this.kartRiderDirectory + PinFileBak);
+                if (File.Exists(this.kartRiderDirectory + PinFileBak))
                 {
-                    File.Delete(kartRiderDirectory + PinFile);
-                    File.Move(kartRiderDirectory + PinFileBak, kartRiderDirectory + PinFile);
+                    File.Delete(this.kartRiderDirectory + PinFile);
+                    File.Move(this.kartRiderDirectory + PinFileBak, this.kartRiderDirectory + PinFile);
                 }
-                File.Copy(kartRiderDirectory + PinFile, kartRiderDirectory + PinFileBak);
-                PINFile val = new PINFile(kartRiderDirectory + PinFile);
-                foreach (PINFile.AuthMethod authMethod in val.AuthMethods)
+                File.Copy(this.kartRiderDirectory + PinFile, this.kartRiderDirectory + PinFileBak);
+                PINFile val = new PINFile(this.kartRiderDirectory + PinFile);
+                foreach (AuthMethod authMethod in val.AuthMethods)
                 {
                     Console.WriteLine($"Changing IP Address to local... {authMethod.Name}");
                     foreach (IPEndPoint loginServer in authMethod.LoginServers)
@@ -366,7 +368,7 @@ namespace KartRider
                         Console.WriteLine($"Found {loginServer.ToString()}");
                     }
                     authMethod.LoginServers.Clear();
-                    authMethod.LoginServers.Add(new PINFile.IPEndPoint
+                    authMethod.LoginServers.Add(new IPEndPoint
                     {
                         IP = "127.0.0.1",
                         Port = 39312
@@ -387,12 +389,12 @@ namespace KartRider
                 }
                 Console.WriteLine();
 
-                File.WriteAllBytes(kartRiderDirectory + PinFile, val.GetEncryptedData());
+                File.WriteAllBytes(this.kartRiderDirectory + PinFile, val.GetEncryptedData());
                 Launcher.GetKart = false;
                 // origin passport:aHR0cHM6Ly9naXRodWIuY29tL3lhbnlnbS9MYXVuY2hlcl9WMi9yZWxlYXNlcw==
                 ProcessStartInfo startInfo = new ProcessStartInfo(Launcher.KartRider, "TGC -region:3 -passport:OFFLINE")
                 {
-                    WorkingDirectory = kartRiderDirectory,
+                    WorkingDirectory = this.kartRiderDirectory,
                     UseShellExecute = true,
                     Verb = "runas"
                 };

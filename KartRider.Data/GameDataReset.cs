@@ -7,6 +7,25 @@ namespace KartRider
 {
     public class GameDataReset
     {
+        public static void DataReset()
+        {
+            SetRider.Lucci = Math.Min(SetRider.Lucci, SessionGroup.LucciMax);
+            GameDataReset.RandomTrack_DataReset();
+            GameDataReset.GameType_DataReset();
+            GameDataReset.StartGame_DataReset();
+            GameDataReset.SpeedType_DataReset();
+            GameDataReset.FlyingPet_DataReset();
+            GameDataReset.Kart_DataReset();
+            ExcSpec.Reset_PartSpec_SpecData();
+            ExcSpec.Reset_Tune_SpecData();
+            ExcSpec.Reset_Plant_SpecData();
+            ExcSpec.Reset_KartLevel_SpecData();
+            V2Spec.Reset_V2Parts_SpecData();
+            V2Spec.Reset_V2Level_SpecData();
+            SpeedPatch.SpeedPatcData();
+            // GameSupport.PrLogin();
+        }
+
         public static void RandomTrack_DataReset()
         {
             RandomTrack.GameType = "item";
@@ -153,26 +172,6 @@ namespace KartRider
             Kart.wallCollGaugeMaxVelLoss = 0f;
             Kart.wallCollGaugeMinVelBound = 0f;
             Kart.wallCollGaugeMinVelLoss = 0f;
-        }
-
-        public static void DataReset()
-        {
-            SetRider.Lucci = Math.Min(SetRider.Lucci, SessionGroup.LucciMax);
-            GameDataReset.RandomTrack_DataReset();
-            GameDataReset.GameType_DataReset();
-            GameDataReset.StartGame_DataReset();
-            GameDataReset.SpeedType_DataReset();
-            GameDataReset.FlyingPet_DataReset();
-            GameDataReset.Kart_DataReset();
-            ExcSpec.Reset_PartSpec_SpecData();
-            ExcSpec.Reset_Tune_SpecData();
-            ExcSpec.Reset_Plant_SpecData();
-            ExcSpec.Reset_KartLevel_SpecData();
-            V2Spec.Reset_V2Parts_SpecData();
-            V2Spec.Reset_V2Level_SpecData();
-            SpeedPatch.SpeedPatcData();
-            // GameSupport.PrLogin();
-            Console.WriteLine("Login...OK");
         }
     }
 }

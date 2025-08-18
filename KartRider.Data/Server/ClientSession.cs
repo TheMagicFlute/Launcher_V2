@@ -48,7 +48,7 @@ namespace KartRider
                 uint hash = iPacket.ReadUInt();
                 if (hash != 1950550337) // PqServerSideUdpBindCheck
                 {
-                    Console.WriteLine((PacketName)hash + ": " + BitConverter.ToString(iPacket.ToArray()).Replace("-", ""));
+                    Console.WriteLine($"[PkgReceived]{(PacketName)hash}: {BitConverter.ToString(iPacket.ToArray()).Replace("-", "")}");
                 }
                 if (hash == Adler32Helper.GenerateAdler32_ASCII("PqCnAuthenLogin", 0))
                 {
@@ -93,7 +93,7 @@ namespace KartRider
                           || hash == Adler32Helper.GenerateAdler32_ASCII("VipPlaytimeCheck", 0)
                           || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqEventRewardPacket", 0))
                     {
-                        //PqGetRecommandChatServerInfo = 라이더 챗 // Chat
+                        // PqGetRecommandChatServerInfo = 라이더 챗 // Chat
                         return;
                     }
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("LoRqAddRacingTimePacket", 0))
@@ -2026,7 +2026,7 @@ namespace KartRider
                     {
                         using (OutPacket outPacket = new OutPacket("PrShopCashPage"))
                         {
-                            outPacket.WriteString("https://github.com/yanygm/Launcher_V2/releases");
+                            outPacket.WriteString($"https://github.com/{Update.owner}/{Update.repo}/releases");
                             this.Parent.Client.Send(outPacket);
                         }
                         return;
@@ -2037,7 +2037,7 @@ namespace KartRider
                         using (OutPacket outPacket = new OutPacket("PrShopURLPage"))
                         {
                             outPacket.WriteInt(URLPageType);
-                            outPacket.WriteString("https://github.com/yanygm/Launcher_V2/releases");
+                            outPacket.WriteString($"https://github.com/{Update.owner}/{Update.repo}/releases");
                             this.Parent.Client.Send(outPacket);
                         }
                         return;
@@ -2326,6 +2326,7 @@ namespace KartRider
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqLogin", 0))
                     {
                         GameDataReset.DataReset();
+                        Console.WriteLine("Login...OK!");
                         using (OutPacket outPacket = new OutPacket("PrLogin"))
                         {
                             outPacket.WriteInt(0);
@@ -2389,7 +2390,7 @@ namespace KartRider
                             outPacket.WriteString("enable");
                             outPacket.WriteString("false");
                             outPacket.WriteString("value");
-                            outPacket.WriteString("https://github.com/yanygm/Launcher_V2/releases");
+                            outPacket.WriteString($"https://github.com/{Update.owner}/{Update.repo}/releases");
                             outPacket.WriteInt(0);
                             outPacket.WriteString("content");
                             outPacket.WriteInt(0);

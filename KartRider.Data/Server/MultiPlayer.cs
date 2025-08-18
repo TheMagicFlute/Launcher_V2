@@ -162,7 +162,7 @@ namespace KartRider
 
         static void settleTrigger(object sender, System.Timers.ElapsedEventArgs e)
         {
-            //SettleTicks = EndTicks + 3100;
+            // SettleTicks = EndTicks + 3100;
             using (OutPacket outPacket = new OutPacket("GameNextStagePacket"))
             {
                 outPacket.WriteByte(1);
@@ -178,20 +178,20 @@ namespace KartRider
                 if (StartGameData.StartTimeAttack_RandomTrackGameType == 0)
                 {
                     aiNodes = doc.Root
-                    ?.Element("SpeedAI")  // 指定父节点（如ItemAI、SpeedAI等）
-                    ?.Elements()        // 获取该父节点下的所有直接子元素
+                    ?.Element("SpeedAI")                            // 指定父节点（如ItemAI、SpeedAI等）
+                    ?.Elements()                                    // 获取该父节点下的所有直接子元素
                     .Where(e => e.Name.LocalName.StartsWith("Ai")
-                    && !e.Name.LocalName.Equals("SpeedSpec"))  // 筛选条件
-                    .OrderBy(e => e.Name.LocalName);  // 按名称排序
+                    && !e.Name.LocalName.Equals("SpeedSpec"))       // 筛选条件
+                    .OrderBy(e => e.Name.LocalName);                // 按名称排序
                 }
                 else if (StartGameData.StartTimeAttack_RandomTrackGameType == 1)
                 {
                     aiNodes = doc.Root
-                    ?.Element("ItemAI")  // 指定父节点（如ItemAI、SpeedAI等）
-                    ?.Elements()        // 获取该父节点下的所有直接子元素
+                    ?.Element("ItemAI")                             // 指定父节点（如ItemAI、SpeedAI等）
+                    ?.Elements()                                    // 获取该父节点下的所有直接子元素
                     .Where(e => e.Name.LocalName.StartsWith("Ai")
-                    && !e.Name.LocalName.Equals("ItemSpec"))  // 筛选条件
-                    .OrderBy(e => e.Name.LocalName);  // 按名称排序
+                    && !e.Name.LocalName.Equals("ItemSpec"))        // 筛选条件
+                    .OrderBy(e => e.Name.LocalName);                // 按名称排序
                 }
                 outPacket.WriteByte();
                 outPacket.WriteInt(1);
@@ -254,9 +254,9 @@ namespace KartRider
                 int index = 0;
                 foreach (var node in aiNodes)
                 {
-                    // 提取 Ai 后的数值部分（例如："Ai2" → "2"）
+                    // 提取 Ai 后的数值部分（例如："Ai2" -> "2"）
                     string nodeName = node.Name.LocalName;
-                    int numberPart = int.Parse(nodeName.Substring(2)); // 从索引2开始截取（跳过"Ai"）
+                    int numberPart = int.Parse(nodeName.Substring(2)); // 从索引 2 开始截取（去除"Ai"）
                     outPacket.WriteInt(numberPart);
 
                     if (AiTimeData.ContainsKey(numberPart) && AiTimeData[numberPart] > 0)
@@ -473,10 +473,10 @@ namespace KartRider
                         // oPacket.WriteInt(channeldata1);
                         oPacket.WriteInt(4);
                         oPacket.WriteEndPoint(IPAddress.Parse("127.0.0.1"), (ushort)RouterListener.port);
-                        //RouterListener.Listener.BeginAcceptSocket(new AsyncCallback(RouterListener.OnAcceptSocket), null);
+                        // RouterListener.Listener.BeginAcceptSocket(new AsyncCallback(RouterListener.OnAcceptSocket), null);
                         RouterListener.MySession.Client.Send(oPacket);
                     }
-                    //GameSupport.OnDisconnect();
+                    // GameSupport.OnDisconnect();
                     StartGameData.StartTimeAttack_SpeedType = 7;
                     StartGameData.StartTimeAttack_RandomTrackGameType = 0;
                 }
@@ -487,10 +487,10 @@ namespace KartRider
                         oPacket.WriteInt(0);
                         oPacket.WriteInt(4);
                         oPacket.WriteEndPoint(IPAddress.Parse("127.0.0.1"), (ushort)RouterListener.port);
-                        //RouterListener.Listener.BeginAcceptSocket(new AsyncCallback(RouterListener.OnAcceptSocket), null);
+                        // RouterListener.Listener.BeginAcceptSocket(new AsyncCallback(RouterListener.OnAcceptSocket), null);
                         RouterListener.MySession.Client.Send(oPacket);
                     }
-                    //GameSupport.OnDisconnect();
+                    // GameSupport.OnDisconnect();
                     StartGameData.StartTimeAttack_SpeedType = 4;
                     StartGameData.StartTimeAttack_RandomTrackGameType = 0;
                 }
@@ -520,7 +520,7 @@ namespace KartRider
                         RouterListener.MySession.Client.Send(outPacket);
                     }
                 }
-                //GameSupport.OnDisconnect();
+                // GameSupport.OnDisconnect();
                 return;
             }
             else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqChannelMovein", 0))
@@ -913,10 +913,10 @@ namespace KartRider
 
         static void GrSlotDataPacket(OutPacket outPacket)
         {
-            outPacket.WriteUInt(track); //track name hash
+            outPacket.WriteUInt(track); // track name hash
             outPacket.WriteInt(0);
             outPacket.WriteBytes(RoomUnkBytes);
-            outPacket.WriteInt(0); //RoomMaster 
+            outPacket.WriteInt(0); // RoomMaster 
             outPacket.WriteInt(2);
             outPacket.WriteInt(0); // outPacket.WriteShort(); outPacket.WriteShort(3);
             outPacket.WriteShort(0); // 797
@@ -927,7 +927,7 @@ namespace KartRider
             for (int i = 0; i < 4; i++) outPacket.WriteInt();
 
             /* ---- One/First player ---- */
-            outPacket.WriteInt(2); // Player Type, 2 = RoomMaster, 3 = AutoReady, 4 = Observer, 5 = ? , 7 = AI
+            outPacket.WriteInt(3); // Player Type, 2 = RoomMaster, 3 = AutoReady, 4 = Observer, 5 = ? , 7 = AI
             outPacket.WriteUInt(SetRider.UserNO);
 
             outPacket.WriteEndPoint(IPAddress.Parse(RouterListener.client.Address.ToString()), (ushort)RouterListener.client.Port);

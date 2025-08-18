@@ -16,7 +16,7 @@ namespace KartRider
 
         public static IPEndPoint client;
 
-        public static System.Net.IPEndPoint CurrentUDPServer { get; set; }
+        public static IPEndPoint CurrentUDPServer { get; set; }
 
         public static string ForceConnect { get; set; }
 
@@ -26,7 +26,7 @@ namespace KartRider
 
         static RouterListener()
         {
-            RouterListener.sIP = "0.0.0.0";
+            RouterListener.sIP = "127.0.0.1";
             RouterListener.port = 39312;
         }
 
@@ -39,15 +39,7 @@ namespace KartRider
             int Month = (dt.Year - 1900) * 12;
             int MonthCount = Month + dt.Month;
             double tempResult = (double)MonthCount / 2;
-            int oddMonthCount;
-            if (tempResult % 1 != 0)
-            {
-                oddMonthCount = (int)tempResult + 1;
-            }
-            else
-            {
-                oddMonthCount = (int)tempResult;
-            }
+            int oddMonthCount = (int)tempResult + (tempResult % 1 != 0 ? 1 : 0);
             return new int[] { t.Days, (int)totalSeconds, oddMonthCount };
         }
 

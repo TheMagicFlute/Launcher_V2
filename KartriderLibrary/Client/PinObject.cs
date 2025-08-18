@@ -18,6 +18,5 @@ namespace KartLibrary.Client
         public short MajorId { get; set; }
         public short PackageVersion { get; set; }
         public short ClientVersion { get; set; }
-
     }
 }

@@ -59,7 +59,7 @@ namespace ExcData
                 SpeedType.BoostAccelFactor = 0.006f;
                 SpeedType.StartForwardAccelForceItem = -530f;
                 SpeedType.StartForwardAccelForceSpeed = -950f;
-                Console.WriteLine("SpeedType:低速 S0");
+                Console.WriteLine("SpeedType: 低速 S0");
             }
             else if (Config.SpeedType == 0) // S1 普通 빠름
             {
@@ -79,7 +79,7 @@ namespace ExcData
                 SpeedType.BoostAccelFactor = 0.006f;
                 SpeedType.StartForwardAccelForceItem = -200f;
                 SpeedType.StartForwardAccelForceSpeed = -360f;
-                Console.WriteLine("SpeedType:普通 S1");
+                Console.WriteLine("SpeedType: 普通 S1");
             }
             else if (Config.SpeedType == 1) // S2 快速 매우빠름
             {
@@ -99,7 +99,7 @@ namespace ExcData
                 SpeedType.BoostAccelFactor = 0.006f;
                 SpeedType.StartForwardAccelForceItem = 200f;
                 SpeedType.StartForwardAccelForceSpeed = 360f;
-                Console.WriteLine("SpeedType:快速 S2");
+                Console.WriteLine("SpeedType: 快速 S2");
             }
             else if (Config.SpeedType == 2) // S3 高速 가장빠름
             {
@@ -119,7 +119,7 @@ namespace ExcData
                 SpeedType.BoostAccelFactor = 0.006f;
                 SpeedType.StartForwardAccelForceItem = 750f;
                 SpeedType.StartForwardAccelForceSpeed = 1350f;
-                Console.WriteLine("SpeedType:高速 S3");
+                Console.WriteLine("SpeedType: 高速 S3");
             }
             else if (Config.SpeedType == 4 || Config.SpeedType == 6 || Config.SpeedType == 7) // S1.5 统合 무부, 통합
             {
@@ -139,7 +139,7 @@ namespace ExcData
                 SpeedType.BoostAccelFactor = 0f;
                 SpeedType.StartForwardAccelForceItem = 0f;
                 SpeedType.StartForwardAccelForceSpeed = 0f;
-                Console.WriteLine("SpeedType:统合 S1.5");
+                Console.WriteLine("SpeedType: 统合 S1.5");
             }
             else if (Config.SpeedType == 10) // 初级
             {
@@ -159,8 +159,9 @@ namespace ExcData
                 SpeedType.BoostAccelFactor = 0.006f;
                 SpeedType.StartForwardAccelForceItem = -270f;
                 SpeedType.StartForwardAccelForceSpeed = -270f;
+                //Console.WriteLine("SpeedType: 初级");
             }
-            else if (Config.SpeedType == 11)// 老S1 L3
+            else if (Config.SpeedType == 11) // 老S1/L3
             {
                 SpeedType.AddSpec_SteerConstraint = 0f;
                 SpeedType.AddSpec_DriftEscapeForce = 0f;
@@ -178,8 +179,9 @@ namespace ExcData
                 SpeedType.BoostAccelFactor = 0.006f;
                 SpeedType.StartForwardAccelForceItem = 450f;
                 SpeedType.StartForwardAccelForceSpeed = 450f;
+                //Console.WriteLine("SpeedType: 老S1/L3");
             }
-            else if (Config.SpeedType == 12) // 老S2 L2
+            else if (Config.SpeedType == 12) // 老S2/L2
             {
                 SpeedType.AddSpec_SteerConstraint = 0f;
                 SpeedType.AddSpec_DriftEscapeForce = 0f;
@@ -197,8 +199,9 @@ namespace ExcData
                 SpeedType.BoostAccelFactor = 0.006f;
                 SpeedType.StartForwardAccelForceItem = 400f;
                 SpeedType.StartForwardAccelForceSpeed = 400f;
+                Console.WriteLine("SpeedType: 老S2/L2");
             }
-            else if (Config.SpeedType == 13) // 老S3 L1
+            else if (Config.SpeedType == 13) // 老S3/L1
             {
                 SpeedType.AddSpec_SteerConstraint = 0f;
                 SpeedType.AddSpec_DriftEscapeForce = 0f;
@@ -216,6 +219,7 @@ namespace ExcData
                 SpeedType.BoostAccelFactor = 0.006f;
                 SpeedType.StartForwardAccelForceItem = 1350f;
                 SpeedType.StartForwardAccelForceSpeed = 1350f;
+                Console.WriteLine("SpeedType: 老S3/L1");
             }
             else if (Config.SpeedType == 14) // Pro
             {
@@ -235,11 +239,12 @@ namespace ExcData
                 SpeedType.BoostAccelFactor = 0.006f;
                 SpeedType.StartForwardAccelForceItem = 1800f;
                 SpeedType.StartForwardAccelForceSpeed = 1800f;
+                Console.WriteLine("SpeedType: Pro");
             }
             else // 错误的/未知的速度频道
             {
                 GameSupport.OnDisconnect();
-                Console.WriteLine("SpeedType:null");
+                Console.WriteLine("SpeedType: Null/Error/UnknownSpeedType");
             }
             FlyingPet.FlyingPet_Spec();
         }
