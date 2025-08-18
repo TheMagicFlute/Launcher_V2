@@ -927,7 +927,7 @@ namespace KartRider
             for (int i = 0; i < 4; i++) outPacket.WriteInt();
 
             /* ---- One/First player ---- */
-            outPacket.WriteInt(3); // Player Type, 2 = RoomMaster, 3 = AutoReady, 4 = Observer, 5 = ? , 7 = AI
+            outPacket.WriteInt(2); // Player Type, 2 = RoomMaster, 3 = AutoReady, 4 = Observer, 5 = Preparing , 7 = AI
             outPacket.WriteUInt(SetRider.UserNO);
 
             outPacket.WriteEndPoint(IPAddress.Parse(RouterListener.client.Address.ToString()), (ushort)RouterListener.client.Port);
