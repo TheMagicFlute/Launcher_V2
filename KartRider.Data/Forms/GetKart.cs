@@ -1,12 +1,12 @@
 ﻿using System;
-using KartRider.IO.Packet;
-using System.Threading;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using ExcData;
-using System.Linq;
-using System.Collections.Generic;
+using KartRider.IO.Packet;
 
 namespace KartRider
 {
@@ -51,7 +51,7 @@ namespace KartRider
                             outPacket.WriteShort(GetKart.Item_Type);
                             outPacket.WriteShort(GetKart.Item_Code);
                             outPacket.WriteShort(KartSN);
-                            outPacket.WriteShort(1);//수량
+                            outPacket.WriteShort(1); // 数量 수량
                             outPacket.WriteShort(0);
                             outPacket.WriteShort(-1);
                             outPacket.WriteShort(0);
@@ -75,7 +75,7 @@ namespace KartRider
                                 outPacket.WriteShort(GetKart.Item_Type);
                                 outPacket.WriteShort(GetKart.Item_Code);
                                 outPacket.WriteShort(KartSN);
-                                outPacket.WriteShort(1);//수량
+                                outPacket.WriteShort(1); // 数量 수량
                                 outPacket.WriteShort(0);
                                 outPacket.WriteShort(-1);
                                 outPacket.WriteShort(0);
@@ -97,7 +97,7 @@ namespace KartRider
                                 outPacket.WriteShort(GetKart.Item_Type);
                                 outPacket.WriteShort(GetKart.Item_Code);
                                 outPacket.WriteShort(KartSN);
-                                outPacket.WriteShort(1);//수량
+                                outPacket.WriteShort(1); // 数量 수량
                                 outPacket.WriteShort(0);
                                 outPacket.WriteShort(-1);
                                 outPacket.WriteShort(0);
@@ -120,7 +120,7 @@ namespace KartRider
                         outPacket.WriteShort(GetKart.Item_Type);
                         outPacket.WriteShort(GetKart.Item_Code);
                         outPacket.WriteUShort(0);
-                        outPacket.WriteShort(1);//수량
+                        outPacket.WriteShort(1); // 数量 수량
                         outPacket.WriteShort(0);
                         outPacket.WriteShort(-1);
                         outPacket.WriteShort(0);

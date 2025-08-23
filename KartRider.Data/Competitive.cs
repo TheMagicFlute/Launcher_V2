@@ -13,8 +13,8 @@ namespace RHOParser
         public uint Track { get; set; }
         public short Kart { get; set; }
         public uint Time { get; set; }
-        public short Boooster { get; set; }
-        public uint BooosterPoint { get; set; }
+        public short Booster { get; set; }
+        public uint BoosterPoint { get; set; }
         public short Crash { get; set; }
         public uint CrashPoint { get; set; }
         public uint Point { get; set; }
@@ -66,8 +66,8 @@ namespace RHOParser
                     existingElement.Attribute("Track").SetValue(data.Track);
                     existingElement.Attribute("Kart").SetValue(data.Kart);
                     existingElement.Attribute("Time").SetValue(data.Time);
-                    existingElement.Attribute("Boooster").SetValue(data.Boooster);
-                    existingElement.Attribute("BooosterPoint").SetValue(data.BooosterPoint);
+                    existingElement.Attribute("Booster").SetValue(data.Booster);
+                    existingElement.Attribute("BoosterPoint").SetValue(data.BoosterPoint);
                     existingElement.Attribute("Crash").SetValue(data.Crash);
                     existingElement.Attribute("CrashPoint").SetValue(data.CrashPoint);
                     existingElement.Attribute("Point").SetValue(data.Point);
@@ -81,8 +81,8 @@ namespace RHOParser
                     new XAttribute("Track", data.Track),
                     new XAttribute("Kart", data.Kart),
                     new XAttribute("Time", data.Time),
-                    new XAttribute("Boooster", data.Boooster),
-                    new XAttribute("BooosterPoint", data.BooosterPoint),
+                    new XAttribute("Boooster", data.Booster),
+                    new XAttribute("BooosterPoint", data.BoosterPoint),
                     new XAttribute("Crash", data.Crash),
                     new XAttribute("CrashPoint", data.CrashPoint),
                     new XAttribute("Point", data.Point)
@@ -92,7 +92,10 @@ namespace RHOParser
             doc.Save(_filePath);
         }
 
-        // 读取所有数据
+        /// <summary>
+        /// 读取所有数据
+        /// </summary>
+        /// <returns>比赛数据</returns>
         public List<CompetitiveData> LoadAllData()
         {
             if (!File.Exists(_filePath))
@@ -106,8 +109,8 @@ namespace RHOParser
                     Track = (uint)e.Attribute("Track"),
                     Kart = (short)e.Attribute("Kart"),
                     Time = (uint)e.Attribute("Time"),
-                    Boooster = e.Attribute("Boooster") != null ? (short)e.Attribute("Boooster") : (short)0,
-                    BooosterPoint = e.Attribute("BooosterPoint") != null ? (uint)e.Attribute("BooosterPoint") : 0u,
+                    Booster = e.Attribute("Booster") != null ? (short)e.Attribute("Booster") : (short)0,
+                    BoosterPoint = e.Attribute("BoosterPoint") != null ? (uint)e.Attribute("BoosterPoint") : 0u,
                     Crash = e.Attribute("Crash") != null ? (short)e.Attribute("Crash") : (short)0,
                     CrashPoint = e.Attribute("CrashPoint") != null ? (uint)e.Attribute("CrashPoint") : 0u,
                     Point = e.Attribute("Point") != null ? (uint)e.Attribute("Point") : 0u
@@ -118,16 +121,20 @@ namespace RHOParser
 
     public class TrackIdExtractor
     {
+        /// <summary>
+        /// 获取当前周期内的赛道ID列表
+        /// </summary>
+        /// <returns>符合条件的赛道ID的列表，或空列表（异常）</returns>
         public List<string> GetCurrentWeekTrackIds(XDocument doc)
         {
             try
             {
-                DateTime now = DateTime.Now; // 获取当前时间
+                DateTime curTime = DateTime.Now; // 获取当前时间
 
                 // 查找当前时间处于其开放周期内的Competitive节点
                 var currentCompetitive = doc.Descendants("Competitive")
                     .FirstOrDefault(competitive =>
-                        IsTimeInPeriod(now, competitive.Attribute("openPeriod").Value));
+                        IsTimeInPeriod(curTime, competitive.Attribute("openPeriod").Value));
 
                 if (currentCompetitive == null)
                 {
@@ -140,7 +147,7 @@ namespace RHOParser
                 DateTime startTime = ParsePeriodStart(openPeriod);
 
                 // 计算当前时间属于第几周（1-4）
-                int weekNumber = CalculateWeekNumber(startTime, now);
+                int weekNumber = CalculateWeekNumber(startTime, curTime);
 
                 // 查找对应的Set节点
                 var targetSet = currentCompetitive.Descendants("Set")
@@ -167,7 +174,11 @@ namespace RHOParser
             }
         }
 
-        // 判断时间是否在周期内
+        /// <summary>
+        /// 判断时间是否在周期内
+        /// </summary>
+        /// <param name="time">时间</param>
+        /// <param name="period">周期，格式为yyyy-M-dTHH:mm:ss</param>
         private bool IsTimeInPeriod(DateTime time, string period)
         {
             string[] periodParts = period.Split('~');
@@ -185,7 +196,11 @@ namespace RHOParser
             return false;
         }
 
-        // 解析周期开始时间
+        /// <summary>
+        /// 解析周期开始时间
+        /// </summary>
+        /// <param name="period">周期，格式为yyyy-M-dTHH:mm:ss</param>
+        /// <returns>该周期开始时间</returns>
         private DateTime ParsePeriodStart(string period)
         {
             string startPart = period.Split('~')[0];
@@ -193,7 +208,12 @@ namespace RHOParser
                 CultureInfo.InvariantCulture, DateTimeStyles.None);
         }
 
-        // 计算当前时间属于第几周（1-4）
+        /// <summary>
+        /// 计算当前时间属于当月第几周（1-4）
+        /// </summary>
+        /// <param name="startTime">当月开始时间</param>
+        /// <param name="currentTime">当前时间</param>
+        /// <returns>当前日期属于当月的第几周</returns>
         private int CalculateWeekNumber(DateTime startTime, DateTime currentTime)
         {
             TimeSpan span = currentTime - startTime;
@@ -270,7 +290,7 @@ namespace RHOParser
                 TrackId = trackId,
                 TotalScore = timeScore + boostScore + crashScore,
                 TimeScore = timeScore,
-                BoostScore = boostScore,
+                BoosterScore = boostScore,
                 CrashScore = crashScore,
             };
         }
@@ -292,7 +312,8 @@ namespace RHOParser
         }
 
         /// <summary>
-        /// 计算碰撞得分（只取最高优先级的符合条件分数）
+        /// 计算碰撞得分
+        /// （只取最高优先级的符合条件分数）
         /// 优先级：count值越小，优先级越高（条件越严格）
         /// </summary>
         private uint CalculateCrashScoreWithPriority(List<DriveBonus> bonuses, short actualCrashCount)
@@ -321,7 +342,7 @@ namespace RHOParser
         /// </summary>
         /// <param name="standardTime">标准时间</param>
         /// <param name="actualTime">实际用时</param>
-        /// <returns>时间成绩得分</returns>
+        /// <returns>时间成绩得分，或者0（异常）</returns>
         private uint CalculateTimeScore(uint standardTime, uint actualTime)
         {
             try
@@ -365,10 +386,10 @@ namespace RHOParser
     public class TrackScoreDetails
     {
         public uint TrackId { get; set; }
-        public uint TotalScore { get; set; }      // 总得分
-        public uint TimeScore { get; set; }       // 时间成绩得分
-        public uint BoostScore { get; set; }      // 加速得分
-        public uint CrashScore { get; set; }      // 碰撞得分
+        public uint TotalScore { get; set; }    // 总得分
+        public uint TimeScore { get; set; }     // 时间成绩得分
+        public uint BoosterScore { get; set; }  // 使用加速器得分
+        public uint CrashScore { get; set; }    // 碰撞得分
     }
 
     // 赛道数据类

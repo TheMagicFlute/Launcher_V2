@@ -21,13 +21,13 @@ namespace KartLibrary.IO
             _sizeSums = new int[byteArrays.Length + 1];
             _position = 0;
             _curIndex = 0;
-            for(int i = 1; i <= byteArrays.Length; i++)
+            for (int i = 1; i <= byteArrays.Length; i++)
             {
                 _sizeSums[i] = _sizeSums[i - 1] + byteArrays[i - 1].Length;
             }
             _length = _sizeSums[byteArrays.Length];
         }
-        
+
         public override bool CanRead => true;
 
         public override bool CanSeek => true;
@@ -47,7 +47,7 @@ namespace KartLibrary.IO
 
         public override void Flush()
         {
-            
+
         }
 
         public override int Read(byte[] buffer, int offset, int count)
@@ -55,7 +55,7 @@ namespace KartLibrary.IO
             int readCount = Math.Min(_length - _position, count);
             int output = readCount;
             int bufferIndex = offset;
-            while(readCount > 0)
+            while (readCount > 0)
             {
                 int curArrIndex = _position - _sizeSums[_curIndex];
                 byte[] curArr = _byteArrays[_curIndex];
@@ -97,14 +97,14 @@ namespace KartLibrary.IO
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            
+
         }
 
         private int findArraysIndex(int position)
         {
             int begin = 0;
             int end = _sizeSums.Length;
-            while((begin + 1) < end)
+            while ((begin + 1) < end)
             {
                 int mid = (begin + end) >> 1;
                 if (position < _sizeSums[mid])

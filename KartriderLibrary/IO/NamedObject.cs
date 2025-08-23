@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace KartLibrary.IO
 {
-    public class NamedObject: KartObject
+    public class NamedObject : KartObject
     {
         public string Name { get; set; } = "";
-        protected NamedObject() 
+        protected NamedObject()
         {
-            
+
         }
         public override void DecodeObject(BinaryReader reader, Dictionary<short, KartObject>? decodedObjectMap, Dictionary<short, object> decodedFieldMap)
         {

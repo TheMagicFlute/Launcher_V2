@@ -99,7 +99,7 @@ namespace KartRider
             MinimizeBox = false;
             Name = "GetKart";
             Icon = Resources.icon;
-            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "添加道具";
             ResumeLayout(false);
             PerformLayout();

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace KartLibrary.Consts
 {
-
     public enum CountryCode
     {
         None,

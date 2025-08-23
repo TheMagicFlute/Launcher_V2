@@ -1,3 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Linq;
 using KartLibrary.Consts;
 using KartLibrary.Data;
 using KartLibrary.File;
@@ -6,23 +20,17 @@ using KartRider.IO.Packet;
 using Microsoft.Win32;
 using RHOParser;
 using Set_Data;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Windows.Forms;
-using System.Xml;
-using System.Linq;
-using System.Xml.Linq;
-using System.Globalization;
-using System.Threading.Tasks;
 
 namespace KartRider
 {
     internal static class Program
     {
+#if DEBUG
+        public const bool DBG = true;
+#else
+        public const bool DBG = false;
+#endif
+
         [DllImport("kernel32.dll")]
         public static extern bool AllocConsole();
 
@@ -32,10 +40,13 @@ namespace KartRider
         [DllImport("user32.dll")]
         public static extern bool IsWindowVisible(IntPtr hWnd);
 
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetConsoleWindow();
+
         public const int SW_HIDE = 0;
         public const int SW_SHOW = 5;
+
         public static int consoleStatus = SW_SHOW;
-        public static string Load_Console = AppDomain.CurrentDomain.BaseDirectory + "Profile\\Console.ini";
         public static IntPtr consoleHandle;
         public static Launcher LauncherDlg;
         public static GetKart GetKartDlg;
@@ -44,11 +55,35 @@ namespace KartRider
         public static string RootDirectory;
         public static CountryCode CC = CountryCode.CN;
 
+        // 当前系统架构 小写字符串 目前仅有 x64 x86 arm64
+        public static string architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
+
         [STAThread]
         private static async Task Main(string[] args)
         {
-            string input;
-            string output;
+            string input = "";
+            string output = "";
+
+            AllocConsole();
+
+            if (!(args == null || args.Length == 0))
+            {
+                // TODO: implement argument handling
+                return;
+            }
+
+            // 初始化自适应编码
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            SetAdaptiveConsoleEncoding();
+
+            consoleHandle = Process.GetCurrentProcess().MainWindowHandle;
+
+            Console.Write($"中国跑跑卡丁车单机启动器 | {architecture} | ");
+            if (DBG) Console.Write("[DEBUG]");
+            Console.WriteLine();
+            Console.WriteLine("--------------------------------------------------");
+
+            // delete updater
             string Update_File = AppDomain.CurrentDomain.BaseDirectory + "Update.bat";
             string Update_Folder = AppDomain.CurrentDomain.BaseDirectory + "Update";
             if (File.Exists(Update_File))
@@ -59,135 +94,165 @@ namespace KartRider
             {
                 Directory.Delete(Update_Folder, true);
             }
-            AllocConsole();
-
-            // 初始化自适应编码
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            SetAdaptiveConsoleEncoding();
-
-            if (!await Update.UpdateDataAsync())
+            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Profile"))
             {
-                string Load_CC = AppDomain.CurrentDomain.BaseDirectory + "Profile\\CountryCode.ini";
-                if (File.Exists(Load_CC))
+                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "Profile");
+            }
+
+            // get country code
+            string CountryCode = await Update.GetCountryAsync();
+            if (CountryCode != "") // available country code
+            {
+                // change country code & write to file
+                CC = ((CountryCode)Enum.Parse(typeof(CountryCode), CountryCode));
+                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_CC, false))
                 {
-                    string textValue = System.IO.File.ReadAllText(Load_CC);
-                    Program.CC = (CountryCode)Enum.Parse(typeof(CountryCode), textValue);
+                    streamWriter.Write(CC.ToString());
+                }
+            }
+            else if (!File.Exists(FileName.Load_CC)) // no country code file, create default
+            {
+                // default country code is CN (China)
+                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_CC, false))
+                {
+                    streamWriter.Write(CC.ToString());
+                }
+            }
+
+            if (File.Exists(FileName.Load_CC)) // load country code from file
+            {
+                string textValue = System.IO.File.ReadAllText(FileName.Load_CC);
+                CC = (CountryCode)Enum.Parse(typeof(CountryCode), textValue);
+            }
+            Console.WriteLine($"最后一次打开于: {CC.ToString()}");
+
+            // check for update
+            if (await Update.UpdateDataAsync()) return;
+
+            if (Process.GetProcessesByName("KartRider").Length != 0)
+            {
+                LauncherSystem.MsgKartIsRunning();
+                return;
+            }
+            string TCGKartRegPth = @"HKEY_CURRENT_USER\SOFTWARE\TCGame\kart";
+            string TCGKartGamePth = (string)Registry.GetValue(TCGKartRegPth, "gamepath", null);
+            if (CheckGameAvailability(AppDomain.CurrentDomain.BaseDirectory))
+            {
+                // working directory
+                RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                Console.WriteLine("使用当前目录下的游戏.");
+            }
+            else if (CheckGameAvailability(TCGKartGamePth))
+            {
+                // TCGame registered directory
+                RootDirectory = TCGKartGamePth;
+                Console.WriteLine("使用TCGame注册的游戏目录下的游戏.");
+            }
+            else
+            {
+                // game not found
+                LauncherSystem.MsgFileNotFound();
+            }
+
+            // load Data files
+            try
+            {
+                Console.WriteLine("读取Data文件...");
+                KartRhoFile.Dump(RootDirectory + @"Data\aaa.pk");
+                KartRhoFile.packFolderManager.Reset();
+                Console.WriteLine("Data文件读取完成!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"读取Data文件时出错: {ex.Message}");
+            }
+
+            // auto hide console window if not in debug mode
+            if (!File.Exists(FileName.Load_ConsoleVisibility))
+            {
+                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_ConsoleVisibility, false))
+                {
+                    streamWriter.Write((DBG ? "1" : "0"));
+                }
+            }
+            string isConsoleVisible = File.ReadAllText(FileName.Load_ConsoleVisibility);
+            if (isConsoleVisible == "0") ShowWindow(consoleHandle, SW_HIDE);
+
+            // open launcher form
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            LauncherDlg = new Launcher();
+            LauncherDlg.kartRiderDirectory = RootDirectory;
+            Application.Run(LauncherDlg);
+
+            return;
+
+            /*
+             * process some files
+             * temporarily disabled
+
+            else if (args.Length == 1)
+            {
+                input = args[0];
+                output = args[0];
+            }
+            else
+            {
+                if (args.Length != 2)
+                    return;
+                input = args[0];
+                output = args[1];
+            }
+
+            if (input.EndsWith(".rho") || input.EndsWith(".rho5"))
+            {
+                Program.decode(input, output);
+            }
+            else if (input.EndsWith("aaa.xml"))
+            {
+                AAAD(input);
+            }
+            else if (input.EndsWith(".xml"))
+            {
+                XtoB(input);
+            }
+            else if (input.EndsWith(".bml"))
+            {
+                BtoX(input);
+            }
+            else if (input.EndsWith(".pk"))
+            {
+                AAAR(input);
+            }
+            else
+            {
+                if (!Directory.Exists(input))
+                    return;
+                if (input.Contains("_0"))
+                {
+                    encode(input, output);
                 }
                 else
                 {
-                    if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Profile"))
+                    string[] files = Directory.GetFiles(input, "*.rho");
+                    if (files.Length > 0)
                     {
-                        Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "Profile");
-                    }
-                    using (StreamWriter streamWriter = new StreamWriter(Load_CC, false))
-                    {
-                        streamWriter.Write(Program.CC.ToString());
-                    }
-                }
-                if (args == null || args.Length == 0)
-                {
-                    string text = "HKEY_CURRENT_USER\\SOFTWARE\\TCGame\\kart";
-                    RootDirectory = (string)Registry.GetValue(text, "gamepath", null);
-                    if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "KartRider.pin") && File.Exists(AppDomain.CurrentDomain.BaseDirectory + "KartRider.exe"))
-                    {
-                        RootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                    }
-                    else if (File.Exists(RootDirectory + "KartRider.pin") && File.Exists(RootDirectory + "KartRider.exe"))
-                    {
+                        AAAC(input, files);
                     }
                     else
                     {
-                        LauncherSystem.MessageBoxType3();
-                        return;
-                    }
-                    if (!string.IsNullOrEmpty(RootDirectory))
-                    {
-                        try
-                        {
-                            KartRhoFile.Dump(RootDirectory + "Data\\aaa.pk");
-                            KartRhoFile.packFolderManager.Reset();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"读取Data文件时出错: {ex.Message}");
-                        }
-                        consoleHandle  = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
-                        if (!File.Exists(Load_Console))
-                        {
-                            using (StreamWriter streamWriter = new StreamWriter(Load_Console, false))
-                            {
-                                streamWriter.Write("0");
-                            }
-                        }
-                        string textValue = System.IO.File.ReadAllText(Load_Console);
-                        if (textValue == "0")
-                        {
-                            ShowWindow(consoleHandle, SW_HIDE);
-                        }
-                        Application.EnableVisualStyles();
-                        Application.SetCompatibleTextRenderingDefault(false);
-                        Launcher StartLauncher = new Launcher();
-                        Program.LauncherDlg = StartLauncher;
-                        Program.LauncherDlg.kartRiderDirectory = RootDirectory;
-                        Application.Run(StartLauncher);
-                    }
-                    input = "";
-                    output = "";
-                }
-                else if (args.Length == 1)
-                {
-                    input = args[0];
-                    output = args[0];
-                }
-                else
-                {
-                    if (args.Length != 2)
-                        return;
-                    input = args[0];
-                    output = args[1];
-                }
-                if (input.EndsWith(".rho") || input.EndsWith(".rho5"))
-                {
-                    Program.decode(input, output);
-                }
-                else if (input.EndsWith("aaa.xml"))
-                {
-                    Program.AAAD(input);
-                }
-                else if (input.EndsWith(".xml"))
-                {
-                    Program.XtoB(input);
-                }
-                else if (input.EndsWith(".bml"))
-                {
-                    Program.BtoX(input);
-                }
-                else if (input.EndsWith(".pk"))
-                {
-                    Program.AAAR(input);
-                }
-                else
-                {
-                    if (!Directory.Exists(input))
-                        return;
-                    if (input.Contains("_0"))
-                    {
-                        Program.encode(input, output);
-                    }
-                    else
-                    {
-                        string[] files = Directory.GetFiles(input, "*.rho");
-                        if (files.Length > 0)
-                        {
-                            Program.AAAC(input, files);
-                        }
-                        else
-                        {
-                            Program.encodea(input, output);
-                        }
+                        encodea(input, output);
                     }
                 }
             }
+            */
+        }
+
+        public static bool CheckGameAvailability(string gamePath)
+        {
+            return !string.IsNullOrEmpty(gamePath)
+                && File.Exists(gamePath + Launcher.KartRider)
+                && File.Exists(gamePath + Launcher.PinFile);
         }
 
         private static void encodea(string input, string output)
@@ -199,12 +264,12 @@ namespace KartRider
             Program.SaveFolder(input, output);
         }
 
-        private static void SaveFolder(string intput, string output)
+        private static void SaveFolder(string input, string output)
         {
             RhoArchive rhoArchive = new RhoArchive();
-            string lastFolderName = Path.GetFileName(intput);
+            string lastFolderName = Path.GetFileName(input);
             string array = lastFolderName.Replace('_', '\\'); ;
-            GetAllFiles(intput + "\\" + array, new List<string>(), rhoArchive.RootFolder);
+            GetAllFiles(input + "\\" + array, new List<string>(), rhoArchive.RootFolder);
 
             rhoArchive.SaveTo(output);
         }
@@ -469,7 +534,24 @@ namespace KartRider
 
         private static void AAAC(string input, string[] files)
         {
-            string[] whitelist = { "_I04_sn", "_I05_sn", "_R01_sn", "_R02_sn", "_I02_sn", "_I01_sn", "_I03_sn", "_L01_", "_L02_", "_L03_03_", "_L03_", "_L04_", "bazzi_", "arthur_", "bero_", "brodi_", "camilla_", "chris_", "contender_", "crowdr_", "CSO_", "dao_", "dizni_", "erini_", "ethi_", "Guazi_", "halloween_", "homrunDao_", "innerWearSonogong_", "innerWearWonwon_", "Jianbing_", "kephi_", "kero_", "kwanwoo_", "Lingling_", "lodumani_", "mabi_", "Mahua_", "marid_", "mobi_", "mos_", "narin_", "neoul_", "neo_", "nymph_", "olympos_", "panda_", "referee_", "ren_", "Reto_", "run_", "zombie_", "santa_", "sophi_", "taki_", "tiera_", "tutu_", "twoTop_", "twotop_", "uni_", "wonwon_", "zhindaru_", "zombie_", "flyingBook_", "flyingMechanic_", "flyingRedlight_", "crow_", "dragonBoat_", "GiLin_", "maple_", "beach_", "village_", "china_", "factory_", "ice_", "mine_", "nemo_", "world_", "forest_", "_I", "_R", "_S", "_F", "_P", "_K", "_D", "_jp" };
+            string[] whitelist =
+            {
+                "_I04_sn", "_I05_sn",
+                "_R01_sn", "_R02_sn",
+                "_I02_sn", "_I01_sn", "_I03_sn",
+                "_L01_", "_L02_", "_L03_03_", "_L03_", "_L04_",
+                "bazzi_", "arthur_", "bero_", "brodi_", "camilla_", "chris_", "contender_", "crowdr_",
+                "CSO_", "dao_", "dizni_", "erini_", "ethi_", "Guazi_", "halloween_", "homrunDao_",
+                "innerWearSonogong_", "innerWearWonwon_",
+                "Jianbing_", "kephi_", "kero_", "kwanwoo_", "Lingling_", "lodumani_", "mabi_", "Mahua_",
+                "marid_", "mobi_", "mos_", "narin_", "neoul_", "neo_", "nymph_", "olympos_", "panda_",
+                "referee_", "ren_", "Reto_", "run_", "zombie_", "santa_", "sophi_", "taki_", "tiera_",
+                "tutu_", "twoTop_", "twotop_", "uni_", "wonwon_", "zhindaru_", "zombie_",
+                "flyingBook_", "flyingMechanic_", "flyingRedlight_",
+                "crow_", "dragonBoat_", "GiLin_",
+                "maple_", "beach_", "village_", "china_", "factory_", "ice_", "mine_", "nemo_", "world_", "forest_",
+                "_I", "_R", "_S", "_F", "_P", "_K", "_D", "_jp"
+            };
             string[] blacklist = { "character_" };
             string Whitelist = AppDomain.CurrentDomain.BaseDirectory + "Profile\\Whitelist.ini";
             string Blacklist = AppDomain.CurrentDomain.BaseDirectory + "Profile\\Blacklist.ini";

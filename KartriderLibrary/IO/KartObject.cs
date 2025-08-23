@@ -9,7 +9,7 @@ namespace KartLibrary.IO
 {
     public abstract class KartObject
     {
-        protected KartObject() 
+        protected KartObject()
         {
             //if (!KartObjectManager.ContainsClass(ClassStamp))
             //    KartObjectManager.RegisterClass(this.GetType());
@@ -25,9 +25,9 @@ namespace KartLibrary.IO
             }
         }
 
-        public virtual void DecodeObject(BinaryReader reader, Dictionary<short, KartObject>? decodedObjectMap, Dictionary<short, object>? decodedFieldMap) 
+        public virtual void DecodeObject(BinaryReader reader, Dictionary<short, KartObject>? decodedObjectMap, Dictionary<short, object>? decodedFieldMap)
         {
-            
+
         }
         public virtual void EncodeObject(BinaryWriter writer, Dictionary<short, KartObject>? decodedObjectMap, Dictionary<short, object>? decodedFieldMap)
         {

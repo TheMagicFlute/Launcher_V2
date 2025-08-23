@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using KartLibrary.IO;
 using System.Xml;
+using KartLibrary.IO;
 
 namespace KartLibrary.Xml
 {
@@ -20,10 +20,10 @@ namespace KartLibrary.Xml
             _rootTag = new BinaryXmlTag();
         }
 
-        public void Read(Encoding encoding,byte[] array)
+        public void Read(Encoding encoding, byte[] array)
         {
             BinaryXmlTag tag = new BinaryXmlTag();
-            using(MemoryStream ms = new MemoryStream(array))
+            using (MemoryStream ms = new MemoryStream(array))
             {
                 BinaryReader br = new BinaryReader(ms);
                 _rootTag = br.ReadBinaryXmlTag(encoding);
@@ -44,7 +44,7 @@ namespace KartLibrary.Xml
         public void ReadFromXml(byte[] EncodedXML)
         {
             XmlDocument xmlDoc = new XmlDocument();
-            using(MemoryStream ms = new MemoryStream(EncodedXML))
+            using (MemoryStream ms = new MemoryStream(EncodedXML))
             {
                 xmlDoc.Load(ms);
                 if (xmlDoc.ChildNodes.Count < 1)

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using System.Numerics;
 
 namespace KartLibrary.Record
 {
@@ -11,7 +11,7 @@ namespace KartLibrary.Record
     {
         public RecordData()
         {
-            
+
         }
 
         public RecordStamp[] Stamps { get; set; } = new RecordStamp[0];
@@ -29,7 +29,7 @@ namespace KartLibrary.Record
                 if (t2.IsInitialObject)
                     return t1;
                 float time21 = (float)(t2.Time - t1.Time);
-                float timec1 = (float)((time - t1.Time))/(time21);
+                float timec1 = (float)((time - t1.Time)) / (time21);
                 RecordStamp curTime = new RecordStamp();
                 curTime.Time = (int)time;
                 curTime.X = t1.X * (1 - timec1) + t2.X * (timec1);

@@ -15,38 +15,39 @@ namespace XmlFileUpdater
         /// <param name="resourceName">资源中XML文件的名称</param>
         public void UpdateLocalXmlWithResource(string localFilePath, string resourceName)
         {
+            Console.WriteLine($"正在检查 {localFilePath} 的更新状态...");
             try
             {
                 // 加载本地XML文件
                 XDocument localXml = XDocument.Load(localFilePath);
-                
+
                 // 加载资源中的XML文件
                 XDocument resourceXml = XDocument.Parse(resourceName);
-                
-                if (localXml == null || resourceXml == null || 
+
+                if (localXml == null || resourceXml == null ||
                     localXml.Root == null || resourceXml.Root == null)
                 {
-                    Console.WriteLine("无法加载ModelMax.xml文件或ModelMax.xml结构不完整");
+                    Console.WriteLine("无法加载 ModelMax.xml 文件或 ModelMax.xml 结构不完整.");
                     return;
                 }
-                
+
                 // 比较并合并XML内容
                 bool isUpdated = MergeXml(localXml.Root, resourceXml.Root);
-                
+
                 // 如果有更新，保存本地文件
                 if (isUpdated)
                 {
                     localXml.Save(localFilePath);
-                    Console.WriteLine("ModelMax.xml文件已更新");
+                    Console.WriteLine("ModelMax.xml 文件已更新!");
                 }
                 else
                 {
-                    Console.WriteLine("ModelMax.xml文件已是最新，无需更新");
+                    Console.WriteLine("ModelMax.xml 文件已是最新，无需更新!");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"处理ModelMax.xml文件时出错: {ex.Message}");
+                Console.WriteLine($"处理 ModelMax.xml 文件时出错: {ex.Message}");
             }
         }
 
@@ -57,13 +58,13 @@ namespace XmlFileUpdater
         private bool MergeXml(XElement localRoot, XElement resourceRoot)
         {
             bool isUpdated = false;
-            
+
             // 比较并添加子元素
             foreach (var resourceElement in resourceRoot.Elements())
             {
                 // 这里使用元素名和关键属性作为唯一标识，可根据实际情况修改
                 bool exists = CheckElementExists(localRoot, resourceElement);
-                
+
                 if (!exists)
                 {
                     // 复制资源元素到本地XML
@@ -82,7 +83,7 @@ namespace XmlFileUpdater
                     }
                 }
             }
-            
+
             return isUpdated;
         }
 
@@ -102,14 +103,14 @@ namespace XmlFileUpdater
         {
             // 简单匹配：元素名相同，且具有相同的ID属性（如果存在）
             var candidates = parent.Elements(elementToFind.Name);
-            
+
             // 如果有ID属性，使用ID进行匹配
             if (elementToFind.Attribute("id") != null)
             {
                 string idValue = elementToFind.Attribute("id").Value;
                 return candidates.FirstOrDefault(e => e.Attribute("id")?.Value == idValue);
             }
-            
+
             // 如果没有ID属性，仅通过元素名匹配（可能不够精确，根据实际情况调整）
             return candidates.FirstOrDefault();
         }

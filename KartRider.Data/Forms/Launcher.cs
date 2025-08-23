@@ -1,25 +1,29 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
-using Set_Data;
 using System.Xml;
-using ExcData;
-using Launcher.Properties;
-using KartRider.Common.Data;
 using System.Xml.Linq;
-using RHOParser;
-using KartRider;
-using KartRider.IO.Packet;
-using KartRider.Common.Utilities;
-using KartLibrary.File;
-using KartRider.Common.Data;
-using System.Collections;
-using System.Reflection;
-using System.Linq;
 using System.Xml.XPath;
+using ExcData;
+using KartLibrary.File;
+using KartRider;
+using KartRider.Common.Data;
+using KartRider.Common.Utilities;
+using KartRider.IO.Packet;
+using Launcher.Properties;
+using RHOParser;
+using Set_Data;
+using static KartRider.Common.Data.PINFile;
+using static KartRider.Program;
+using static KartRider.Update;
 
 namespace KartRider
 {
@@ -28,11 +32,13 @@ namespace KartRider
         public static bool GetKart = true;
         public static short KartSN = 0;
         public string kartRiderDirectory = null;
-        public static string KartRider = "KartRider.exe";
-        public static string pinFile = "KartRider.pin";
+        public const string KartRider = "KartRider.exe";
+        public const string PinFile = "KartRider.pin";
+        public const string PinFileBak = "KartRider-bak.pin";
+        public static string executablePath;
+
         private Button Start_Button;
         private Button GetKart_Button;
-        private Button button_ToggleTerminal;
         private Label label_Client;
         private ComboBox Speed_comboBox;
         private Label Speed_label;
@@ -40,33 +46,62 @@ namespace KartRider
         private Label KartInfo;
         private Label Launcher_label;
         private Label ClientVersion;
+        private Label label_Docs;
+        private Label label_TimeAttackLog;
+        private Button button_KillGameProcesses;
+        private Button button_ToggleConsole;
+        private Button button_More_Options;
         private Label VersionLabel;
 
         public Launcher()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+            // ----------
+            SetGameOption.Load_SetGameOption();
+            foreach (string key in SpeedType.speedNames.Keys)
+            {
+                Speed_comboBox.Items.Add(key);
+            }
+            KeyValuePair<string, byte> speed = SpeedType.speedNames.FirstOrDefault(a => a.Value == SetGameOption.SpeedType);
+            if (!String.IsNullOrEmpty(speed.Key))
+            {
+                Speed_comboBox.Text = speed.Key;
+            }
+            ClientVersion.Text = $"P{SetGameOption.Version.ToString()}";
+            VersionLabel.Text = currentVersion;
+            VersionLabel.Location = new Point(Launcher_label.Location.X + 70, Launcher_label.Location.Y);
+            ClientVersion.Location = new Point(label_Client.Location.X + 70, label_Client.Location.Y);
+
+            StartPosition = FormStartPosition.Manual;
+            Rectangle screen = Screen.PrimaryScreen.WorkingArea;
+            Location = new Point(screen.Width - Width, screen.Height - Height);
         }
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Launcher));
             Start_Button = new Button();
             GetKart_Button = new Button();
-            button_ToggleTerminal = new Button();
             label_Client = new Label();
             ClientVersion = new Label();
             VersionLabel = new Label();
+            Launcher_label = new Label();
             Speed_comboBox = new ComboBox();
             Speed_label = new Label();
             GitHub = new Label();
             KartInfo = new Label();
-            Launcher_label = new Label();
+            label_Docs = new Label();
+            label_TimeAttackLog = new Label();
+            button_KillGameProcesses = new Button();
+            button_ToggleConsole = new Button();
+            button_More_Options = new Button();
             SuspendLayout();
             // 
             // Start_Button
             // 
-            Start_Button.Location = new System.Drawing.Point(19, 20);
+            Start_Button.Location = new Point(12, 12);
             Start_Button.Name = "Start_Button";
-            Start_Button.Size = new System.Drawing.Size(114, 23);
+            Start_Button.Size = new Size(200, 25);
             Start_Button.TabIndex = 364;
             Start_Button.Text = "启动游戏";
             Start_Button.UseVisualStyleBackColor = true;
@@ -74,127 +109,169 @@ namespace KartRider
             // 
             // GetKart_Button
             // 
-            GetKart_Button.Location = new System.Drawing.Point(19, 49);
+            GetKart_Button.Location = new Point(12, 105);
             GetKart_Button.Name = "GetKart_Button";
-            GetKart_Button.Size = new System.Drawing.Size(114, 23);
+            GetKart_Button.Size = new Size(200, 25);
             GetKart_Button.TabIndex = 365;
             GetKart_Button.Text = "添加道具";
             GetKart_Button.UseVisualStyleBackColor = true;
             GetKart_Button.Click += GetKart_Button_Click;
             // 
-            // button_ToggleTerminal
-            // 
-            button_ToggleTerminal.Location = new System.Drawing.Point(19, 78);
-            button_ToggleTerminal.Name = "button_ToggleTerminal";
-            button_ToggleTerminal.Size = new System.Drawing.Size(114, 23);
-            button_ToggleTerminal.TabIndex = 366;
-            button_ToggleTerminal.Text = "切换终端";
-            button_ToggleTerminal.UseVisualStyleBackColor = true;
-            button_ToggleTerminal.Click += button_ToggleTerminal_Click;
-            // 
-            // Speed_comboBox
-            // 
-            Speed_comboBox.ForeColor = System.Drawing.Color.Red;
-            Speed_comboBox.FormattingEnabled = true;
-            Speed_comboBox.Sorted = false;
-            foreach (string key in SpeedType.speedNames.Keys)
-            {
-                Speed_comboBox.Items.Add(key);
-            }
-            Speed_comboBox.Location = new System.Drawing.Point(54, 107);
-            Speed_comboBox.Name = "Speed_comboBox";
-            Speed_comboBox.Size = new System.Drawing.Size(78, 20);
-            Speed_comboBox.TabIndex = 367;
-            Speed_comboBox.Text = "标准";
-            Speed_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            Speed_comboBox.SelectedIndexChanged += Speed_comboBox_SelectedIndexChanged;
-            // 
-            // Speed_label
-            // 
-            Speed_label.AutoSize = true;
-            Speed_label.ForeColor = System.Drawing.Color.Blue;
-            Speed_label.Location = new System.Drawing.Point(19, 111);
-            Speed_label.Name = "Speed_label";
-            Speed_label.Size = new System.Drawing.Size(59, 12);
-            Speed_label.TabIndex = 368;
-            Speed_label.Text = "速度:";
-            // 
             // label_Client
             // 
             label_Client.AutoSize = true;
-            label_Client.BackColor = System.Drawing.SystemColors.Control;
-            label_Client.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            label_Client.ForeColor = System.Drawing.Color.Blue;
-            label_Client.Location = new System.Drawing.Point(2, 144);
+            label_Client.BackColor = SystemColors.Control;
+            label_Client.Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_Client.ForeColor = Color.Blue;
+            label_Client.Location = new Point(2, 239);
             label_Client.Name = "label_Client";
-            label_Client.Size = new System.Drawing.Size(47, 12);
-            label_Client.TabIndex = 369;
-            label_Client.Text = "Client:";
+            label_Client.Size = new Size(71, 12);
+            label_Client.TabIndex = 367;
+            label_Client.Text = "游戏版本  :";
             label_Client.Click += label_Client_Click;
             // 
             // ClientVersion
             // 
             ClientVersion.AutoSize = true;
-            ClientVersion.BackColor = System.Drawing.SystemColors.Control;
-            ClientVersion.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            ClientVersion.ForeColor = System.Drawing.Color.Red;
-            ClientVersion.Location = new System.Drawing.Point(45, 144);
+            ClientVersion.BackColor = SystemColors.Control;
+            ClientVersion.Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            ClientVersion.ForeColor = Color.Red;
+            ClientVersion.Location = new Point(0, 0);
             ClientVersion.Name = "ClientVersion";
-            ClientVersion.Size = new System.Drawing.Size(0, 12);
-            ClientVersion.TabIndex = 370;
+            ClientVersion.Size = new Size(0, 12);
+            ClientVersion.TabIndex = 367;
             ClientVersion.Click += label_Client_Click;
-            //
+            // 
             // VersionLabel
-            //
+            // 
             VersionLabel.AutoSize = true;
-            VersionLabel.BackColor = System.Drawing.SystemColors.Control;
-            VersionLabel.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            VersionLabel.ForeColor = System.Drawing.Color.Red;
-            VersionLabel.Location = new System.Drawing.Point(57, 160);
+            VersionLabel.BackColor = SystemColors.Control;
+            VersionLabel.Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            VersionLabel.ForeColor = Color.Red;
+            VersionLabel.Location = new Point(0, 0);
             VersionLabel.Name = "VersionLabel";
-            VersionLabel.Size = new System.Drawing.Size(0, 12);
-            VersionLabel.TabIndex = 371;
+            VersionLabel.Size = new Size(0, 12);
+            VersionLabel.TabIndex = 373;
             VersionLabel.Click += GitHub_Click;
+            // 
+            // Launcher_label
+            // 
+            Launcher_label.AutoSize = true;
+            Launcher_label.ForeColor = Color.Blue;
+            Launcher_label.Location = new Point(2, 251);
+            Launcher_label.Name = "Launcher_label";
+            Launcher_label.Size = new Size(71, 12);
+            Launcher_label.TabIndex = 373;
+            Launcher_label.Text = "启动器版本:";
+            Launcher_label.Click += GitHub_Click;
+            // 
+            // Speed_comboBox
+            // 
+            Speed_comboBox.ForeColor = Color.Red;
+            Speed_comboBox.FormattingEnabled = true;
+            Speed_comboBox.Location = new Point(13, 159);
+            Speed_comboBox.Name = "Speed_comboBox";
+            Speed_comboBox.Size = new Size(199, 20);
+            Speed_comboBox.TabIndex = 368;
+            Speed_comboBox.Text = "统合S1.5";
+            Speed_comboBox.SelectedIndexChanged += Speed_comboBox_SelectedIndexChanged;
+            // 
+            // Speed_label
+            // 
+            Speed_label.AutoSize = true;
+            Speed_label.Font = new Font("宋体", 9F);
+            Speed_label.ForeColor = Color.Blue;
+            Speed_label.Location = new Point(12, 144);
+            Speed_label.Name = "Speed_label";
+            Speed_label.Size = new Size(65, 12);
+            Speed_label.TabIndex = 369;
+            Speed_label.Text = "速度选择: ";
             // 
             // GitHub
             // 
             GitHub.AutoSize = true;
-            GitHub.ForeColor = System.Drawing.Color.Blue;
-            GitHub.Location = new System.Drawing.Point(213, 144);
+            GitHub.ForeColor = Color.Blue;
+            GitHub.Location = new Point(171, 239);
             GitHub.Name = "GitHub";
-            GitHub.Size = new System.Drawing.Size(41, 12);
-            GitHub.TabIndex = 372;
+            GitHub.Size = new Size(41, 12);
+            GitHub.TabIndex = 371;
             GitHub.Text = "GitHub";
             GitHub.Click += GitHub_Click;
             // 
             // KartInfo
             // 
             KartInfo.AutoSize = true;
-            KartInfo.ForeColor = System.Drawing.Color.Blue;
-            KartInfo.Location = new System.Drawing.Point(201, 160);
+            KartInfo.ForeColor = Color.Blue;
+            KartInfo.Location = new Point(159, 251);
             KartInfo.Name = "KartInfo";
-            KartInfo.Size = new System.Drawing.Size(53, 12);
-            KartInfo.TabIndex = 373;
+            KartInfo.Size = new Size(53, 12);
+            KartInfo.TabIndex = 372;
             KartInfo.Text = "KartInfo";
             KartInfo.Click += KartInfo_Click;
-            //
-            // Launcher_label
-            //
-            Launcher_label.AutoSize = true;
-            Launcher_label.ForeColor = System.Drawing.Color.Blue;
-            Launcher_label.Location = new System.Drawing.Point(2, 160);
-            Launcher_label.Name = "Launcher_label";
-            Launcher_label.Size = new System.Drawing.Size(47, 12);
-            Launcher_label.TabIndex = 374;
-            Launcher_label.Text = "Launcher:";
-            Launcher_label.Click += GitHub_Click;
+            // 
+            // label_Docs
+            // 
+            label_Docs.AutoSize = true;
+            label_Docs.ForeColor = Color.Blue;
+            label_Docs.Location = new Point(135, 227);
+            label_Docs.Name = "label_Docs";
+            label_Docs.Size = new Size(77, 12);
+            label_Docs.TabIndex = 374;
+            label_Docs.Text = "线上说明文档";
+            label_Docs.Click += label_Docs_Click;
+            // 
+            // label_TimeAttackLog
+            // 
+            label_TimeAttackLog.AutoSize = true;
+            label_TimeAttackLog.ForeColor = Color.Blue;
+            label_TimeAttackLog.Location = new Point(135, 215);
+            label_TimeAttackLog.Name = "label_TimeAttackLog";
+            label_TimeAttackLog.Size = new Size(77, 12);
+            label_TimeAttackLog.TabIndex = 375;
+            label_TimeAttackLog.Text = "查看计时记录";
+            label_TimeAttackLog.Click += label_TimeAttackLog_Click;
+            // 
+            // button_KillGameProcesses
+            // 
+            button_KillGameProcesses.Location = new Point(12, 43);
+            button_KillGameProcesses.Name = "button_KillGameProcesses";
+            button_KillGameProcesses.Size = new Size(200, 25);
+            button_KillGameProcesses.TabIndex = 376;
+            button_KillGameProcesses.Text = "强制关闭游戏";
+            button_KillGameProcesses.UseVisualStyleBackColor = true;
+            button_KillGameProcesses.Click += button_KillGameProcesses_Click;
+            // 
+            // button_ToggleConsole
+            // 
+            button_ToggleConsole.Location = new Point(12, 74);
+            button_ToggleConsole.Name = "button_ToggleConsole";
+            button_ToggleConsole.Size = new Size(200, 25);
+            button_ToggleConsole.TabIndex = 377;
+            button_ToggleConsole.Text = "切换终端";
+            button_ToggleConsole.UseVisualStyleBackColor = true;
+            button_ToggleConsole.Click += button_ToggleConsole_Click;
+            // 
+            // button_More_Options
+            // 
+            button_More_Options.Location = new Point(12, 185);
+            button_More_Options.Name = "button_More_Options";
+            button_More_Options.Size = new Size(200, 25);
+            button_More_Options.TabIndex = 378;
+            button_More_Options.Text = "更多选项";
+            button_More_Options.UseVisualStyleBackColor = true;
+            button_More_Options.Click += button_More_Options_Click;
             // 
             // Launcher
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            AutoScaleDimensions = new SizeF(6F, 12F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = System.Drawing.SystemColors.Control;
-            ClientSize = new System.Drawing.Size(257, 180);
+            BackColor = SystemColors.Control;
+            ClientSize = new Size(224, 271);
+            Controls.Add(button_More_Options);
+            Controls.Add(button_ToggleConsole);
+            Controls.Add(button_KillGameProcesses);
+            Controls.Add(label_TimeAttackLog);
+            Controls.Add(label_Docs);
             Controls.Add(VersionLabel);
             Controls.Add(Launcher_label);
             Controls.Add(KartInfo);
@@ -203,16 +280,15 @@ namespace KartRider
             Controls.Add(Speed_label);
             Controls.Add(ClientVersion);
             Controls.Add(label_Client);
-            Controls.Add(button_ToggleTerminal);
             Controls.Add(GetKart_Button);
             Controls.Add(Start_Button);
-            Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+            Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "Launcher";
-            Icon = Resources.icon;
-            StartPosition = FormStartPosition.CenterScreen;
             Text = "Launcher";
+            TopMost = true;
             FormClosing += OnFormClosing;
             Load += OnLoad;
             ResumeLayout(false);
@@ -221,40 +297,39 @@ namespace KartRider
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            if (File.Exists(this.kartRiderDirectory + "KartRider-bak.pin"))
-            {
-                File.Delete(this.kartRiderDirectory + "KartRider.pin");
-                File.Move(this.kartRiderDirectory + "KartRider-bak.pin", this.kartRiderDirectory + "KartRider.pin");
-            }
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                LauncherSystem.MessageBoxType1();
+                MessageBox.Show("跑跑卡丁车正在运行，请结束跑跑卡丁车后再退出该程序！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 e.Cancel = true;
+                return;
+            }
+            if (File.Exists(this.kartRiderDirectory + PinFileBak))
+            {
+                File.Delete(this.kartRiderDirectory + PinFile);
+                File.Move(this.kartRiderDirectory + PinFileBak, this.kartRiderDirectory + PinFile);
             }
         }
 
         private void OnLoad(object sender, EventArgs e)
         {
-            string executablePath = Process.GetCurrentProcess().MainModule.FileName;
+            executablePath = Process.GetCurrentProcess().MainModule.FileName;
             Load_KartExcData();
             StartingLoad_ALL.StartingLoad();
-            PINFile val = new PINFile(this.kartRiderDirectory + "KartRider.pin");
+            PINFile val = new PINFile(this.kartRiderDirectory + PinFile);
             SetGameOption.Version = val.Header.MinorVersion;
             SetGameOption.Save_SetGameOption();
-            ClientVersion.Text = SetGameOption.Version.ToString();
-            DateTime compilationDate = File.GetLastWriteTime(executablePath);
-            string formattedDate = compilationDate.ToString("yyMMdd");
-            VersionLabel.Text = formattedDate;
-            Console.WriteLine("Process: {0}", this.kartRiderDirectory + Launcher.KartRider);
+
+            Console.WriteLine($"Process: {this.kartRiderDirectory + KartRider}");
             try
             {
                 RouterListener.Start();
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error: {ex}");
                 if (ex is System.Net.Sockets.SocketException)
                 {
-                    LauncherSystem.MessageBoxType2();
+                    LauncherSystem.MsgMultiInstance();
                 }
             }
         }
@@ -263,84 +338,86 @@ namespace KartRider
         {
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                LauncherSystem.MessageBoxType1();
+                LauncherSystem.MsgKartIsRunning();
             }
-            else
+            if (!CheckGameAvailability(this.kartRiderDirectory))
             {
-                (new Thread(() =>
-                {
-                    Console.WriteLine("Backing up old PinFile...");
-                    Console.WriteLine(this.kartRiderDirectory + "KartRider-bak.pin");
-                    if (File.Exists(this.kartRiderDirectory + "KartRider-bak.pin"))
-                    {
-                        File.Delete(this.kartRiderDirectory + "KartRider.pin");
-                        File.Move(this.kartRiderDirectory + "KartRider-bak.pin", this.kartRiderDirectory + "KartRider.pin");
-                    }
-                    File.Copy(this.kartRiderDirectory + "KartRider.pin", this.kartRiderDirectory + "KartRider-bak.pin");
-                    PINFile val = new PINFile(this.kartRiderDirectory + "KartRider.pin");
-                    foreach (PINFile.AuthMethod authMethod in val.AuthMethods)
-                    {
-                        Console.WriteLine("Changing IP Addr to local... {0}", authMethod.Name);
-                        authMethod.LoginServers.Clear();
-                        authMethod.LoginServers.Add(new PINFile.IPEndPoint
-                        {
-                            IP = "127.0.0.1",
-                            Port = 39312
-                        });
-                    }
-                    foreach (BmlObject bml in val.BmlObjects)
-                    {
-                        if (bml.Name == "extra")
-                        {
-                            for (int i = bml.SubObjects.Count - 1; i >= 0; i--)
-                            {
-                                Console.WriteLine("Removing {0}", bml.SubObjects[i].Item1);
-                                if (bml.SubObjects[i].Item1 == "NgsOn")
-                                {
-                                    bml.SubObjects.RemoveAt(i);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    File.WriteAllBytes(this.kartRiderDirectory + "KartRider.pin", val.GetEncryptedData());
-                    Start_Button.Enabled = true;
-                    Launcher.GetKart = false;
-                    ProcessStartInfo startInfo = new ProcessStartInfo(Launcher.KartRider, "TGC -region:3 -passport:aHR0cHM6Ly9naXRodWIuY29tL3lhbnlnbS9MYXVuY2hlcl9WMi9yZWxlYXNlcw==")
-                    {
-                        WorkingDirectory = this.kartRiderDirectory,
-                        UseShellExecute = true,
-                        Verb = "runas"
-                    };
-                    try
-                    {
-                        Process.Start(startInfo);
-                        Thread.Sleep(1000);
-                        Start_Button.Enabled = true;
-                        Launcher.GetKart = true;
-                    }
-                    catch (System.ComponentModel.Win32Exception ex)
-                    {
-                        // 用户取消了UAC提示或没有权限
-                        Console.WriteLine(ex.Message);
-                    }
-                })).Start();
+                LauncherSystem.MsgFileNotFound();
             }
+            (new Thread(() =>
+            {
+                Console.WriteLine("Backing up old PinFile...");
+                Console.WriteLine(this.kartRiderDirectory + PinFileBak);
+                if (File.Exists(this.kartRiderDirectory + PinFileBak))
+                {
+                    File.Delete(this.kartRiderDirectory + PinFile);
+                    File.Move(this.kartRiderDirectory + PinFileBak, this.kartRiderDirectory + PinFile);
+                }
+                File.Copy(this.kartRiderDirectory + PinFile, this.kartRiderDirectory + PinFileBak);
+                PINFile val = new PINFile(this.kartRiderDirectory + PinFile);
+                foreach (AuthMethod authMethod in val.AuthMethods)
+                {
+                    Console.WriteLine($"Changing IP Address to local... {authMethod.Name}");
+                    foreach (IPEndPoint loginServer in authMethod.LoginServers)
+                    {
+                        Console.WriteLine($"Found {loginServer.ToString()}");
+                    }
+                    authMethod.LoginServers.Clear();
+                    authMethod.LoginServers.Add(new PINFile.IPEndPoint
+                    {
+                        IP = "127.0.0.1",
+                        Port = 39312
+                    });
+                    Console.WriteLine($"All Changed to {authMethod.LoginServers[0].ToString()} \n");
+                }
+
+                Console.WriteLine("Scanning Bml Objects in PinFile...");
+                foreach (BmlObject bml in val.BmlObjects)
+                {
+                    for (int i = bml.SubObjects.Count - 1; i >= 0; i--)
+                    {
+                        Console.WriteLine($"Found {bml.SubObjects[i].Item1} in {bml.Name}");
+                        if (bml.SubObjects[i].Item1 != "NgsOn") continue;
+                        Console.WriteLine($"Removing {bml.SubObjects[i].Item1}");
+                        bml.SubObjects.RemoveAt(i);
+                    }
+                }
+                Console.WriteLine();
+
+                File.WriteAllBytes(this.kartRiderDirectory + PinFile, val.GetEncryptedData());
+                Launcher.GetKart = false;
+                // origin passport:aHR0cHM6Ly9naXRodWIuY29tL3lhbnlnbS9MYXVuY2hlcl9WMi9yZWxlYXNlcw==
+                ProcessStartInfo startInfo = new ProcessStartInfo(Launcher.KartRider, "TGC -region:3 -passport:OFFLINE")
+                {
+                    WorkingDirectory = this.kartRiderDirectory,
+                    UseShellExecute = true,
+                    Verb = "runas"
+                };
+                try
+                {
+                    Process.Start(startInfo);
+                    Thread.Sleep(1000);
+                    Launcher.GetKart = true;
+                }
+                catch (System.ComponentModel.Win32Exception ex)
+                {
+                    // 用户取消了UAC提示或没有权限
+                    // Console.WriteLine(ex.Message);
+                    Console.WriteLine("用户积极取消操作, 或者没有Administer权限.");
+                }
+            })).Start();
         }
 
         private void GetKart_Button_Click(object sender, EventArgs e)
         {
-            if (Launcher.GetKart)
-            {
-                //GetKart_Button.Enabled = false;
-                Program.GetKartDlg = new GetKart();
-                Program.GetKartDlg.ShowDialog();
-                //GetKart_Button.Enabled = true;
-            }
+            if (!GetKart) return;
+            Program.GetKartDlg = new GetKart();
+            Program.GetKartDlg.ShowDialog();
         }
 
         public void Load_KartExcData()
         {
+            Console.WriteLine("正在读取配置文件...");
             string ModelMaxPath = AppDomain.CurrentDomain.BaseDirectory + @"Profile\ModelMax.xml";
             string ModelMax = Resources.ModelMax;
             if (!File.Exists(ModelMaxPath))
@@ -362,6 +439,7 @@ namespace KartRider
             KartExcData.PartsList = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\PartsData.xml", LoadPartsData);
             KartExcData.Parts12List = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\Parts12Data.xml", LoadParts12Data);
             KartExcData.Level12List = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\Level12Data.xml", LoadLevel12Data);
+            Console.WriteLine("配置文件读取完成!");
         }
 
         private void EnsureDefaultDataFileExists(string filePath, Action<string> createDefaultData)
@@ -469,7 +547,7 @@ namespace KartRider
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"生成XML文件时出错：{ex.Message}");
+                Console.WriteLine($"生成 XML 文件时出错: {ex.Message}");
             }
         }
 
@@ -496,7 +574,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\NewKart.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\NewKart.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -522,7 +600,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\TuneData.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\TuneData.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -549,7 +627,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\PlantData.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\PlantData.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -575,7 +653,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\LevelData.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\LevelData.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -608,7 +686,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\PartsData.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\PartsData.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -643,7 +721,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\Parts12Data.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\Parts12Data.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -670,7 +748,7 @@ namespace KartRider
                 }
                 else
                 {
-                    Console.WriteLine(@"读取“Profile\Level12Data.xml”文件失败，建议删除文件后重试！");
+                    Console.WriteLine(@"读取 Profile\Level12Data.xml 文件失败, 建议删除文件后重试!");
                 }
             }
             return result;
@@ -683,26 +761,29 @@ namespace KartRider
                 string selectedSpeed = Speed_comboBox.SelectedItem.ToString();
                 if (SpeedType.speedNames.ContainsKey(selectedSpeed))
                 {
-                    config.SpeedType = SpeedType.speedNames[selectedSpeed];
-                    Console.WriteLine(selectedSpeed);
+                    Config.SpeedType = SpeedType.speedNames[selectedSpeed];
+                    Console.Write($"速度更改为: {selectedSpeed}...");
+                    SetGameOption.SpeedType = Config.SpeedType;
+                    SetGameOption.Save_SetGameOption();
+                    Console.WriteLine("已保存.");
                 }
                 else
                 {
-                    Console.WriteLine("Invalid speed type selected.");
+                    Console.WriteLine("未知/错误的速度选项");
                 }
             }
         }
 
         private void GitHub_Click(object sender, EventArgs e)
         {
-            string url = "https://github.com/yanygm/Launcher_V2/releases";
+            string url = $"https://github.com/{owner}/{repo}/releases";
             try
             {
                 Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"错误: {ex.Message}");
+                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
             }
         }
 
@@ -715,7 +796,7 @@ namespace KartRider
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"错误: {ex.Message}");
+                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
             }
         }
 
@@ -728,16 +809,59 @@ namespace KartRider
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"错误: {ex.Message}");
+                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
             }
         }
 
-        private void button_ToggleTerminal_Click(object sender, EventArgs e)
+        private void label_Docs_Click(object sender, EventArgs e)
         {
-            bool isConsoleVisible = Program.IsWindowVisible(Program.consoleHandle);
+            string url = "https://themagicflute.github.io/Launcher_V2/";
+            try
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
+            }
+        }
+
+        private void label_TimeAttackLog_Click(object sender, EventArgs e)
+        {
+            string cmd = AppDomain.CurrentDomain.BaseDirectory + @"Profile\TimeAttack.log";
+            try
+            {
+                Process.Start(new ProcessStartInfo(cmd) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                if (ex is System.ComponentModel.Win32Exception)
+                {
+                    Console.WriteLine("计时日志文件未找到, 请进行计时后再查看!");
+                }
+                else
+                {
+                    Console.WriteLine($"错误: {ex.Message}");
+                }
+            }
+        }
+
+        private void button_KillGameProcesses_Click(object sender, EventArgs e)
+        {
+            LauncherSystem.TryKillKart();
+        }
+
+        private void button_More_Options_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("更多选项功能尚未实现!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void button_ToggleConsole_Click(object sender, EventArgs e)
+        {
+            bool isConsoleVisible = IsWindowVisible(consoleHandle);
             isConsoleVisible = !isConsoleVisible;
-            Program.ShowWindow(Program.consoleHandle, isConsoleVisible ? Program.SW_SHOW : Program.SW_HIDE);
-            using (StreamWriter streamWriter = new StreamWriter(Program.Load_Console, false))
+            ShowWindow(consoleHandle, isConsoleVisible ? SW_SHOW : SW_HIDE);
+            using (StreamWriter streamWriter = new StreamWriter(FileName.Load_ConsoleVisibility, false))
             {
                 streamWriter.Write((isConsoleVisible ? "1" : "0"));
             }

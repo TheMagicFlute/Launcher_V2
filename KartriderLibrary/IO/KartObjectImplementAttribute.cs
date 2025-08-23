@@ -17,7 +17,7 @@ namespace KartLibrary.IO
         public KartObjectImplementAttribute()
         {
             this.CreateObjectMethod = null;
-            
+
         }
 
         public KartObjectImplementAttribute(CreateObjectFunc? createObjectMethod)
