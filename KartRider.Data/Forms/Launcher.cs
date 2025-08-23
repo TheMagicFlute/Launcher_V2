@@ -329,10 +329,7 @@ namespace KartRider
                 Console.WriteLine($"Error: {ex}");
                 if (ex is System.Net.Sockets.SocketException)
                 {
-                    Console.WriteLine("This port has been used. Probably there is another launcher starts at the same time.");
-                    Console.WriteLine("Exit with code 1.");
-                    MessageBox.Show("已经有一个启动器在运行了。\n不可以同时运行多个启动器，因为通常每个套接字地址只允许使用一次\n点击确认以退出程序", "警告", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Environment.Exit(1);
+                    LauncherSystem.MsgMultiInstance();
                 }
             }
         }
@@ -341,13 +338,11 @@ namespace KartRider
         {
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                MessageBox.Show("跑跑卡丁车已经在运行了！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                LauncherSystem.MsgKartIsRunning();
             }
             if (!CheckGameAvailability(this.kartRiderDirectory))
             {
-                MsgErrorFileNotFound();
-                return;
+                LauncherSystem.MsgFileNotFound();
             }
             (new Thread(() =>
             {
@@ -474,9 +469,9 @@ namespace KartRider
                     {
                         XElement speedSpecElement = new XElement("SpeedSpec");
                         speedSpecElement.SetAttributeValue("a", "1");
-                        speedSpecElement.SetAttributeValue("b", "2300");
-                        speedSpecElement.SetAttributeValue("c", "2930");
-                        speedSpecElement.SetAttributeValue("d", "1.4");
+                        speedSpecElement.SetAttributeValue("b", "2500");
+                        speedSpecElement.SetAttributeValue("c", "2970");
+                        speedSpecElement.SetAttributeValue("d", "1.5");
                         speedSpecElement.SetAttributeValue("e", "1000");
                         speedSpecElement.SetAttributeValue("f", "1500");
                         speedAI.Add(speedSpecElement);
@@ -497,9 +492,9 @@ namespace KartRider
                     {
                         XElement itemSpecElement = new XElement("ItemSpec");
                         itemSpecElement.SetAttributeValue("a", "0.8");
-                        itemSpecElement.SetAttributeValue("b", "2300");
-                        itemSpecElement.SetAttributeValue("c", "2930");
-                        itemSpecElement.SetAttributeValue("d", "1.4");
+                        itemSpecElement.SetAttributeValue("b", "2500");
+                        itemSpecElement.SetAttributeValue("c", "2970");
+                        itemSpecElement.SetAttributeValue("d", "1.5");
                         itemSpecElement.SetAttributeValue("e", "1000");
                         itemSpecElement.SetAttributeValue("f", "1500");
                         itemAI.Add(itemSpecElement);
@@ -528,9 +523,9 @@ namespace KartRider
                         new XElement("SpeedAI",
                             new XElement("SpeedSpec",
                                 new XAttribute("a", "1"),
-                                new XAttribute("b", "2300"),
-                                new XAttribute("c", "2930"),
-                                new XAttribute("d", "1.4"),
+                                new XAttribute("b", "2500"),
+                                new XAttribute("c", "2970"),
+                                new XAttribute("d", "1.5"),
                                 new XAttribute("e", "1000"),
                                 new XAttribute("f", "1500")
                             )
@@ -539,9 +534,9 @@ namespace KartRider
                         new XElement("ItemAI",
                             new XElement("ItemSpec",
                                 new XAttribute("a", "0.8"),
-                                new XAttribute("b", "2300"),
-                                new XAttribute("c", "2930"),
-                                new XAttribute("d", "1.4"),
+                                new XAttribute("b", "2500"),
+                                new XAttribute("c", "2970"),
+                                new XAttribute("d", "1.5"),
                                 new XAttribute("e", "1000"),
                                 new XAttribute("f", "1500")
                             )
@@ -853,42 +848,7 @@ namespace KartRider
 
         private void button_KillGameProcesses_Click(object sender, EventArgs e)
         {
-            Process[] gameProcesses = Process.GetProcessesByName("KartRider");
-            if (gameProcesses.Length > 0)
-            {
-
-                if ((int)MessageBox.Show("确认要强制停止所有跑跑卡丁车游戏进程吗？", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) != 1)
-                {
-                    return;
-                }
-                foreach (Process gProcess in gameProcesses)
-                {
-                    try
-                    {
-                        gProcess.Kill();
-                        gProcess.WaitForExit();
-                        Console.WriteLine("成功强制关闭游戏进程!");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"无法强制关闭游戏进程: {ex.Message}");
-                    }
-                }
-                gameProcesses = Process.GetProcessesByName("KartRider");
-                if (gameProcesses.Length == 0)
-                {
-                    MessageBox.Show("所有游戏进程已成功关闭!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBox.Show("部分游戏进程无法关闭, 请尝试使用任务管理器!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-            else
-            {
-                Console.WriteLine("没有找到正在运行的游戏进程!");
-                MessageBox.Show("没有找到正在运行的跑跑卡丁车进程!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+            LauncherSystem.TryKillKart();
         }
 
         private void button_More_Options_Click(object sender, EventArgs e)

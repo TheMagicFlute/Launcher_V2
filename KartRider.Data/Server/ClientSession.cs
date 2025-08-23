@@ -48,7 +48,7 @@ namespace KartRider
                 uint hash = iPacket.ReadUInt();
                 if (hash != 1950550337) // PqServerSideUdpBindCheck
                 {
-                    Console.WriteLine($"[PkgReceived]{(PacketName)hash}: {BitConverter.ToString(iPacket.ToArray()).Replace("-", "")}");
+                    Console.WriteLine($"[Handling]{(PacketName)hash}: {BitConverter.ToString(iPacket.ToArray()).Replace("-", "")}");
                 }
                 if (hash == Adler32Helper.GenerateAdler32_ASCII("PqCnAuthenLogin", 0))
                 {
@@ -117,19 +117,22 @@ namespace KartRider
                         }
                         var manager = new CompetitiveDataManager();
                         CompleteTrackScoreCalculator calculator = new CompleteTrackScoreCalculator();
-                        var Scores = calculator.CalculateTrackScoreDetails(Track, Time, Booster, Crash, FavoriteItem.TrackDictionary);
-                        var data = new CompetitiveData
-                        {
-                            Track = Track,
-                            Kart = Kart,
-                            Time = Time,
-                            Booster = Booster,
-                            BoosterPoint = Scores.BoostScore,
-                            Crash = Crash,
-                            CrashPoint = Scores.CrashScore,
-                            Point = Scores.TotalScore
-                        };
-                        manager.SaveData(data);
+                        var scores = calculator.CalculateTrackScoreDetails(Track, Time, Booster, Crash, FavoriteItem.TrackDictionary);
+						if (scores != null)
+						{
+	                        var data = new CompetitiveData
+                            {
+                                Track = Track,
+                                Kart = Kart,
+                                Time = Time,
+                                Booster = Booster,
+                                BoosterPoint = scores.BoosterScore,
+                                Crash = Crash,
+                                CrashPoint = scores.CrashScore,
+                                Point = scores.TotalScore
+                            };
+	                        manager.SaveData(data);
+						}
                         using (OutPacket outPacket = new OutPacket("PrGetCompetitiveSlotInfo"))
                         {
                             var competitiveData = manager.LoadAllData();
@@ -295,7 +298,7 @@ namespace KartRider
                                 outPacket.WriteString(SetRider.Card);
                                 outPacket.WriteUInt(SetRider.RP);
                                 outPacket.WriteInt(0);
-                                outPacket.WriteByte(6);//Licenses
+                                outPacket.WriteByte(6); // Licenses
                                 outPacket.WriteUShort((ushort)RouterListener.DataTime()[0]);
                                 outPacket.WriteUShort((ushort)RouterListener.DataTime()[1]);
                                 outPacket.WriteBytes(new byte[17]);

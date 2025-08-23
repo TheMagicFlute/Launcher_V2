@@ -131,7 +131,7 @@ namespace KartRider
 
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                MessageBox.Show("跑跑卡丁车已经在运行了！\n请先关闭跑跑卡丁车，否则无法正常操作相关文件！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LauncherSystem.MsgKartIsRunning();
                 return;
             }
             string TCGKartRegPth = @"HKEY_CURRENT_USER\SOFTWARE\TCGame\kart";
@@ -151,8 +151,7 @@ namespace KartRider
             else
             {
                 // game not found
-                MsgErrorFileNotFound();
-                return;
+                LauncherSystem.MsgFileNotFound();
             }
 
             // load Data files
@@ -254,13 +253,6 @@ namespace KartRider
             return !string.IsNullOrEmpty(gamePath)
                 && File.Exists(gamePath + Launcher.KartRider)
                 && File.Exists(gamePath + Launcher.PinFile);
-        }
-
-        public static void MsgErrorFileNotFound()
-        {
-            Console.WriteLine($"Error: Cannot find {Launcher.KartRider} or {Launcher.PinFile}.");
-            MessageBox.Show($"找不到 {Launcher.KartRider} 或者 {Launcher.PinFile} !\n请检查游戏是否正确安装.\n如使用特定版本游戏, 请检查启动器处在的位置是否与该版本安装在同一目录下.\n如错误仍然存在, 请重新安装游戏.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Environment.Exit(1);
         }
 
         private static void encodea(string input, string output)
