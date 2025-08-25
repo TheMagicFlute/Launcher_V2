@@ -32,9 +32,14 @@ namespace Profile
             ClampValue();
             try
             {
+                var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings
+                {
+                    Formatting = Newtonsoft.Json.Formatting.Indented,
+                };
+
                 using (StreamWriter streamWriter = new StreamWriter(config_path, false))
                 {
-                    streamWriter.Write(JsonConvert.SerializeObject(ProfileConfig, Formatting.Indented));
+                    streamWriter.Write(Newtonsoft.Json.JsonConvert.SerializeObject(ProfileConfig, jsonSettings));
                 }
             }
             catch (Exception ex)
@@ -75,7 +80,6 @@ namespace Profile
                 Load_SetRiderItem();
                 Load_SetMyRoom();
                 Load_SetGameOption();
-                Load_DataPack();
             }
             catch (Exception ex)
             {
@@ -607,15 +611,6 @@ namespace Profile
             {
                 string textValue = System.IO.File.ReadAllText(Load_Version);
                 ProfileService.ProfileConfig.GameOption.Version = ushort.Parse(textValue);
-            }
-        }
-        public static void Load_DataPack()
-        {
-            string Load_DataPack = FileName.config_LoadFile + FileName.SetETC_DataPack + FileName.Extension;
-            if (File.Exists(Load_DataPack))
-            {
-                string textValue = System.IO.File.ReadAllText(Load_DataPack);
-                ProfileService.ProfileConfig.ETC.DataPack_Use = byte.Parse(textValue);
             }
         }
         private static void DeleteOldFiles()
