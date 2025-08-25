@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using ExcData;
-using Set_Data;
+using Profile;
 
 namespace KartRider
 {
@@ -9,7 +9,7 @@ namespace KartRider
     {
         public static void DataReset()
         {
-            SetRider.Lucci = Math.Min(SetRider.Lucci, SessionGroup.LucciMax);
+            ProfileService.ProfileConfig.Rider.Lucci = Math.Min(ProfileService.ProfileConfig.Rider.Lucci, SessionGroup.LucciMax);
             GameDataReset.RandomTrack_DataReset();
             GameDataReset.GameType_DataReset();
             GameDataReset.StartGame_DataReset();
@@ -22,7 +22,7 @@ namespace KartRider
             ExcSpec.Reset_KartLevel_SpecData();
             V2Spec.Reset_V2Parts_SpecData();
             V2Spec.Reset_V2Level_SpecData();
-            SpeedPatch.SpeedPatcData();
+            SpeedPatch.SpeedPatchData();
             // GameSupport.PrLogin();
         }
 

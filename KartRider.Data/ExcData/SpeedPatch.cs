@@ -1,5 +1,6 @@
 ﻿using System;
 using KartRider;
+using Profile;
 
 namespace ExcData
 {
@@ -15,9 +16,9 @@ namespace ExcData
         public static float StartForwardAccelForceItem = 0f;    // 道具启动加速器加速力 출발 부스터 가속 아이템
         public static float StartForwardAccelForceSpeed = 0f;   // 竞速启动加速器加速力 출발 부스터 가속 스피드
 
-        public static void SpeedPatcData()
+        public static void SpeedPatchData()
         {
-            if (Program.SpeedPatch)
+            if (ProfileService.ProfileConfig.ServerSetting.SpeedPatch_Use == 1)
             {
                 SpeedPatch.DragFactor = -0.003f;
                 SpeedPatch.ForwardAccelForce = 30f;

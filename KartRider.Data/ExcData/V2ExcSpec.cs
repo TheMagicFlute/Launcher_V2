@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using KartRider;
-using Set_Data;
+using KartRider;
+using Profile;
 
 namespace ExcData
 {
@@ -48,7 +49,7 @@ namespace ExcData
         {
             int[] skillID = { 4, 6, 8 };
             List<short> skills = new List<short>();
-            var existingLevel = KartExcData.Level12List.FirstOrDefault(list => list[0] == SetRiderItem.Set_Kart && list[1] == SetRiderItem.Set_KartSN);
+            var existingLevel = KartExcData.Level12List.FirstOrDefault(list => list[0] == ProfileService.ProfileConfig.RiderItem.Set_Kart && list[1] == ProfileService.ProfileConfig.RiderItem.Set_KartSN);
             if (existingLevel != null)
             {
                 for (int i = 0; i < skillID.Length; i++)
@@ -120,7 +121,7 @@ namespace ExcData
         {
             if (Kart.defaultExceedType > 0)
             {
-                var KartAndSN = new { Kart = SetRiderItem.Set_Kart, SN = SetRiderItem.Set_KartSN };
+                var KartAndSN = new { Kart = ProfileService.ProfileConfig.RiderItem.Set_Kart, SN = ProfileService.ProfileConfig.RiderItem.Set_KartSN };
                 var existingParts = KartExcData.Parts12List.FirstOrDefault(list => list[0] == KartAndSN.Kart && list[1] == KartAndSN.SN);
 
                 // Handle exceed type

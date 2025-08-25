@@ -4,7 +4,6 @@ using System.Xml;
 using System.Xml.Linq;
 using ExcData;
 using KartRider.Common.Utilities;
-using Set_Data;
 
 namespace KartRider
 {

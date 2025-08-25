@@ -1,10 +1,13 @@
 ﻿using System;
 
-namespace Set_Data
+namespace Profile
 {
+    [Obsolete("FileName Class is a Constant Class for old config files. Now use ProfileConfig and ProfileService instead.")]
     public static class FileName
     {
         public const string Extension = ".ini";
+
+        public static string ConfigRoot = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Launcher\";
 
         public static string SetRider_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Launcher\SetRider\";
         public static string SetRiderItem_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Launcher\SetRider\SetRiderItem\";

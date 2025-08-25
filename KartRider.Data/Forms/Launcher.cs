@@ -19,8 +19,9 @@ using KartRider.Common.Data;
 using KartRider.Common.Utilities;
 using KartRider.IO.Packet;
 using Launcher.Properties;
+using Newtonsoft.Json;
+using Profile;
 using RHOParser;
-using Set_Data;
 using static KartRider.Common.Data.PINFile;
 using static KartRider.Program;
 using static KartRider.Update;
@@ -35,7 +36,7 @@ namespace KartRider
         public const string KartRider = "KartRider.exe";
         public const string PinFile = "KartRider.pin";
         public const string PinFileBak = "KartRider-bak.pin";
-        public static string executablePath;
+        public static string executablePath = Process.GetCurrentProcess().MainModule.FileName;
 
         private Button Start_Button;
         private Button GetKart_Button;
@@ -56,21 +57,11 @@ namespace KartRider
         public Launcher()
         {
             InitializeComponent();
+
             // ----------
-            SetGameOption.Load_SetGameOption();
-            foreach (string key in SpeedType.speedNames.Keys)
-            {
-                Speed_comboBox.Items.Add(key);
-            }
-            KeyValuePair<string, byte> speed = SpeedType.speedNames.FirstOrDefault(a => a.Value == SetGameOption.SpeedType);
-            if (!String.IsNullOrEmpty(speed.Key))
-            {
-                Speed_comboBox.Text = speed.Key;
-            }
-            ClientVersion.Text = $"P{SetGameOption.Version.ToString()}";
-            VersionLabel.Text = currentVersion;
-            VersionLabel.Location = new Point(Launcher_label.Location.X + 70, Launcher_label.Location.Y);
+
             ClientVersion.Location = new Point(label_Client.Location.X + 70, label_Client.Location.Y);
+            VersionLabel.Location = new Point(Launcher_label.Location.X + 70, Launcher_label.Location.Y);
 
             StartPosition = FormStartPosition.Manual;
             Rectangle screen = Screen.PrimaryScreen.WorkingArea;
@@ -308,17 +299,30 @@ namespace KartRider
                 File.Delete(this.kartRiderDirectory + PinFile);
                 File.Move(this.kartRiderDirectory + PinFileBak, this.kartRiderDirectory + PinFile);
             }
+            ProfileService.Save();
         }
 
         private void OnLoad(object sender, EventArgs e)
         {
-            executablePath = Process.GetCurrentProcess().MainModule.FileName;
             Load_KartExcData();
-            StartingLoad_ALL.StartingLoad();
-            PINFile val = new PINFile(this.kartRiderDirectory + PinFile);
-            SetGameOption.Version = val.Header.MinorVersion;
-            SetGameOption.Save_SetGameOption();
 
+            PINFile val = new PINFile(this.kartRiderDirectory + PinFile);
+            ProfileService.ProfileConfig.GameOption.Version = val.Header.MinorVersion;
+            ProfileService.Save();
+
+            foreach (string key in SpeedType.speedNames.Keys)
+            {
+                Speed_comboBox.Items.Add(key);
+            }
+            KeyValuePair<string, byte> speed = SpeedType.speedNames.FirstOrDefault(a => a.Value == ProfileService.ProfileConfig.GameOption.SpeedType);
+            if (!String.IsNullOrEmpty(speed.Key))
+            {
+                Speed_comboBox.Text = speed.Key;
+            }
+            ClientVersion.Text = $"P{ProfileService.ProfileConfig.GameOption.Version.ToString()}";
+            VersionLabel.Text = currentVersion;
+
+            if (DBG) Console.WriteLine($"Config:\n{JsonConvert.SerializeObject(ProfileService.ProfileConfig, Newtonsoft.Json.Formatting.Indented)}");
             Console.WriteLine($"Process: {this.kartRiderDirectory + KartRider}");
             try
             {
@@ -411,8 +415,8 @@ namespace KartRider
         private void GetKart_Button_Click(object sender, EventArgs e)
         {
             if (!GetKart) return;
-            Program.GetKartDlg = new GetKart();
-            Program.GetKartDlg.ShowDialog();
+            GetKartDlg = new();
+            GetKartDlg.ShowDialog();
         }
 
         public void Load_KartExcData()
@@ -761,11 +765,9 @@ namespace KartRider
                 string selectedSpeed = Speed_comboBox.SelectedItem.ToString();
                 if (SpeedType.speedNames.ContainsKey(selectedSpeed))
                 {
-                    Config.SpeedType = SpeedType.speedNames[selectedSpeed];
-                    Console.Write($"速度更改为: {selectedSpeed}...");
-                    SetGameOption.SpeedType = Config.SpeedType;
-                    SetGameOption.Save_SetGameOption();
-                    Console.WriteLine("已保存.");
+                    ProfileService.ProfileConfig.GameOption.SpeedType = SpeedType.speedNames[selectedSpeed];
+                    ProfileService.Save();
+                    Console.WriteLine($"速度更改为: {selectedSpeed}.");
                 }
                 else
                 {
@@ -858,13 +860,9 @@ namespace KartRider
 
         private void button_ToggleConsole_Click(object sender, EventArgs e)
         {
-            bool isConsoleVisible = IsWindowVisible(consoleHandle);
-            isConsoleVisible = !isConsoleVisible;
-            ShowWindow(consoleHandle, isConsoleVisible ? SW_SHOW : SW_HIDE);
-            using (StreamWriter streamWriter = new StreamWriter(FileName.Load_ConsoleVisibility, false))
-            {
-                streamWriter.Write((isConsoleVisible ? "1" : "0"));
-            }
+            ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility = !IsWindowVisible(consoleHandle);
+            ShowWindow(consoleHandle, ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility ? SW_SHOW : SW_HIDE);
+            ProfileService.Save();
         }
     }
 }

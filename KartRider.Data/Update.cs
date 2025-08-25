@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Profile;
 
 namespace KartRider
 {
@@ -90,7 +91,7 @@ namespace KartRider
             try
             {
                 // string country = await GetCountryAsync();
-                string country = Program.CC.ToString();
+                string country = ProfileService.ProfileConfig.ServerSetting.CC.ToString();
                 // 中国大陆需要使用代理下载，处理 url
                 if (country != "" && country == "CN")
                 {

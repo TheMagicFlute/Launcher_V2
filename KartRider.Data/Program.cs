@@ -18,8 +18,8 @@ using KartLibrary.File;
 using KartLibrary.Xml;
 using KartRider.IO.Packet;
 using Microsoft.Win32;
+using Profile;
 using RHOParser;
-using Set_Data;
 
 namespace KartRider
 {
@@ -46,14 +46,10 @@ namespace KartRider
         public const int SW_HIDE = 0;
         public const int SW_SHOW = 5;
 
-        public static int consoleStatus = SW_SHOW;
         public static IntPtr consoleHandle;
         public static Launcher LauncherDlg;
         public static GetKart GetKartDlg;
-        public static bool SpeedPatch;
-        public static bool PreventItem;
         public static string RootDirectory;
-        public static CountryCode CC = CountryCode.CN;
 
         // 当前系统架构 小写字符串 目前仅有 x64 x86 arm64
         public static string architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
@@ -61,22 +57,22 @@ namespace KartRider
         [STAThread]
         private static async Task Main(string[] args)
         {
-            string input = "";
-            string output = "";
-
-            AllocConsole();
-
+            // string input = "";
+            // string output = "";
             if (!(args == null || args.Length == 0))
             {
                 // TODO: implement argument handling
                 return;
             }
 
+            AllocConsole();
+            consoleHandle = Process.GetCurrentProcess().MainWindowHandle;
+
             // 初始化自适应编码
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             SetAdaptiveConsoleEncoding();
 
-            consoleHandle = Process.GetCurrentProcess().MainWindowHandle;
+            ProfileService.Load();
 
             Console.Write($"中国跑跑卡丁车单机启动器 | {architecture} | ");
             if (DBG) Console.Write("[DEBUG]");
@@ -104,27 +100,10 @@ namespace KartRider
             if (CountryCode != "") // available country code
             {
                 // change country code & write to file
-                CC = ((CountryCode)Enum.Parse(typeof(CountryCode), CountryCode));
-                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_CC, false))
-                {
-                    streamWriter.Write(CC.ToString());
-                }
+                ProfileService.ProfileConfig.ServerSetting.CC = ((CountryCode)Enum.Parse(typeof(CountryCode), CountryCode));
+                ProfileService.Save();
             }
-            else if (!File.Exists(FileName.Load_CC)) // no country code file, create default
-            {
-                // default country code is CN (China)
-                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_CC, false))
-                {
-                    streamWriter.Write(CC.ToString());
-                }
-            }
-
-            if (File.Exists(FileName.Load_CC)) // load country code from file
-            {
-                string textValue = System.IO.File.ReadAllText(FileName.Load_CC);
-                CC = (CountryCode)Enum.Parse(typeof(CountryCode), textValue);
-            }
-            Console.WriteLine($"最后一次打开于: {CC.ToString()}");
+            Console.WriteLine($"最后一次打开于: {ProfileService.ProfileConfig.ServerSetting.CC.ToString()}");
 
             // check for update
             if (await Update.UpdateDataAsync()) return;
@@ -168,20 +147,12 @@ namespace KartRider
             }
 
             // auto hide console window if not in debug mode
-            if (!File.Exists(FileName.Load_ConsoleVisibility))
-            {
-                using (StreamWriter streamWriter = new StreamWriter(FileName.Load_ConsoleVisibility, false))
-                {
-                    streamWriter.Write((DBG ? "1" : "0"));
-                }
-            }
-            string isConsoleVisible = File.ReadAllText(FileName.Load_ConsoleVisibility);
-            if (isConsoleVisible == "0") ShowWindow(consoleHandle, SW_HIDE);
+            if (ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility) ShowWindow(consoleHandle, SW_HIDE);
 
             // open launcher form
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            LauncherDlg = new Launcher();
+            LauncherDlg = new();
             LauncherDlg.kartRiderDirectory = RootDirectory;
             Application.Run(LauncherDlg);
 
@@ -333,7 +304,7 @@ namespace KartRider
                 input = input.Replace("\\", "/");
                 if (!input.EndsWith("/"))
                     input += "/";
-                rho5Archive.SaveFolder(input, dataPackName, fullName, CC, dataPackID);
+                rho5Archive.SaveFolder(input, dataPackName, fullName, ProfileService.ProfileConfig.ServerSetting.CC, dataPackID);
             }
             else
             {
@@ -348,7 +319,7 @@ namespace KartRider
             if (output.EndsWith(".rho5"))
                 output = output.Replace(".rho5", "");
             PackFolderManager packFolderManager = new PackFolderManager();
-            packFolderManager.OpenSingleFile(input, CC);
+            packFolderManager.OpenSingleFile(input, ProfileService.ProfileConfig.ServerSetting.CC);
             Queue<PackFolderInfo> packFolderInfoQueue = new Queue<PackFolderInfo>();
             packFolderInfoQueue.Enqueue(packFolderManager.GetRootFolder());
             packFolderManager.GetRootFolder();
@@ -602,7 +573,7 @@ namespace KartRider
                 {
                     string folderName = splitParts[i];
                     XElement? subFolder = currentFolder.Elements("PackFolder")
-                                                     .FirstOrDefault(f => (string?)f.Attribute("name") == folderName);
+                                                       .FirstOrDefault(f => (string?)f.Attribute("name") == folderName);
                     if (subFolder == null)
                     {
                         if (folderName == "character" || folderName == "flyingPet" || folderName == "pet" || folderName == "track")
