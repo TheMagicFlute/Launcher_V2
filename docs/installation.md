@@ -7,7 +7,7 @@
 
 ## 1. 下载二进制文件
 
-前往 [Release](https://github.com/TheMagicFlute/Launcher_V2/latest "latest release") 或 [Yany Release](https://github.com/yanygm/Launcher_V2/releases/latest) 并根据操作系统下载最新的二进制文件压缩包，解压即可。
+前往 [Release](https://github.com/TheMagicFlute/Launcher_V2/releases/latest "latest release") 或 [Yany Release](https://github.com/yanygm/Launcher_V2/releases/latest) 并根据操作系统下载最新的二进制文件压缩包，解压即可。
 
 此方法**容易报毒**！提前关闭 Windows Defender 对相关目录的扫描，或者添加信任。
 
