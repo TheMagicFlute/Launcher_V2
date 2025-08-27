@@ -30,5 +30,5 @@
 
 ## 进入了游戏，过了一会马上闪退怎么办？
 
-> 删除 `Profile` 文件夹，并重启启动器。
-> 如果想要保存配置，请备份 `Profile` 文件夹。
+> 尝试更新/修复游戏。
+> 如果无法解决，请提 [issue](https://github.com/yangym/Launcher_V2/issues)，并附上相关的日志。
