@@ -10,10 +10,10 @@ using Profile;
 
 namespace RiderData
 {
-    public static class NewRider
-    {
-        private static readonly HashSet<short> excludedKeys = new HashSet<short> { 3, 6, 10, 15, 19, 24, 25, 29, 30, 32, 33, 34, 35, 36, 40, 41, 47, 48, 50, 51, 56, 57, 58, 59, 60, 62, 63, 64, 65, 66, 72, 73, 74, 75 };
-        private static readonly HashSet<short> ValidItemCatIds = new HashSet<short> { 1, 2, 4, 8, 11, 12, 13, 14, 16, 18, 20, 21, 26, 27, 28, 31, 52, 61, 70, 71 };
+	public static class NewRider
+	{
+		private static readonly HashSet<short> excludedKeys = new HashSet<short> { 3, 6, 10, 15, 19, 25, 29, 30, 32, 33, 34, 35, 36, 40, 41, 47, 48, 50, 51, 56, 57, 58, 59, 60, 62, 63, 64, 65, 66, 72, 73, 74, 75 };
+		private static readonly HashSet<short> ValidItemCatIds = new HashSet<short> { 1, 2, 4, 8, 11, 12, 13, 14, 16, 18, 20, 21, 26, 27, 28, 31, 52, 61, 70, 71 };
 
         public static void LoadItemData()
         {
@@ -63,40 +63,39 @@ namespace RiderData
             }
         }
 
-        public static void NewKart1()
-        {
-
-            short sn = 1;
-            int range = 100; // 分批次数
-            if (KartExcData.items.TryGetValue(3, out Dictionary<short, string> resultDict))
-            {
-                List<short> kart = new List<short>(resultDict.Keys);
-                int times = kart.Count / range + (kart.Count % range > 0 ? 1 : 0);
-                for (int i = 0; i < times; i++)
-                {
-                    var tempList = kart.GetRange(i * range, (i + 1) * range > kart.Count ? (kart.Count - i * range) : range);
-                    int Count = tempList.Count;
-                    using (OutPacket outPacket = new OutPacket("PrRequestKartInfoPacket"))
-                    {
-                        outPacket.WriteByte(1);
-                        outPacket.WriteInt(Count);
-                        foreach (var Kart in tempList)
-                        {
-                            outPacket.WriteShort(3);
-                            outPacket.WriteShort(Kart);
-                            outPacket.WriteShort(sn);
-                            outPacket.WriteShort(1); // 数量
-                            outPacket.WriteShort(0);
-                            outPacket.WriteShort(-1);
-                            outPacket.WriteShort(0);
-                            outPacket.WriteShort(0);
-                            outPacket.WriteShort(0);
-                        }
-                        RouterListener.MySession.Client.Send(outPacket);
-                    }
-                }
-            }
-        }
+		public static void NewKart1()
+		{
+			short sn = 1;
+			int range = 100; // 分批次数
+			if (KartExcData.items.TryGetValue(3, out Dictionary<short, string> resultDict))
+			{
+				List<short> kart = new List<short>(resultDict.Keys);
+				int times = kart.Count / range + (kart.Count % range > 0 ? 1 : 0);
+				for (int i = 0; i < times; i++)
+				{
+					var tempList = kart.GetRange(i * range, (i + 1) * range > kart.Count ? (kart.Count - i * range) : range);
+					int Count = tempList.Count;
+					using (OutPacket outPacket = new OutPacket("PrRequestKartInfoPacket"))
+					{
+						outPacket.WriteByte(1);
+						outPacket.WriteInt(Count);
+						foreach (var Kart in tempList)
+						{
+							outPacket.WriteShort(3);
+							outPacket.WriteShort(Kart);
+							outPacket.WriteShort(sn);
+							outPacket.WriteShort(1); // 数量
+							outPacket.WriteShort(0);
+							outPacket.WriteShort(-1);
+							outPacket.WriteShort(0);
+							outPacket.WriteShort(0);
+							outPacket.WriteShort(0);
+						}
+						RouterListener.MySession.Client.Send(outPacket);
+					}
+				}
+			}
+		}
 
         public static void NewKart2()
         {
