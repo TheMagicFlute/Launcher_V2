@@ -182,21 +182,11 @@ namespace KartRider
             }
         }
 
-        public static void SpRpLotteryPacket(short Lottery_Item)
+        public static void SpRpLotteryPacket()
         {
             int stock1 = LotteryManager.GetRandomStockIds(1)[0];
             Random random = new Random();
             BingoNum = (byte)random.Next(1, 50);
-            using (OutPacket outPacket = new OutPacket("SpRpLotteryPacket"))
-            {
-                outPacket.WriteInt(0);
-                outPacket.WriteInt(stock1);
-                outPacket.WriteHexString("FFFFFFFF");
-                outPacket.WriteByte(0);
-                outPacket.WriteByte(BingoNum);
-                outPacket.WriteBytes(new byte[11]);
-                RouterListener.MySession.Client.Send(outPacket);
-            }
             if (BingoNums.Count == 0 && BingoNumsList.Count == 0)
             {
                 BingoNumber();
@@ -209,6 +199,16 @@ namespace KartRider
                         BingoItems.Add(stock, 0);
                     }
                 }
+            }
+            using (OutPacket outPacket = new OutPacket("SpRpLotteryPacket"))
+            {
+                outPacket.WriteInt(0);
+                outPacket.WriteInt(stock1);
+                outPacket.WriteHexString("FFFFFFFF");
+                outPacket.WriteByte(0);
+                outPacket.WriteByte(BingoNum);
+                outPacket.WriteBytes(new byte[11]);
+                RouterListener.MySession.Client.Send(outPacket);
             }
             if (BingoNums.ContainsKey(BingoNum) && BingoNumsList.Contains(BingoNum))
             {
@@ -317,3 +317,4 @@ namespace KartRider
         }
     }
 }
+
