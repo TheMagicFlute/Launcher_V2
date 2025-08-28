@@ -18,6 +18,7 @@ namespace ExcData
         public static string PartsData_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\PartsData.xml";
         public static string Parts12Data_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Parts12Data.xml";
         public static string Level12Data_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Level12Data.xml";
+
         public static List<List<short>> TuneList = new List<List<short>>();
         public static List<List<short>> PlantList = new List<List<short>>();
         public static List<List<short>> LevelList = new List<List<short>>();
@@ -183,7 +184,7 @@ namespace ExcData
                         oPacket.WriteShort(tempList[f][5]);
                         oPacket.WriteShort(tempList[f][6]);
                         oPacket.WriteShort(tempList[f][7]);
-                        oPacket.WriteShort(tempList[f][8]); //코팅
+                        oPacket.WriteShort(tempList[f][8]); // 车膜 Coating 코팅
                     }
                     oPacket.WriteInt(0);
                     oPacket.WriteInt(0);

@@ -352,7 +352,7 @@ namespace KartRider.Common.Network
 
         public void Send(OutPacket pPacket)
         {
-            Console.WriteLine((PacketName)BitConverter.ToUInt32(pPacket.ToArray(), 0) + "：" + BitConverter.ToString(pPacket.ToArray()).Replace("-", ""));
+            Console.WriteLine($"[Send]{(PacketName)BitConverter.ToUInt32(pPacket.ToArray(), 0)}: {BitConverter.ToString(pPacket.ToArray()).Replace("-", "")}");
             try
             {
                 if (this.mDisconnected == 0)
