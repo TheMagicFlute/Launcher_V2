@@ -147,7 +147,7 @@ namespace KartRider
             }
 
             // auto hide console window if not in debug mode
-            if (ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility) ShowWindow(consoleHandle, SW_HIDE);
+            if (!ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility) ShowWindow(consoleHandle, SW_HIDE);
 
             // open launcher form
             Application.EnableVisualStyles();

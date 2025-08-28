@@ -30,76 +30,77 @@ namespace KartRider
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new System.Windows.Forms.Button();
-            label1 = new System.Windows.Forms.Label();
-            label2 = new System.Windows.Forms.Label();
-            ItemType = new System.Windows.Forms.ComboBox();
-            ItemID = new System.Windows.Forms.ComboBox();
+            button_Add = new Button();
+            label_Type = new Label();
+            label_Item = new Label();
+            ItemType = new ComboBox();
+            ItemID = new ComboBox();
             SuspendLayout();
             // 
-            // button1
+            // button_Add
             // 
-            button1.Location = new System.Drawing.Point(189, 15);
-            button1.Name = "button1";
-            button1.Size = new System.Drawing.Size(64, 50);
-            button1.TabIndex = 0;
-            button1.Text = "添加";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            button_Add.Location = new Point(189, 12);
+            button_Add.Name = "button_Add";
+            button_Add.Size = new Size(72, 59);
+            button_Add.TabIndex = 0;
+            button_Add.Text = "添加";
+            button_Add.UseVisualStyleBackColor = true;
+            button_Add.Click += button_Add_Click;
             // 
-            // label1
+            // label_Type
             // 
-            label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(10, 16);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(35, 12);
-            label1.TabIndex = 362;
-            label1.Text = "类型:";
+            label_Type.AutoSize = true;
+            label_Type.Location = new Point(10, 16);
+            label_Type.Name = "label_Type";
+            label_Type.Size = new Size(35, 12);
+            label_Type.TabIndex = 362;
+            label_Type.Text = "类型:";
             // 
-            // label2
+            // label_Item
             // 
-            label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(10, 55);
-            label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(35, 12);
-            label2.TabIndex = 363;
-            label2.Text = "道具:";
+            label_Item.AutoSize = true;
+            label_Item.Location = new Point(10, 55);
+            label_Item.Name = "label_Item";
+            label_Item.Size = new Size(35, 12);
+            label_Item.TabIndex = 363;
+            label_Item.Text = "道具:";
             // 
             // ItemType
             // 
             ItemType.FormattingEnabled = true;
-            ItemType.Location = new System.Drawing.Point(46, 12);
+            ItemType.Location = new Point(46, 12);
             ItemType.Name = "ItemType";
-            ItemType.Size = new System.Drawing.Size(121, 20);
+            ItemType.Size = new Size(137, 20);
             ItemType.TabIndex = 364;
-            ItemType.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
+            ItemType.SelectedIndexChanged += ItemType_SelectedIndexChanged;
+            ItemType.MouseEnter += ItemType_MouseEnter;
             // 
             // ItemID
             // 
             ItemID.FormattingEnabled = true;
-            ItemID.Location = new System.Drawing.Point(46, 51);
+            ItemID.Location = new Point(46, 51);
             ItemID.Name = "ItemID";
-            ItemID.Size = new System.Drawing.Size(121, 20);
+            ItemID.Size = new Size(137, 20);
             ItemID.TabIndex = 365;
-            ItemID.SelectedIndexChanged += comboBox2_SelectedIndexChanged;
+            ItemID.SelectedIndexChanged += ItemID_SelectedIndexChanged;
+            ItemID.MouseEnter += ItemID_MouseEnter;
             // 
             // GetKart
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(273, 100);
+            AutoScaleDimensions = new SizeF(6F, 12F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(273, 100);
             Controls.Add(ItemID);
             Controls.Add(ItemType);
-            Controls.Add(label2);
-            Controls.Add(label1);
-            Controls.Add(button1);
-            Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            Controls.Add(label_Item);
+            Controls.Add(label_Type);
+            Controls.Add(button_Add);
+            Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "GetKart";
-            Icon = Resources.icon;
-            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "添加道具";
             ResumeLayout(false);
             PerformLayout();
@@ -107,9 +108,9 @@ namespace KartRider
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button button_Add;
+        private System.Windows.Forms.Label label_Type;
+        private System.Windows.Forms.Label label_Item;
         private System.Windows.Forms.ComboBox ItemType;
         private System.Windows.Forms.ComboBox ItemID;
     }

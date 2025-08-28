@@ -25,6 +25,7 @@ using RHOParser;
 using static KartRider.Common.Data.PINFile;
 using static KartRider.Program;
 using static KartRider.Update;
+using static KartRider.LauncherSystem;
 
 namespace KartRider
 {
@@ -119,7 +120,6 @@ namespace KartRider
             label_Client.Size = new Size(71, 12);
             label_Client.TabIndex = 367;
             label_Client.Text = "游戏版本  :";
-            label_Client.Click += label_Client_Click;
             // 
             // ClientVersion
             // 
@@ -132,6 +132,17 @@ namespace KartRider
             ClientVersion.Size = new Size(0, 12);
             ClientVersion.TabIndex = 367;
             ClientVersion.Click += label_Client_Click;
+            ClientVersion.MouseEnter += ClientVersion_MouseEnter;
+            // 
+            // Launcher_label
+            // 
+            Launcher_label.AutoSize = true;
+            Launcher_label.ForeColor = Color.Blue;
+            Launcher_label.Location = new Point(2, 251);
+            Launcher_label.Name = "Launcher_label";
+            Launcher_label.Size = new Size(71, 12);
+            Launcher_label.TabIndex = 373;
+            Launcher_label.Text = "启动器版本:";
             // 
             // VersionLabel
             // 
@@ -143,18 +154,8 @@ namespace KartRider
             VersionLabel.Name = "VersionLabel";
             VersionLabel.Size = new Size(0, 12);
             VersionLabel.TabIndex = 373;
-            VersionLabel.Click += GitHub_Click;
-            // 
-            // Launcher_label
-            // 
-            Launcher_label.AutoSize = true;
-            Launcher_label.ForeColor = Color.Blue;
-            Launcher_label.Location = new Point(2, 251);
-            Launcher_label.Name = "Launcher_label";
-            Launcher_label.Size = new Size(71, 12);
-            Launcher_label.TabIndex = 373;
-            Launcher_label.Text = "启动器版本:";
-            Launcher_label.Click += GitHub_Click;
+            VersionLabel.Click += GitHub_Release_Click;
+            VersionLabel.MouseEnter += VersionLabel_MouseEnter;
             // 
             // Speed_comboBox
             // 
@@ -188,6 +189,7 @@ namespace KartRider
             GitHub.TabIndex = 371;
             GitHub.Text = "GitHub";
             GitHub.Click += GitHub_Click;
+            GitHub.MouseEnter += GitHub_MouseEnter;
             // 
             // KartInfo
             // 
@@ -199,6 +201,7 @@ namespace KartRider
             KartInfo.TabIndex = 372;
             KartInfo.Text = "KartInfo";
             KartInfo.Click += KartInfo_Click;
+            KartInfo.MouseEnter += KartInfo_MouseEnter;
             // 
             // label_Docs
             // 
@@ -241,6 +244,7 @@ namespace KartRider
             button_ToggleConsole.Text = "切换终端";
             button_ToggleConsole.UseVisualStyleBackColor = true;
             button_ToggleConsole.Click += button_ToggleConsole_Click;
+            button_ToggleConsole.MouseEnter += button_ToggleConsole_MouseEnter;
             // 
             // button_More_Options
             // 
@@ -333,7 +337,7 @@ namespace KartRider
                 Console.WriteLine($"Error: {ex}");
                 if (ex is System.Net.Sockets.SocketException)
                 {
-                    LauncherSystem.MsgMultiInstance();
+                    MsgMultiInstance();
                 }
             }
         }
@@ -342,11 +346,11 @@ namespace KartRider
         {
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                LauncherSystem.MsgKartIsRunning();
+                MsgKartIsRunning();
             }
             if (!CheckGameAvailability(this.kartRiderDirectory))
             {
-                LauncherSystem.MsgFileNotFound();
+                MsgFileNotFound();
             }
             (new Thread(() =>
             {
@@ -778,54 +782,51 @@ namespace KartRider
 
         private void GitHub_Click(object sender, EventArgs e)
         {
+            string url = $"https://github.com/{owner}/{repo}";
+            TryOpenUrl(url);
+        }
+        private void VersionLabel_MouseEnter(object sender, EventArgs e)
+        {
+            new ToolTip().SetToolTip(VersionLabel, "点击前往GitHub Release");
+        }
+
+        private void GitHub_Release_Click(object sender, EventArgs e)
+        {
             string url = $"https://github.com/{owner}/{repo}/releases";
-            try
-            {
-                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
-            }
+            TryOpenUrl(url);
+        }
+
+        private void GitHub_MouseEnter(object sender, EventArgs e)
+        {
+            new ToolTip().SetToolTip(GitHub, "点击前往GitHub仓库");
         }
 
         private void KartInfo_Click(object sender, EventArgs e)
         {
             string url = "https://kartinfo.me/thread-9369-1-1.html";
-            try
-            {
-                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
-            }
+            TryOpenUrl(url);
+        }
+
+        private void KartInfo_MouseEnter(object sender, EventArgs e)
+        {
+            new ToolTip().SetToolTip(KartInfo, "点击前往KartInfo论坛");
         }
 
         private void label_Client_Click(object sender, EventArgs e)
         {
             string url = "https://github.com/brownsugar/popkart-client-archive/releases";
-            try
-            {
-                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
-            }
+            TryOpenUrl(url);
+        }
+
+        private void ClientVersion_MouseEnter(object sender, EventArgs e)
+        {
+            new ToolTip().SetToolTip(ClientVersion, "点击前往BrownSugar的跑跑卡丁车存档");
         }
 
         private void label_Docs_Click(object sender, EventArgs e)
         {
             string url = "https://themagicflute.github.io/Launcher_V2/";
-            try
-            {
-                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
-            }
+            TryOpenUrl(url);
         }
 
         private void label_TimeAttackLog_Click(object sender, EventArgs e)
@@ -850,7 +851,7 @@ namespace KartRider
 
         private void button_KillGameProcesses_Click(object sender, EventArgs e)
         {
-            LauncherSystem.TryKillKart();
+            TryKillKart();
         }
 
         private void button_More_Options_Click(object sender, EventArgs e)
@@ -863,6 +864,11 @@ namespace KartRider
             ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility = !IsWindowVisible(consoleHandle);
             ShowWindow(consoleHandle, ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility ? SW_SHOW : SW_HIDE);
             ProfileService.Save();
+        }
+
+        private void button_ToggleConsole_MouseEnter(object sender, EventArgs e)
+        {
+            new ToolTip().SetToolTip(button_ToggleConsole, "显示/隐藏控制台");
         }
     }
 }

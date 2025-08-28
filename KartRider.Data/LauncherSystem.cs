@@ -7,6 +7,7 @@ namespace KartRider
 	public static class LauncherSystem
 	{
         #region messages
+
         public static void MsgKartIsRunning()
 		{
 			MessageBox.Show("跑跑卡丁车已经运行了!", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -64,6 +65,25 @@ namespace KartRider
                 MessageBox.Show("没有找到正在运行的跑跑卡丁车进程!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
+
+        #endregion
+
+        #region utils
+
+        public static bool TryOpenUrl(string url)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"打开超链接时发生错误: {ex.Message}");
+                return false;
+            }
+            return true;
+        }
+
+        #endregion
     }
-    #endregion
 }
