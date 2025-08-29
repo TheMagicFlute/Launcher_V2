@@ -35,23 +35,31 @@ namespace Profile
     public class RiderData
     {
         public int ClubCode { get; set; } = 10000;
-        public int ClubMark_LOGO { get; set; } = 0; // 343 Vero  343 베로
+        public int ClubMark_LOGO { get; set; } = 2; // 343 Vero  343 베로
         public int ClubMark_LINE { get; set; } = 0;
-        public string ClubName { get; set; } = "GitHub-KartRider";
+        public string ClubName { get; set; } = "TCCstar";
+        public string ClubIntro { get; set; } = $"跑跑卡丁车交流群: 84338611\n单机启动器下载地址: https://github.com/{Update.owner}/{Update.repo}/releases/latest";
         public string UserID { get; set; } = "KartPlayer";
         public uint UserNO { get; set; } = 1982596588;
         public string Nickname { get; set; } = "KartPlayer";
-        public string RiderIntro { get; set; } = "Kart Offline Player / 单机玩家";
+        public string RiderIntro { get; set; } = $"Kart Offline Player / 单机玩家\n单机启动器下载地址: https://github.com/{Update.owner}/{Update.repo}/releases/latest";
         public string Card { get; set; } = "";
         public short Emblem1 { get; set; } = 0;
         public short Emblem2 { get; set; } = 0;
         public uint Lucci { get; set; } = 1000000;
         public uint RP { get; set; } = 2000000000;
         public uint Koin { get; set; } = 10000;
+        public uint Cash { get; set; } = 10000;
+        public uint TcCash { get; set; } = 10000;
         public int Premium { get; set; } = 5; // 100
         public byte Ranker { get; set; } = 0;
-        public ushort SlotChanger { get; set; } = 60000;
+        public ushort SlotChanger { get; set; } = 32766;
         public uint pmap { get; set; } = 0; // 3130 // 1068 // 2520
+
+        /// <summary>
+        /// 验证情况
+        /// </summary>
+        /// <value>1: 绿色玩家 0: 未验证 other: 强制置0</value>
         public byte IdentificationType { get; set; } = 1;
     }
     public class RiderItemData
