@@ -32,6 +32,7 @@ namespace KartRider
     public class Launcher : Form
     {
         public static bool GetKart = true;
+        public static bool Options = true;
         public static short KartSN = 0;
         public string kartRiderDirectory = null;
         public const string KartRider = "KartRider.exe";
@@ -856,7 +857,9 @@ namespace KartRider
 
         private void button_More_Options_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("更多选项功能尚未实现!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (!Options) return;
+            OptionsDlg = new();
+            OptionsDlg.ShowDialog();
         }
 
         private void button_ToggleConsole_Click(object sender, EventArgs e)

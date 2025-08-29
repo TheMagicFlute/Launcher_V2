@@ -102,6 +102,7 @@ namespace KartRider
             Name = "GetKart";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "添加道具";
+            TopMost = true;
             ResumeLayout(false);
             PerformLayout();
         }

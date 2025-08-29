@@ -49,6 +49,7 @@ namespace KartRider
         public static IntPtr consoleHandle;
         public static Launcher LauncherDlg;
         public static GetKart GetKartDlg;
+        public static Options OptionsDlg;
         public static string RootDirectory;
 
         // 当前系统架构 小写字符串 目前仅有 x64 x86 arm64
