@@ -51,8 +51,6 @@ namespace KartRider
         private Label ClientVersion;
         private Label label_Docs;
         private Label label_TimeAttackLog;
-        private Button button_KillGameProcesses;
-        private Button button_ToggleConsole;
         private Button button_More_Options;
         private Label VersionLabel;
 
@@ -85,8 +83,6 @@ namespace KartRider
             KartInfo = new Label();
             label_Docs = new Label();
             label_TimeAttackLog = new Label();
-            button_KillGameProcesses = new Button();
-            button_ToggleConsole = new Button();
             button_More_Options = new Button();
             SuspendLayout();
             // 
@@ -102,7 +98,7 @@ namespace KartRider
             // 
             // GetKart_Button
             // 
-            GetKart_Button.Location = new Point(12, 105);
+            GetKart_Button.Location = new Point(13, 43);
             GetKart_Button.Name = "GetKart_Button";
             GetKart_Button.Size = new Size(200, 25);
             GetKart_Button.TabIndex = 365;
@@ -116,7 +112,7 @@ namespace KartRider
             label_Client.BackColor = SystemColors.Control;
             label_Client.Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label_Client.ForeColor = Color.Blue;
-            label_Client.Location = new Point(2, 239);
+            label_Client.Location = new Point(2, 163);
             label_Client.Name = "label_Client";
             label_Client.Size = new Size(71, 12);
             label_Client.TabIndex = 367;
@@ -135,16 +131,6 @@ namespace KartRider
             ClientVersion.Click += label_Client_Click;
             ClientVersion.MouseEnter += ClientVersion_MouseEnter;
             // 
-            // Launcher_label
-            // 
-            Launcher_label.AutoSize = true;
-            Launcher_label.ForeColor = Color.Blue;
-            Launcher_label.Location = new Point(2, 251);
-            Launcher_label.Name = "Launcher_label";
-            Launcher_label.Size = new Size(71, 12);
-            Launcher_label.TabIndex = 373;
-            Launcher_label.Text = "启动器版本:";
-            // 
             // VersionLabel
             // 
             VersionLabel.AutoSize = true;
@@ -158,11 +144,21 @@ namespace KartRider
             VersionLabel.Click += GitHub_Release_Click;
             VersionLabel.MouseEnter += VersionLabel_MouseEnter;
             // 
+            // Launcher_label
+            // 
+            Launcher_label.AutoSize = true;
+            Launcher_label.ForeColor = Color.Blue;
+            Launcher_label.Location = new Point(2, 176);
+            Launcher_label.Name = "Launcher_label";
+            Launcher_label.Size = new Size(71, 12);
+            Launcher_label.TabIndex = 373;
+            Launcher_label.Text = "启动器版本:";
+            // 
             // Speed_comboBox
             // 
             Speed_comboBox.ForeColor = Color.Red;
             Speed_comboBox.FormattingEnabled = true;
-            Speed_comboBox.Location = new Point(13, 159);
+            Speed_comboBox.Location = new Point(12, 86);
             Speed_comboBox.Name = "Speed_comboBox";
             Speed_comboBox.Size = new Size(199, 20);
             Speed_comboBox.TabIndex = 368;
@@ -174,7 +170,7 @@ namespace KartRider
             Speed_label.AutoSize = true;
             Speed_label.Font = new Font("宋体", 9F);
             Speed_label.ForeColor = Color.Blue;
-            Speed_label.Location = new Point(12, 144);
+            Speed_label.Location = new Point(12, 71);
             Speed_label.Name = "Speed_label";
             Speed_label.Size = new Size(65, 12);
             Speed_label.TabIndex = 369;
@@ -184,7 +180,7 @@ namespace KartRider
             // 
             GitHub.AutoSize = true;
             GitHub.ForeColor = Color.Blue;
-            GitHub.Location = new Point(171, 239);
+            GitHub.Location = new Point(171, 164);
             GitHub.Name = "GitHub";
             GitHub.Size = new Size(41, 12);
             GitHub.TabIndex = 371;
@@ -196,7 +192,7 @@ namespace KartRider
             // 
             KartInfo.AutoSize = true;
             KartInfo.ForeColor = Color.Blue;
-            KartInfo.Location = new Point(159, 251);
+            KartInfo.Location = new Point(159, 176);
             KartInfo.Name = "KartInfo";
             KartInfo.Size = new Size(53, 12);
             KartInfo.TabIndex = 372;
@@ -208,7 +204,7 @@ namespace KartRider
             // 
             label_Docs.AutoSize = true;
             label_Docs.ForeColor = Color.Blue;
-            label_Docs.Location = new Point(135, 227);
+            label_Docs.Location = new Point(135, 152);
             label_Docs.Name = "label_Docs";
             label_Docs.Size = new Size(77, 12);
             label_Docs.TabIndex = 374;
@@ -219,37 +215,16 @@ namespace KartRider
             // 
             label_TimeAttackLog.AutoSize = true;
             label_TimeAttackLog.ForeColor = Color.Blue;
-            label_TimeAttackLog.Location = new Point(135, 215);
+            label_TimeAttackLog.Location = new Point(135, 140);
             label_TimeAttackLog.Name = "label_TimeAttackLog";
             label_TimeAttackLog.Size = new Size(77, 12);
             label_TimeAttackLog.TabIndex = 375;
             label_TimeAttackLog.Text = "查看计时记录";
             label_TimeAttackLog.Click += label_TimeAttackLog_Click;
             // 
-            // button_KillGameProcesses
-            // 
-            button_KillGameProcesses.Location = new Point(12, 43);
-            button_KillGameProcesses.Name = "button_KillGameProcesses";
-            button_KillGameProcesses.Size = new Size(200, 25);
-            button_KillGameProcesses.TabIndex = 376;
-            button_KillGameProcesses.Text = "强制关闭游戏";
-            button_KillGameProcesses.UseVisualStyleBackColor = true;
-            button_KillGameProcesses.Click += button_KillGameProcesses_Click;
-            // 
-            // button_ToggleConsole
-            // 
-            button_ToggleConsole.Location = new Point(12, 74);
-            button_ToggleConsole.Name = "button_ToggleConsole";
-            button_ToggleConsole.Size = new Size(200, 25);
-            button_ToggleConsole.TabIndex = 377;
-            button_ToggleConsole.Text = "切换终端";
-            button_ToggleConsole.UseVisualStyleBackColor = true;
-            button_ToggleConsole.Click += button_ToggleConsole_Click;
-            button_ToggleConsole.MouseEnter += button_ToggleConsole_MouseEnter;
-            // 
             // button_More_Options
             // 
-            button_More_Options.Location = new Point(12, 185);
+            button_More_Options.Location = new Point(13, 112);
             button_More_Options.Name = "button_More_Options";
             button_More_Options.Size = new Size(200, 25);
             button_More_Options.TabIndex = 378;
@@ -262,10 +237,8 @@ namespace KartRider
             AutoScaleDimensions = new SizeF(6F, 12F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(224, 271);
+            ClientSize = new Size(224, 196);
             Controls.Add(button_More_Options);
-            Controls.Add(button_ToggleConsole);
-            Controls.Add(button_KillGameProcesses);
             Controls.Add(label_TimeAttackLog);
             Controls.Add(label_Docs);
             Controls.Add(VersionLabel);
@@ -850,28 +823,11 @@ namespace KartRider
             }
         }
 
-        private void button_KillGameProcesses_Click(object sender, EventArgs e)
-        {
-            TryKillKart();
-        }
-
         private void button_More_Options_Click(object sender, EventArgs e)
         {
             if (!Options) return;
             OptionsDlg = new();
             OptionsDlg.ShowDialog();
-        }
-
-        private void button_ToggleConsole_Click(object sender, EventArgs e)
-        {
-            ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility = !IsWindowVisible(consoleHandle);
-            ShowWindow(consoleHandle, ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility ? SW_SHOW : SW_HIDE);
-            ProfileService.Save();
-        }
-
-        private void button_ToggleConsole_MouseEnter(object sender, EventArgs e)
-        {
-            new ToolTip().SetToolTip(button_ToggleConsole, "显示/隐藏控制台");
         }
     }
 }

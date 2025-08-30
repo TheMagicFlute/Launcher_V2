@@ -43,9 +43,13 @@ namespace KartRider
             {
                 iPacket.Position = 0;
                 uint hash = iPacket.ReadUInt();
+                string packetDetail = BitConverter.ToString(iPacket.ToArray()).Replace("-", "");
                 if (hash != 1950550337) // PqServerSideUdpBindCheck
                 {
-                    Console.WriteLine($"[Handling]{(PacketName)hash}: {BitConverter.ToString(iPacket.ToArray()).Replace("-", "")}");
+                    if (ProfileService.ProfileConfig.ServerSetting.ShowPacketDetail)
+                        Console.WriteLine($"[Handling]{(PacketName)hash}: {packetDetail}");
+                    else
+                        Console.WriteLine($"[Handling]{(PacketName)hash}");
                 }
                 if (hash == Adler32Helper.GenerateAdler32_ASCII("PqCnAuthenLogin", 0))
                 {

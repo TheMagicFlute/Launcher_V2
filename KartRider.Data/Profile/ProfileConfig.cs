@@ -29,8 +29,21 @@ namespace Profile
     {
         public byte PreventItem_Use { get; set; } = 0;
         public byte SpeedPatch_Use { get; set; } = 0;
+
+        /// <summary>
+        /// current country code
+        /// </summary>
         public CountryCode CC { get; set; } = CountryCode.CN;
+
+        /// <summary>
+        /// console visibility
+        /// </summary>
         public bool ConsoleVisibility { get; set; } = Program.DBG;
+
+        /// <summary>
+        /// show packet detail or not
+        /// </summary>
+        public bool ShowPacketDetail { get; set; } = Program.DBG;
     }
     public class RiderData
     {

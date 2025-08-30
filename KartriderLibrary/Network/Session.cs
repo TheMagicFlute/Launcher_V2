@@ -7,6 +7,7 @@ using KartRider.Common.Security;
 using KartRider.Common.Utilities;
 using KartRider.IO.Packet;
 using KartRider_PacketName;
+using Profile;
 
 namespace KartRider.Common.Network
 {
@@ -352,7 +353,12 @@ namespace KartRider.Common.Network
 
         public void Send(OutPacket pPacket)
         {
-            Console.WriteLine($"[Send]{(PacketName)BitConverter.ToUInt32(pPacket.ToArray(), 0)}: {BitConverter.ToString(pPacket.ToArray()).Replace("-", "")}");
+            uint hash = BitConverter.ToUInt32(pPacket.ToArray(), 0);
+            string packetDetail = BitConverter.ToString(pPacket.ToArray()).Replace("-", "");
+            if (ProfileService.ProfileConfig.ServerSetting.ShowPacketDetail)
+                Console.WriteLine($"[Send]{(PacketName)hash}: {packetDetail}");
+            else
+                Console.WriteLine($"[Send]{(PacketName)hash}");
             try
             {
                 if (this.mDisconnected == 0)

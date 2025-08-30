@@ -20,6 +20,7 @@ using KartRider.IO.Packet;
 using Microsoft.Win32;
 using Profile;
 using RHOParser;
+using static KartRider.LauncherSystem;
 
 namespace KartRider
 {
@@ -111,7 +112,7 @@ namespace KartRider
 
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                LauncherSystem.MsgKartIsRunning();
+                MsgKartIsRunning();
                 return;
             }
             string TCGKartRegPth = @"HKEY_CURRENT_USER\SOFTWARE\TCGame\kart";
@@ -131,7 +132,7 @@ namespace KartRider
             else
             {
                 // game not found
-                LauncherSystem.MsgFileNotFound();
+                MsgFileNotFound();
             }
 
             // load Data files
