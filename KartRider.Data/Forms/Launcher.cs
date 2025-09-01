@@ -34,11 +34,10 @@ namespace KartRider
         public static bool GetKart = true;
         public static bool Options = true;
         public static short KartSN = 0;
-        public string kartRiderDirectory = null;
-        public const string KartRider = "KartRider.exe";
-        public const string PinFile = "KartRider.pin";
-        public const string PinFileBak = "KartRider-bak.pin";
-        public static string executablePath = Process.GetCurrentProcess().MainModule.FileName;
+
+        public static string KartRider = Path.GetFullPath(Path.Combine(Program.RootDirectory, FileName.KartRider));
+        public static string PinFile = Path.GetFullPath(Path.Combine(Program.RootDirectory, FileName.PinFile));
+        public static string PinFileBak = Path.GetFullPath(Path.Combine(Program.RootDirectory, FileName.PinFileBak));
 
         private Button Start_Button;
         private Button GetKart_Button;
@@ -268,14 +267,14 @@ namespace KartRider
         {
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
-                MessageBox.Show("跑跑卡丁车正在运行，请结束跑跑卡丁车后再退出该程序！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("跑跑卡丁车正在运行!\n为保证游戏文件不被损坏, 请结束跑跑卡丁车后再退出该程序!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 e.Cancel = true;
                 return;
             }
-            if (File.Exists(this.kartRiderDirectory + PinFileBak))
+            if (File.Exists(PinFileBak))
             {
-                File.Delete(this.kartRiderDirectory + PinFile);
-                File.Move(this.kartRiderDirectory + PinFileBak, this.kartRiderDirectory + PinFile);
+                File.Delete(PinFile);
+                File.Move(PinFileBak, PinFile);
             }
             ProfileService.Save();
         }
@@ -284,7 +283,7 @@ namespace KartRider
         {
             Load_KartExcData();
 
-            PINFile val = new PINFile(this.kartRiderDirectory + PinFile);
+            PINFile val = new PINFile(PinFile);
             ProfileService.ProfileConfig.GameOption.Version = val.Header.MinorVersion;
             ProfileService.Save();
 
@@ -301,7 +300,7 @@ namespace KartRider
             VersionLabel.Text = currentVersion;
 
             if (DBG) Console.WriteLine($"Config:\n{JsonConvert.SerializeObject(ProfileService.ProfileConfig, Newtonsoft.Json.Formatting.Indented)}");
-            Console.WriteLine($"Process: {this.kartRiderDirectory + KartRider}");
+            Console.WriteLine($"Process: {KartRider}");
             try
             {
                 RouterListener.Start();
@@ -322,21 +321,21 @@ namespace KartRider
             {
                 MsgKartIsRunning();
             }
-            if (!CheckGameAvailability(this.kartRiderDirectory))
+            if (!CheckGameAvailability(Program.RootDirectory))
             {
                 MsgFileNotFound();
             }
             (new Thread(() =>
             {
                 Console.WriteLine("Backing up old PinFile...");
-                Console.WriteLine(this.kartRiderDirectory + PinFileBak);
-                if (File.Exists(this.kartRiderDirectory + PinFileBak))
+                Console.WriteLine(PinFileBak);
+                if (File.Exists(PinFileBak))
                 {
-                    File.Delete(this.kartRiderDirectory + PinFile);
-                    File.Move(this.kartRiderDirectory + PinFileBak, this.kartRiderDirectory + PinFile);
+                    File.Delete( PinFile);
+                    File.Move(PinFileBak, PinFile);
                 }
-                File.Copy(this.kartRiderDirectory + PinFile, this.kartRiderDirectory + PinFileBak);
-                PINFile val = new PINFile(this.kartRiderDirectory + PinFile);
+                File.Copy(PinFile, PinFileBak);
+                PINFile val = new PINFile(PinFile);
                 foreach (AuthMethod authMethod in val.AuthMethods)
                 {
                     Console.WriteLine($"Changing IP Address to local... {authMethod.Name}");
@@ -366,12 +365,12 @@ namespace KartRider
                 }
                 Console.WriteLine();
 
-                File.WriteAllBytes(this.kartRiderDirectory + PinFile, val.GetEncryptedData());
+                File.WriteAllBytes(PinFile, val.GetEncryptedData());
                 Launcher.GetKart = false;
                 // origin passport:aHR0cHM6Ly9naXRodWIuY29tL3lhbnlnbS9MYXVuY2hlcl9WMi9yZWxlYXNlcw==
                 ProcessStartInfo startInfo = new ProcessStartInfo(Launcher.KartRider, "TGC -region:3 -passport:OFFLINE")
                 {
-                    WorkingDirectory = this.kartRiderDirectory,
+                    WorkingDirectory = Program.RootDirectory,
                     UseShellExecute = true,
                     Verb = "runas"
                 };
@@ -402,17 +401,17 @@ namespace KartRider
             Console.WriteLine("正在读取配置文件...");
             string ModelMaxPath = AppDomain.CurrentDomain.BaseDirectory + @"Profile\ModelMax.xml";
             string ModelMax = Resources.ModelMax;
-            if (!File.Exists(ModelMaxPath))
+            if (!File.Exists(FileName.ModelMax_LoadFile))
             {
-                using (StreamWriter streamWriter = new StreamWriter(ModelMaxPath, false))
+                using (StreamWriter streamWriter = new StreamWriter(FileName.ModelMax_LoadFile, false))
                 {
                     streamWriter.Write(ModelMax);
                 }
             }
             XmlFileUpdater.XmlUpdater updater = new XmlFileUpdater.XmlUpdater();
-            updater.UpdateLocalXmlWithResource(ModelMaxPath, ModelMax);
+            updater.UpdateLocalXmlWithResource(FileName.ModelMax_LoadFile, ModelMax);
 
-            EnsureDefaultDataFileExists(AppDomain.CurrentDomain.BaseDirectory + @"Profile\AI.xml", CreateAIDefaultData);
+            EnsureDefaultDataFileExists(FileName.AI_LoadFile, CreateAIDefaultData);
 
             KartExcData.NewKart = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\NewKart.xml", LoadNewKart);
             KartExcData.TuneList = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\TuneData.xml", LoadTuneData);

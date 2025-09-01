@@ -14,9 +14,7 @@ namespace Profile
     public class ProfileService
     {
         public static ProfileConfig ProfileConfig { get; set; } = new();
-
-        private readonly static string config_path = AppDomain.CurrentDomain.BaseDirectory + @"Profile\" + "Config.json";
-
+        
         /// <summary>
         /// Clamp values to valid ranges before saving and after loading.
         /// </summary>
@@ -37,7 +35,7 @@ namespace Profile
                     Formatting = Newtonsoft.Json.Formatting.Indented,
                 };
 
-                using (StreamWriter streamWriter = new StreamWriter(config_path, false))
+                using (StreamWriter streamWriter = new StreamWriter(FileName.ConfigFile, false))
                 {
                     streamWriter.Write(Newtonsoft.Json.JsonConvert.SerializeObject(ProfileConfig, jsonSettings));
                 }
@@ -51,9 +49,9 @@ namespace Profile
         {
             try
             {
-                if (File.Exists(config_path))
+                if (File.Exists(FileName.ConfigFile))
                 {
-                    ProfileConfig = JsonConvert.DeserializeObject<ProfileConfig>(File.ReadAllText(config_path));
+                    ProfileConfig = JsonConvert.DeserializeObject<ProfileConfig>(File.ReadAllText(FileName.ConfigFile)) ?? new ProfileConfig();
                 }
                 else
                 {
@@ -617,6 +615,7 @@ namespace Profile
         {
             Directory.Delete(FileName.ConfigRoot, true);
         }
+        
         #endregion
     }
 }

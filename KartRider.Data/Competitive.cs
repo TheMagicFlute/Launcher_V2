@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using KartRider.Common.Utilities;
+using Profile;
 
 namespace RHOParser
 {
@@ -22,12 +23,10 @@ namespace RHOParser
 
     public class CompetitiveDataManager
     {
-        private string _filePath = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Competitive.xml";
-
         public CompetitiveDataManager()
         {
             // 如果文件不存在则创建
-            if (!File.Exists(_filePath))
+            if (!File.Exists(FileName.Competitive_LoadFile))
             {
                 CreateNewFile();
             }
@@ -40,7 +39,7 @@ namespace RHOParser
                 new XDeclaration("1.0", "utf-8", "yes"),
                 new XElement("CompetitiveDataList")
             );
-            doc.Save(_filePath);
+            doc.Save(FileName.Competitive_LoadFile);
         }
 
         // 保存数据，如果Track重复则比较Time，Time小则替换
@@ -49,7 +48,7 @@ namespace RHOParser
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
-            XDocument doc = XDocument.Load(_filePath);
+            XDocument doc = XDocument.Load(FileName.Competitive_LoadFile);
             var root = doc.Root;
 
             // 查找是否存在相同的Track
@@ -89,7 +88,7 @@ namespace RHOParser
                 ));
             }
 
-            doc.Save(_filePath);
+            doc.Save(FileName.Competitive_LoadFile);
         }
 
         /// <summary>
@@ -98,10 +97,10 @@ namespace RHOParser
         /// <returns>比赛数据</returns>
         public List<CompetitiveData> LoadAllData()
         {
-            if (!File.Exists(_filePath))
+            if (!File.Exists(FileName.Competitive_LoadFile))
                 return new List<CompetitiveData>();
 
-            XDocument doc = XDocument.Load(_filePath);
+            XDocument doc = XDocument.Load(FileName.Competitive_LoadFile);
 
             return doc.Root.Elements("Data")
                 .Select(e => new CompetitiveData

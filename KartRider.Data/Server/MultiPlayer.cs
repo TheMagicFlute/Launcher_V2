@@ -35,7 +35,6 @@ namespace KartRider
         public static long BootTicksNow = 0;
         public static long StartTicks = 0;
         public static uint FinishTime = 0;
-        public static string AiXmlFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\AI.xml";
         public static Dictionary<int, uint> AiTimeData = new Dictionary<int, uint>();
         public static Dictionary<int, uint> TimeData = new Dictionary<int, uint>();
 
@@ -184,7 +183,7 @@ namespace KartRider
             using (OutPacket outPacket = new OutPacket("GameResultPacket"))
             {
                 // 加载 XML 文件
-                XDocument doc = XDocument.Load(AiXmlFile);
+                XDocument doc = XDocument.Load(FileName.AI_LoadFile);
                 IOrderedEnumerable<XElement> aiNodes = null;
                 if (StartGameData.StartTimeAttack_RandomTrackGameType == 0)
                 {
@@ -590,7 +589,7 @@ namespace KartRider
                 if (Playernum > 0 && AiSwitch == 6)
                 {
                     // 读取 XML 文件
-                    XDocument doc = XDocument.Load(AiXmlFile);
+                    XDocument doc = XDocument.Load(FileName.AI_LoadFile);
 
                     string targetParentNode = "";
                     if (StartGameData.StartTimeAttack_RandomTrackGameType == 0)
@@ -612,7 +611,7 @@ namespace KartRider
                     AddAiNodes(targetParent, Playernum - 1);
 
                     // 保存修改后的 XML 文件
-                    doc.Save(AiXmlFile);
+                    doc.Save(FileName.AI_LoadFile);
                 }
                 return;
             }
@@ -677,7 +676,7 @@ namespace KartRider
 
                     // AI data
                     XmlDocument doc = new XmlDocument();
-                    doc.Load(AiXmlFile);
+                    doc.Load(FileName.AI_LoadFile);
                     int listCount = 0;
                     XmlNodeList lis = null;
                     if (StartGameData.StartTimeAttack_RandomTrackGameType == 0)
@@ -770,8 +769,8 @@ namespace KartRider
                     AiXml = "ItemAI";
                 }
                 XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(AiXmlFile);
-                XmlNode ai = xmlDoc.SelectSingleNode("//" + AiXml + "/Ai" + pos.ToString());
+                xmlDoc.Load(FileName.AI_LoadFile);
+                XmlNode ai = xmlDoc.SelectSingleNode($"//{AiXml}/Ai{pos.ToString()}");
                 if (ai != null)
                 {
                     using (OutPacket oPacket = new OutPacket("GrSlotDataBasicAi"))
@@ -787,7 +786,7 @@ namespace KartRider
                     {
                         parentNode.RemoveChild(ai);
                     }
-                    xmlDoc.Save(AiXmlFile);
+                    xmlDoc.Save(FileName.AI_LoadFile);
                 }
                 else
                 {
@@ -856,7 +855,7 @@ namespace KartRider
                                         AiNode.AppendChild(aiElement);
                                         Console.WriteLine("Ai" + pos.ToString() + "元素已成功添加");
                                     }
-                                    xmlDoc.Save(AiXmlFile);
+                                    xmlDoc.Save(FileName.AI_LoadFile);
                                 }
                                 else
                                 {
@@ -1010,7 +1009,7 @@ namespace KartRider
             // process AI Data
             XmlDocument doc = new XmlDocument();
             outPacket.WriteShort(0);
-            doc.Load(AiXmlFile);
+            doc.Load(FileName.AI_LoadFile);
             string parentNodePath = "";
             if (StartGameData.StartTimeAttack_RandomTrackGameType == 0) parentNodePath = "//SpeedAI";
             else if ((StartGameData.StartTimeAttack_RandomTrackGameType == 1)) parentNodePath = "//ItemAI";

@@ -22,12 +22,18 @@ namespace KartRider
         public const string repo = "Launcher_V2";       // GitHub Repo Name
 
         public static string simpleName = "Launcher_" + Program.architecture;
-        public static string fileName = simpleName + ".zip";
+        public static string fileName = simpleName + ".exe";
         public static string currentVersion = GetCurrentVersion();
 
         private static string update_url = "";
         private static string tag_name = "";
         private static string update_info = "";
+
+        private static string updateScript = @$"@echo off
+timeout /t 3 /nobreak
+move {"\"" + Path.GetFullPath(Path.Combine(FileName.Update_Folder, fileName)) + "\""} {"\"" + Path.GetFullPath(FileName.AppDir) + "\""}
+start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, fileName)) + "\""}
+";
 
         /// <summary>check and try to apply update</summary>
         /// <returns>true if update should be applied</returns>
@@ -76,7 +82,6 @@ namespace KartRider
                 // 尝试下载最新的版本
                 string update_url = $"https://github.com/{owner}/{repo}/releases/download/{tag_name}/{fileName}";
                 update_url = await ProcessUrlAsync(update_url);
-                Console.WriteLine($"正在 从 {update_url} 下载 {tag_name}...");
                 return await DownloadUpdateAsync(update_url);
             }
             else
@@ -137,8 +142,7 @@ namespace KartRider
             // Assembly assembly = Assembly.GetExecutingAssembly();
             // AssemblyName assemblyName = assembly.GetName();
             // string simpleName = assemblyName.Name + ".exe";
-            string fileName = Process.GetCurrentProcess().MainModule.FileName;
-            DateTime compilationDate = File.GetLastWriteTime(AppDomain.CurrentDomain.BaseDirectory + fileName);
+            DateTime compilationDate = File.GetLastWriteTime(Process.GetCurrentProcess().MainModule.FileName);
             string formattedDate = compilationDate.ToString("yyMMdd");
             return formattedDate;
         }
@@ -156,7 +160,7 @@ namespace KartRider
         {
             try
             {
-                Console.WriteLine($"开始下载更新包: {UpdatePackageUrl}");
+                Console.WriteLine($"正在 从 {update_url} 下载 {tag_name}...");
                 using (HttpClient client = new HttpClient())
                 {
                     using (HttpResponseMessage response = await client.GetAsync(UpdatePackageUrl, HttpCompletionOption.ResponseHeadersRead))
@@ -164,13 +168,11 @@ namespace KartRider
                         response.EnsureSuccessStatusCode();
                         using (Stream contentStream = await response.Content.ReadAsStreamAsync())
                         {
-                            string folderPath = AppDomain.CurrentDomain.BaseDirectory + "Update";
-                            if (!Directory.Exists(folderPath))
-                            {
-                                Directory.CreateDirectory(folderPath);
-                            }
+                            if (!Directory.Exists(FileName.Update_Folder))
+                                Directory.CreateDirectory(FileName.Update_Folder);
+
                             long? totalBytes = response.Content.Headers.ContentLength;
-                            using (FileStream fileStream = new FileStream(AppDomain.CurrentDomain.BaseDirectory + "Update\\" + fileName, FileMode.Create, FileAccess.Write, FileShare.None))
+                            using (FileStream fileStream = new FileStream(FileName.Update_ZipFile, FileMode.Create, FileAccess.Write, FileShare.None))
                             {
                                 byte[] buffer = new byte[4096];
                                 int bytesRead;
@@ -213,24 +215,17 @@ namespace KartRider
         {
             try
             {
-                System.IO.Compression.ZipFile.ExtractToDirectory(AppDomain.CurrentDomain.BaseDirectory + "Update\\" + fileName, AppDomain.CurrentDomain.BaseDirectory + "Update\\");
-                string script = @$"@echo off
-timeout /t 3 /nobreak
-move {"\"" + AppDomain.CurrentDomain.BaseDirectory + "Update\\" + simpleName + ".exe" + "\""} {"\"" + AppDomain.CurrentDomain.BaseDirectory + "\""}
-start {"\"\" \"" + AppDomain.CurrentDomain.BaseDirectory + simpleName + ".exe" + "\""}
-";
-                string filePath = AppDomain.CurrentDomain.BaseDirectory + "Update.bat";
+                System.IO.Compression.ZipFile.ExtractToDirectory(FileName.Update_ZipFile, FileName.Update_Folder);
                 try
                 {
-                    File.WriteAllText(filePath, script);
-                    Console.WriteLine("\n写入文件成功。");
+                    File.WriteAllText(FileName.Update_File, updateScript);
+                    Console.WriteLine("\n写入更新脚本成功。");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"\n写入文件时出错: {ex.Message}");
+                    Console.WriteLine($"\n写入更新脚本时出错: {ex.Message}");
                 }
-                Process.Start(filePath);
-                // Process.GetCurrentProcess().Kill();
+                Process.Start(FileName.Update_File);
                 Environment.Exit(0);
                 return true;
             }

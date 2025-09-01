@@ -1,22 +1,67 @@
 ﻿using System;
+using System.IO;
+using Microsoft.Win32;
 
 namespace Profile
 {
-    [Obsolete("FileName Class is a Constant Class for old config files. Now use ProfileConfig and ProfileService instead.")]
+    /// <summary>
+    /// A static class containing file names and paths.
+    /// </summary>
     public static class FileName
     {
+        #region Constants
+
+        public const string KartRider = "KartRider.exe";
+        public const string PinFile = "KartRider.pin";
+        public const string PinFileBak = "KartRider-bak.pin";
+
+        public const string TCGKartRegPath = @"HKEY_CURRENT_USER\SOFTWARE\TCGame\kart";
+
+        #endregion
+
+        public static string AppDir = AppDomain.CurrentDomain.BaseDirectory;
+
+        public static string TCGKartGamePath = Path.GetFullPath((string)Registry.GetValue(TCGKartRegPath, "gamepath", null));
+
+        public static string ProfileDir = Path.GetFullPath(Path.Combine(AppDir, @"Profile\"));
+		public static string ConfigFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Config.json"));
+
+		public static string Update_File = Path.GetFullPath(Path.Combine(AppDir, @"Update.bat"));
+		public static string Update_ZipFile = Path.GetFullPath(Path.Combine(AppDir, @"Update\Launcher.zip"));
+		public static string Update_Folder = Path.GetFullPath(Path.Combine(AppDir, @"Update\"));
+        
+		public static string Whitelist = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Whitelist.ini"));
+		public static string Blacklist = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Blacklist.ini"));
+
+		public static string NewKart_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\NewKart.xml"));
+		public static string ModelMax_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\ModelMax.xml"));
+		public static string Favorite_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Favorite.xml"));
+		public static string FavoriteTrack_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\FavoriteTrack.xml"));
+		public static string TrainingMission_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\TrainingMission.xml"));
+		public static string Competitive_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Competitive.xml"));
+		public static string AI_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\AI.xml"));
+		public static string TuneData_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\TuneData.xml"));
+		public static string PlantData_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\PlantData.xml"));
+		public static string LevelData_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\LevelData.xml"));
+		public static string PartsData_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\PartsData.xml"));
+		public static string Parts12Data_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Parts12Data.xml"));
+		public static string Level12Data_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Level12Data.xml"));
+
+        #region Legacy Configs
+
         public const string Extension = ".ini";
 
         public static string ConfigRoot = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Launcher\";
 
-        public static string SetRider_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Launcher\SetRider\";
-        public static string SetRiderItem_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Launcher\SetRider\SetRiderItem\";
-        public static string SetMyRoom_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Launcher\MyRoom\";
-        public static string SetGameOption_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Launcher\GameOption\";
-        public static string config_LoadFile = AppDomain.CurrentDomain.BaseDirectory + @"Profile\Launcher\Config";
+		public static string LoadFolder = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Launcher\"));
+		public static string SetRider_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Launcher\SetRider\"));
+		public static string SetRiderItem_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Launcher\SetRider\SetRiderItem\"));
+		public static string SetMyRoom_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Launcher\MyRoom\"));
+		public static string SetGameOption_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Launcher\GameOption\"));
+		public static string config_LoadFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Launcher\config\"));
 
-        public static string Load_CC = AppDomain.CurrentDomain.BaseDirectory + @"Profile\CountryCode" + Extension;
-        public static string Load_ConsoleVisibility = AppDomain.CurrentDomain.BaseDirectory + @"Profile\ConsoleVisibility" + Extension;
+        public static string Load_Console = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Console.ini"));
+		public static string Load_CC = Path.GetFullPath(Path.Combine(AppDir, @"Profile\CountryCode.ini"));
 
         public static string SetRider_Nickname = "Set_Nickname";
         public static string SetRider_RiderIntro = "Set_RiderIntro";
@@ -104,5 +149,7 @@ namespace Profile
         public static string config_FavoriteItem = "FavoriteItem";
         public static string config_PreventItem = "PreventItem";
         public static string config_SpeedPatch = "SP_UpdateTest";
+
+        #endregion
     }
 }
