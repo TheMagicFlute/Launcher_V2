@@ -28,7 +28,6 @@ namespace Profile
         public static string SpecialKartConfig = Path.GetFullPath(Path.Combine(AppDir, @"Profile\SpecialKartConfig.json"));
 
 		public static string Update_File = Path.GetFullPath(Path.Combine(AppDir, @"Update.bat"));
-		public static string Update_ZipFile = Path.GetFullPath(Path.Combine(AppDir, @"Update\Launcher.zip"));
 		public static string Update_Folder = Path.GetFullPath(Path.Combine(AppDir, @"Update\"));
         
 		public static string Whitelist = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Whitelist.ini"));

@@ -22,17 +22,18 @@ namespace KartRider
         public const string repo = "Launcher_V2";       // GitHub Repo Name
 
         public static string simpleName = "Launcher_" + Program.architecture;
-        public static string fileName = simpleName + ".exe";
-        public static string currentVersion = GetCurrentVersion();
+        public static string zipName = simpleName + ".zip";
+        public static string exeName = simpleName + ".exe";
 
+        public static string currentVersion = GetCurrentVersion();
         private static string update_url = "";
-        private static string tag_name = "";
+        private static string tag_name = "000000"; // 000000 for default, for unable to get remote tag name.
         private static string update_info = "";
 
         private static string updateScript = @$"@echo off
 timeout /t 3 /nobreak
-move {"\"" + Path.GetFullPath(Path.Combine(FileName.Update_Folder, fileName)) + "\""} {"\"" + Path.GetFullPath(FileName.AppDir) + "\""}
-start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, fileName)) + "\""}
+move {"\"" + Path.GetFullPath(Path.Combine(FileName.Update_Folder, exeName)) + "\""} {"\"" + Path.GetFullPath(FileName.AppDir) + "\""}
+start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\""}
 ";
 
         /// <summary>check and try to apply update</summary>
@@ -80,7 +81,7 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, fileName)) + "
                     Console.Write("请输入 (Y for yes / n for no): ");
                 }
                 // 尝试下载最新的版本
-                string update_url = $"https://github.com/{owner}/{repo}/releases/download/{tag_name}/{fileName}";
+                update_url = $"https://github.com/{owner}/{repo}/releases/download/{tag_name}/{zipName}";
                 update_url = await ProcessUrlAsync(update_url);
                 return await DownloadUpdateAsync(update_url);
             }
@@ -95,7 +96,6 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, fileName)) + "
         {
             try
             {
-                // string country = await GetCountryAsync();
                 string country = ProfileService.ProfileConfig.ServerSetting.CC.ToString();
                 // 中国大陆需要使用代理下载，处理 url
                 if (country != "" && country == "CN")
@@ -172,7 +172,8 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, fileName)) + "
                                 Directory.CreateDirectory(FileName.Update_Folder);
 
                             long? totalBytes = response.Content.Headers.ContentLength;
-                            using (FileStream fileStream = new FileStream(FileName.Update_ZipFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                            DateTime startTime = DateTime.Now;
+                            using (FileStream fileStream = new FileStream(Path.Combine(FileName.Update_Folder, zipName), FileMode.Create, FileAccess.Write, FileShare.None))
                             {
                                 byte[] buffer = new byte[4096];
                                 int bytesRead;
@@ -182,15 +183,22 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, fileName)) + "
                                     await fileStream.WriteAsync(buffer, 0, bytesRead);
                                     totalRead += bytesRead;
                                     double progress = totalBytes.HasValue ? (double)totalRead / totalBytes.Value * 100 : 0;
-                                    Console.Write($"\r下载进度: {progress:F2}%");
+                                    string progressBar = "";
+                                    int i = 1;
+                                    for (; i * 2 <= progress; i++)
+                                        progressBar += "#";
+                                    for (; i * 2 <= 100; i++)
+                                        progressBar += "=";
+                                    Console.Write($"\r下载进度: {progress:F2}% [{progressBar}]");
                                 }
-                                Console.WriteLine();
                             }
+                            DateTime endTime = DateTime.Now;
+                            Console.WriteLine($"\n下载完成! 总用时: {(endTime - startTime).TotalMilliseconds}ms");
                         }
                     }
-                    string expectedHash = await GetSHA256Async(fileName);
+                    string expectedHash = await GetSHA256Async(zipName);
                     Console.WriteLine($"期望 SHA256 为: {expectedHash}");
-                    if (!CheckFileHash(AppDomain.CurrentDomain.BaseDirectory + "Update\\" + fileName, expectedHash))
+                    if (!CheckFileHash(Path.Combine(FileName.Update_Folder, zipName), expectedHash))
                     {
                         Console.WriteLine($"文件 SHA256 校验失败，下载可能不完整或被篡改。");
                         Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
@@ -215,7 +223,8 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, fileName)) + "
         {
             try
             {
-                System.IO.Compression.ZipFile.ExtractToDirectory(FileName.Update_ZipFile, FileName.Update_Folder);
+                Console.WriteLine("正在尝试应用更新...");
+                System.IO.Compression.ZipFile.ExtractToDirectory(Path.Combine(FileName.Update_Folder, zipName), FileName.Update_Folder);
                 try
                 {
                     File.WriteAllText(FileName.Update_File, updateScript);
