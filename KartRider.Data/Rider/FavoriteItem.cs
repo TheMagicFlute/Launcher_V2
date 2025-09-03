@@ -5,8 +5,8 @@ using System.Linq;
 using System.Xml;
 using KartRider;
 using KartRider.IO.Packet;
-using RHOParser;
 using Profile;
+using RHOParser;
 
 namespace RiderData
 {

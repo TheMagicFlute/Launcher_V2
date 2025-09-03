@@ -23,9 +23,9 @@ using Newtonsoft.Json;
 using Profile;
 using RHOParser;
 using static KartRider.Common.Data.PINFile;
+using static KartRider.LauncherSystem;
 using static KartRider.Program;
 using static KartRider.Update;
-using static KartRider.LauncherSystem;
 
 namespace KartRider
 {
@@ -413,13 +413,15 @@ namespace KartRider
 
             EnsureDefaultDataFileExists(FileName.AI_LoadFile, CreateAIDefaultData);
 
-            KartExcData.NewKart = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\NewKart.xml", LoadNewKart);
-            KartExcData.TuneList = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\TuneData.xml", LoadTuneData);
-            KartExcData.PlantList = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\PlantData.xml", LoadPlantData);
-            KartExcData.LevelList = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\LevelData.xml", LoadLevelData);
-            KartExcData.PartsList = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\PartsData.xml", LoadPartsData);
-            KartExcData.Parts12List = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\Parts12Data.xml", LoadParts12Data);
-            KartExcData.Level12List = LoadKartData(AppDomain.CurrentDomain.BaseDirectory + @"Profile\Level12Data.xml", LoadLevel12Data);
+            KartExcData.NewKart = LoadKartData(FileName.NewKart_LoadFile, LoadNewKart);
+            KartExcData.TuneList = LoadKartData(FileName.TuneData_LoadFile, LoadTuneData);
+            KartExcData.PlantList = LoadKartData(FileName.PlantData_LoadFile, LoadPlantData);
+            KartExcData.LevelList = LoadKartData(FileName.LevelData_LoadFile, LoadLevelData);
+            KartExcData.PartsList = LoadKartData(FileName.PartsData_LoadFile, LoadPartsData);
+            KartExcData.Parts12List = LoadKartData(FileName.Parts12Data_LoadFile, LoadParts12Data);
+            KartExcData.Level12List = LoadKartData(FileName.Level12Data_LoadFile, LoadLevel12Data);
+            SpecialKartConfig.SaveConfigToFile(FileName.SpecialKartConfig);
+            MultiPlayer.kartConfig = SpecialKartConfig.LoadConfigFromFile(FileName.SpecialKartConfig);
             Console.WriteLine("配置文件读取完成!");
         }
 

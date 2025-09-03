@@ -8,8 +8,8 @@ using System.Xml;
 using System.Xml.Linq;
 using ExcData;
 using KartRider;
-using RiderData;
 using Profile;
+using RiderData;
 
 namespace KartRider
 {

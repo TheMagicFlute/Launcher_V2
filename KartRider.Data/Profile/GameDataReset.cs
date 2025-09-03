@@ -99,8 +99,8 @@ namespace KartRider
             FlyingPet.StartForwardAccelForceItem = 0f;
             FlyingPet.StartForwardAccelForceSpeed = 0f;
         }
-
-        public static void Kart_DataReset()
+        
+		public static void Kart_DataReset()
         {
             Kart.draftMulAccelFactor = 0f;
             Kart.draftTick = 0;
@@ -172,6 +172,26 @@ namespace KartRider
             Kart.wallCollGaugeMaxVelLoss = 0f;
             Kart.wallCollGaugeMinVelBound = 0f;
             Kart.wallCollGaugeMinVelLoss = 0f;
+            Kart.modelMaxX = 0;
+            Kart.modelMaxY = 0;
+            Kart.defaultExceedType = 0;
+            Kart.defaultEngineType = 0;
+            Kart.EngineType = 1;
+            Kart.defaultHandleType = 0;
+            Kart.HandleType = 1;
+            Kart.defaultWheelType = 0;
+            Kart.WheelType = 1;
+            Kart.defaultBoosterType = 0;
+            Kart.BoosterType = 1;
+            Kart.chargeInstAccelGaugeByWallAdded = 0f;
+            Kart.chargeInstAccelGaugeByBoostAdded = 0f;
+            Kart.chargerSystemboosterUseCount = 0;
+            Kart.chargerSystemUseTime = 0f;
+            Kart.chargeBoostBySpeedAdded = 0f;
+            Kart.driftGaugeFactor = 0f;
+            Kart.chargeAntiCollideBalance = 1f;
+            Kart.startItemTableId = 0;
+            Kart.startItemId = 0;
         }
     }
 }

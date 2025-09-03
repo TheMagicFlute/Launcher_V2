@@ -25,6 +25,7 @@ namespace Profile
 
         public static string ProfileDir = Path.GetFullPath(Path.Combine(AppDir, @"Profile\"));
 		public static string ConfigFile = Path.GetFullPath(Path.Combine(AppDir, @"Profile\Config.json"));
+        public static string SpecialKartConfig = Path.GetFullPath(Path.Combine(AppDir, @"Profile\SpecialKartConfig.json"));
 
 		public static string Update_File = Path.GetFullPath(Path.Combine(AppDir, @"Update.bat"));
 		public static string Update_ZipFile = Path.GetFullPath(Path.Combine(AppDir, @"Update\Launcher.zip"));
