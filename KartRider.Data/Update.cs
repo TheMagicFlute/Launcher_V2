@@ -234,6 +234,7 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\
                 {
                     Console.WriteLine($"\n写入更新脚本时出错: {ex.Message}");
                 }
+                MessageBox.Show("更新已准备就绪! 确认以重启程序应用更新!", "更新准备就绪", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Process.Start(FileName.Update_File);
                 Environment.Exit(0);
                 return true;
