@@ -227,7 +227,7 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\
                 System.IO.Compression.ZipFile.ExtractToDirectory(Path.Combine(FileName.Update_Folder, zipName), FileName.Update_Folder);
                 try
                 {
-                    File.WriteAllText(FileName.Update_File, updateScript);
+                    File.WriteAllText(FileName.Update_File, updateScript, Program.targetEncoding);
                     Console.WriteLine("\n写入更新脚本成功。");
                 }
                 catch (Exception ex)
@@ -396,3 +396,4 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\
         }
     }
 }
+

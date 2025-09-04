@@ -50,6 +50,9 @@ namespace KartRider
         public static IntPtr consoleHandle;
         public static Launcher LauncherDlg;
         public static GetKart GetKartDlg;
+
+        public static Encoding targetEncoding = Encoding.UTF8;
+
         public static Options OptionsDlg;
         public static string RootDirectory;
 
@@ -160,7 +163,7 @@ namespace KartRider
                 bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
                 // 2. 优先尝试 UTF-8（跨平台通用）
-                Encoding targetEncoding = Encoding.UTF8;
+                targetEncoding = Encoding.UTF8;
 
                 // 3. Windows 中文环境特殊处理（部分终端默认 GBK）
                 if (isWindows)
