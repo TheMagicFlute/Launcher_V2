@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -16,6 +17,48 @@ using Profile;
 
 namespace KartRider
 {
+    /// <summary>
+    /// GitHub Releases API返回的根对象（仅包含需要的字段，其他字段已忽略）
+    /// </summary>
+    public class GitHubReleaseRoot
+    {
+        /// <summary>
+        /// 发布版本下的所有资产文件（如exe、zip）
+        /// </summary>
+        public GitHubReleaseAsset[] Assets { get; set; }
+
+        /// <summary>
+        /// 发布版本的标签名（如250101）
+        /// </summary>
+        public string Tag_Name { get; set; }
+
+        /// <summary>
+        /// 发布版本的详细信息（如更新日志）
+        /// </summary>
+        public string Body { get; set; }
+    }
+
+    /// <summary>
+    /// GitHub Releases中的单个资产文件（如Launcher.exe）
+    /// </summary>
+    public class GitHubReleaseAsset
+    {
+        /// <summary>
+        /// 文件名（如Launcher.exe）
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 文件的SHA256哈希值（格式：sha256:xxxxxx）
+        /// </summary>
+        public string Digest { get; set; }
+
+        /// <summary>
+        /// 文件的浏览器下载链接
+        /// </summary>
+        public string Browser_Download_Url { get; set; }
+    }
+
     internal static class Update
     {
         public const string owner = "TheMagicFlute";    // GitHub Repo Owner
@@ -25,16 +68,17 @@ namespace KartRider
         public static string zipName = simpleName + ".zip";
         public static string exeName = simpleName + ".exe";
 
+        public static GitHubReleaseRoot releaseData = null;
+        public static GitHubReleaseAsset launcherAsset = null;
+
         public static string currentVersion = GetCurrentVersion();
         private static string update_url = "";
-        private static string tag_name = "000000"; // 000000 for default, for unable to get remote tag name.
-        private static string update_info = "";
 
-        private static string updateScript = @$"@echo off
-timeout /t 3 /nobreak
-move {"\"" + Path.GetFullPath(Path.Combine(FileName.Update_Folder, exeName)) + "\""} {"\"" + Path.GetFullPath(FileName.AppDir) + "\""}
-start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\""}
-";
+        private static string updateScript = $"@echo off{Environment.NewLine}" +
+            $"timeout /t 3 /nobreak{Environment.NewLine}" +
+            $"move \"{Path.GetFullPath(Path.Combine(FileName.Update_Folder, exeName))}\" \"{Path.GetFullPath(FileName.AppDir)}\"{Environment.NewLine}" +
+            $"del \"{Path.GetFullPath(FileName.AppDir)}\" /f /q{Environment.NewLine}" +
+            $"start \"{Path.GetFullPath(Path.Combine(FileName.AppDir, exeName))}\"{Environment.NewLine}";
 
         /// <summary>check and try to apply update</summary>
         /// <returns>true if update should be applied</returns>
@@ -47,21 +91,38 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\
             Console.WriteLine($"当前Commit日期: {ThisAssembly.Git.CommitDate}");
             Console.WriteLine($"当前版本为: {currentVersion}");
 
-            tag_name = await GetTag_name();
+            releaseData = await GetReleaseDetailAsync();
 
-            if (tag_name == "") // 更新请求失败
+            if (releaseData == null)
             {
+                Console.WriteLine("更新信息获取失败!");
                 Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
                 return false;
             }
 
-            if (int.Parse(currentVersion) < int.Parse(tag_name))
+            if (releaseData?.Assets == null || releaseData.Assets.Length == 0)
             {
-                update_info = await GetUpdate_Info();
+                Console.WriteLine("错误: API返回的资产列表为空");
+                return false;
+            }
+            launcherAsset = Array.Find(
+                releaseData.Assets,
+                asset => string.Equals(asset.Name, zipName, StringComparison.OrdinalIgnoreCase) // 忽略文件名大小写
+            );
+            if (launcherAsset == null)
+            {
+                Console.WriteLine($"错误: 在资产列表中找不到 {zipName}");
+                return false;
+            }
+
+            // 检查更新: 由于版本号使用日期格式，当天多次发布的版本号相同，故选择直接比较Digest
+            // 如目前版本的SHA256与最新版本的SHA256不同，则说明需要更新
+            if (CheckFileHash(Path.Combine(FileName.AppDir, Process.GetCurrentProcess().MainModule.FileName), launcherAsset.Digest))
+            {
                 // ask user whether to update
-                Console.WriteLine($"发现新版本: {tag_name}");
+                Console.WriteLine($"发现 {releaseData.Tag_Name} 中有更新!");
                 Console.WriteLine("-------------------------");
-                Console.WriteLine($"更新信息: \n{update_info}");
+                Console.WriteLine($"更新信息: \n{releaseData.Body}");
                 Console.WriteLine("-------------------------");
                 Console.Write("请问是否需要更新? (Y/n): ");
                 string usrInput = null;
@@ -81,8 +142,7 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\
                     Console.Write("请输入 (Y for yes / n for no): ");
                 }
                 // 尝试下载最新的版本
-                update_url = $"https://github.com/{owner}/{repo}/releases/download/{tag_name}/{zipName}";
-                update_url = await ProcessUrlAsync(update_url);
+                update_url = await ProcessUrlAsync(launcherAsset.Browser_Download_Url);
                 return await DownloadUpdateAsync(update_url);
             }
             else
@@ -104,22 +164,14 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\
                     List<string> urls = new List<string>()
                     {
                         "https://ghproxy.net/",
-                        "https://hub.myany.uk/",
                         "https://gh-proxy.com/",
-                        "http://kra.myany.uk:2233/",
-                        "http://krb.myany.uk:2233/"
                     };
                     foreach (string url_ in urls)
                     {
                         string testUrl = url;
-                        if (url_ == "https://ghproxy.net/" || url_ == "https://hub.myany.uk/")
-                        {
-                            testUrl = url_ + url;
-                        }
-                        else
-                        {
-                            testUrl = url_ + url.Replace("https://", "");
-                        }
+                        testUrl = url_ + url;
+                        // testUrl = url_ + url.Replace("https://", "");
+
                         if (await GetUrl(testUrl))
                         {
                             url = testUrl;
@@ -137,30 +189,11 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\
             return "";
         }
 
-        public static string GetCompileDate()
-        {
-            // Assembly assembly = Assembly.GetExecutingAssembly();
-            // AssemblyName assemblyName = assembly.GetName();
-            // string simpleName = assemblyName.Name + ".exe";
-            DateTime compilationDate = File.GetLastWriteTime(Process.GetCurrentProcess().MainModule.FileName);
-            string formattedDate = compilationDate.ToString("yyMMdd");
-            return formattedDate;
-        }
-
-        public static string GetCurrentVersion()
-        {
-#if DEBUG
-            return DateTime.Now.ToString("yyMMdd");
-#else
-            return ThisAssembly.Git.CommitDate.Substring(0, 10).Replace("-", "").Substring(2, 6);
-#endif
-        }
-
         public static async Task<bool> DownloadUpdateAsync(string UpdatePackageUrl)
         {
             try
             {
-                Console.WriteLine($"正在 从 {update_url} 下载 {tag_name}...");
+                Console.WriteLine($"正在 从 {update_url} 下载 {releaseData.Tag_Name}...");
                 using (HttpClient client = new HttpClient())
                 {
                     using (HttpResponseMessage response = await client.GetAsync(UpdatePackageUrl, HttpCompletionOption.ResponseHeadersRead))
@@ -196,18 +229,14 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\
                             Console.WriteLine($"\n下载完成! 总用时: {(endTime - startTime).TotalMilliseconds}ms");
                         }
                     }
-                    string expectedHash = await GetSHA256Async(zipName);
-                    Console.WriteLine($"期望 SHA256 为: {expectedHash}");
-                    if (!CheckFileHash(Path.Combine(FileName.Update_Folder, zipName), expectedHash))
+                    Console.WriteLine($"期望 SHA256 为: {launcherAsset.Digest}");
+                    if (!CheckFileHash(Path.Combine(FileName.Update_Folder, zipName), launcherAsset.Digest))
                     {
                         Console.WriteLine($"文件 SHA256 校验失败，下载可能不完整或被篡改。");
                         Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
                         return false;
                     }
-                    else
-                    {
-                        Console.WriteLine($"文件 SHA256 校验成功。");
-                    }
+                    Console.WriteLine($"文件 SHA256 校验成功。");
                     return ApplyUpdate();
                 }
             }
@@ -247,48 +276,42 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\
             }
         }
 
-        public static async Task<string> GetSHA256Async(string filename)
+        public static async Task<GitHubReleaseRoot> GetReleaseDetailAsync()
         {
-            HttpResponseMessage responseMsg = await GetReleaseInfoAsync();
-            if (responseMsg == null) return ""; // fail to get response
-            if (responseMsg.IsSuccessStatusCode)
+            try
             {
-                // parse JSON
-                string json = await responseMsg.Content.ReadAsStringAsync();
-                dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-                // find the asset with the same name
-                foreach (var asset in data.assets)
-                {
-                    if (asset.name == filename)
-                    {
-                        string digest = asset.digest;
-                        digest = digest.Substring("sha256:".Length);
-                        return digest;
-                    }
-                }
-                return "";
-            }
-            else
-            {
-                Console.WriteLine($"请求更新信息失败，状态码: {responseMsg.StatusCode}");
-                return "";
-            }
-        }
+                // 创建HttpClient（设置User-Agent，避免GitHub API拒绝请求）
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("GitHubReleaseParser/1.0"); // GitHub要求必须设置User-Agent
+                httpClient.Timeout = TimeSpan.FromSeconds(10); // 设置10秒超时
 
-        public static bool CheckFileHash(string filePath, string expectedHash)
-        {
-            if (!File.Exists(filePath))
-            {
-                Console.WriteLine($"文件 {filePath} 不存在。");
-                return false;
+                // 发送GET请求获取API响应
+                var response = await httpClient.GetAsync($"https://api.github.com/repos/{owner}/{repo}/releases/latest");
+                response.EnsureSuccessStatusCode(); // 若状态码不是200-299，抛出异常（如404、500）
+
+                // 读取响应内容并反序列化为C#对象
+                var jsonContent = await response.Content.ReadAsStringAsync();
+                var releaseData = JsonSerializer.Deserialize<GitHubReleaseRoot>(
+                    jsonContent,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true } // 忽略JSON字段大小写（适配API的camelCase）
+                );
+                return releaseData;
             }
-            using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            catch (JsonException ex)
             {
-                SHA256 sha256 = new SHA256Managed();
-                byte[] hash = sha256.ComputeHash(fileStream);
-                string actualHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                Console.WriteLine($"文件 SHA256 为：{actualHash}");
-                return actualHash == expectedHash;
+                Console.WriteLine($"JSON反序列化错误: {ex.Message}");
+                Console.WriteLine("可能原因: API返回格式异常");
+                return null;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"HTTP请求错误: {ex.Message}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"未知错误: {ex.Message}");
+                return null;
             }
         }
 
@@ -320,60 +343,39 @@ start {"\"\" \"" + Path.GetFullPath(Path.Combine(FileName.AppDir, exeName)) + "\
             }
         }
 
-        public static async Task<HttpResponseMessage> GetReleaseInfoAsync()
+        public static string GetCompileDate()
         {
-            string url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
-            url = await ProcessUrlAsync(url);
-            try
-            {
-
-                using (HttpClient client = new HttpClient())
-                {
-                    client.DefaultRequestHeaders.Add("User-Agent", repo);
-                    HttpResponseMessage response = await client.GetAsync(url);
-                    return response;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"请求时发生异常: {ex.Message}");
-                return null;
-            }
+            // Assembly assembly = Assembly.GetExecutingAssembly();
+            // AssemblyName assemblyName = assembly.GetName();
+            // string simpleName = assemblyName.Name + ".exe";
+            DateTime compilationDate = File.GetLastWriteTime(Process.GetCurrentProcess().MainModule.FileName);
+            string formattedDate = compilationDate.ToString("yyMMdd");
+            return formattedDate;
         }
 
-        public static async Task<string> GetTag_name()
+        public static string GetCurrentVersion()
         {
-            HttpResponseMessage responseMsg = await GetReleaseInfoAsync();
-            if (responseMsg == null) return ""; // fail to get response
-            if (responseMsg.IsSuccessStatusCode)
-            {
-                // parse JSON
-                string json = await responseMsg.Content.ReadAsStringAsync();
-                dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-                return data.tag_name;
-            }
-            else
-            {
-                Console.WriteLine($"请求当前版本失败，状态码: {responseMsg.StatusCode}");
-                return "";
-            }
+#if DEBUG
+            return DateTime.Now.ToString("yyMMdd");
+#else
+            return ThisAssembly.Git.CommitDate.Substring(0, 10).Replace("-", "").Substring(2, 6);
+#endif
         }
 
-        public static async Task<string> GetUpdate_Info()
+        public static bool CheckFileHash(string filePath, string expectedHash)
         {
-            HttpResponseMessage responseMsg = await GetReleaseInfoAsync();
-            if (responseMsg == null) return ""; // fail to get response
-            if (responseMsg.IsSuccessStatusCode)
+            if (!File.Exists(filePath))
             {
-                // parse JSON
-                string json = await responseMsg.Content.ReadAsStringAsync();
-                dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-                return data.body;
+                Console.WriteLine($"文件 {filePath} 不存在。");
+                return false;
             }
-            else
+            using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
-                Console.WriteLine($"请求更新信息失败，状态码: {responseMsg.StatusCode}");
-                return "";
+                SHA256 sha256 = new SHA256Managed();
+                byte[] hash = sha256.ComputeHash(fileStream);
+                string actualHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                Console.WriteLine($"文件 SHA256 为：{actualHash}");
+                return actualHash == expectedHash;
             }
         }
 

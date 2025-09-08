@@ -62,6 +62,7 @@ namespace KartRider
         [STAThread]
         private static async Task Main(string[] args)
         {
+            // 分配控制台
             AllocConsole();
             consoleHandle = Process.GetCurrentProcess().MainWindowHandle;
 
@@ -84,12 +85,6 @@ namespace KartRider
             // check & create app directory
             if (!Directory.Exists(FileName.ProfileDir))
                 Directory.CreateDirectory(FileName.ProfileDir);
-
-            // delete updater
-            if (File.Exists(FileName.Update_File))
-                File.Delete(FileName.Update_File);
-            if (Directory.Exists(FileName.Update_Folder))
-                Directory.Delete(FileName.Update_Folder, true);
 
             // get country code
             string CountryCode = await Update.GetCountryAsync();

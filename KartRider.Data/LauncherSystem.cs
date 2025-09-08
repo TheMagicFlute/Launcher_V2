@@ -26,7 +26,7 @@ namespace KartRider
 
 		public static void MsgMultiInstance()
 		{
-			MessageBox.Show("已经有一个启动器在运行了, 不可以同时运行多个启动器!\n点击确认退出程序.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			MessageBox.Show("已经有一个启动器在运行了! 不可以同时运行多个启动器进行端口侦听!\n点击确认退出程序.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			Environment.Exit(1);
 		}
 
@@ -42,11 +42,9 @@ namespace KartRider
             Process[] gameProcesses = Process.GetProcessesByName("KartRider");
             if (gameProcesses.Length > 0)
             {
-
                 if ((int)MessageBox.Show("确认要强制停止所有跑跑卡丁车游戏进程吗？", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) != 1)
-                {
                     return;
-                }
+
                 foreach (Process gProcess in gameProcesses)
                 {
                     try
@@ -62,13 +60,9 @@ namespace KartRider
                 }
                 gameProcesses = Process.GetProcessesByName("KartRider");
                 if (gameProcesses.Length == 0)
-                {
                     MessageBox.Show("所有游戏进程已成功关闭!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
                 else
-                {
                     MessageBox.Show("部分游戏进程无法关闭, 请尝试使用任务管理器!", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
             }
             else
             {
@@ -84,8 +78,8 @@ namespace KartRider
         public static bool CheckGameAvailability(string gamePath)
         {
             return !string.IsNullOrEmpty(gamePath)
-                && File.Exists(gamePath + FileName.KartRider)
-                && File.Exists(gamePath + FileName.PinFile);
+                && File.Exists(Path.Combine(gamePath, FileName.KartRider))
+                && File.Exists(Path.Combine(gamePath, FileName.PinFile));
         }
 
         public static bool TryOpenUrl(string url)
