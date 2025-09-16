@@ -17,6 +17,7 @@ using KartLibrary.Data;
 using KartLibrary.File;
 using KartLibrary.Xml;
 using KartRider.IO.Packet;
+using LoggerLibrary;
 using Microsoft.Win32;
 using Profile;
 using RHOParser;
@@ -66,14 +67,27 @@ namespace KartRider
             AllocConsole();
             consoleHandle = Process.GetCurrentProcess().MainWindowHandle;
 
+            // 保存原始输出流
+            var originalOut = Console.Out;
+
+            // 创建缓存编写器并替换控制台输出
+            CachedConsoleWriter.cachedWriter = new CachedConsoleWriter(originalOut);
+            Console.SetOut(CachedConsoleWriter.cachedWriter);
+
             // 初始化自适应编码
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             SetAdaptiveConsoleEncoding();
 
             if (args != null && args.Length > 1)
             {
-                ProcessPack((new ArraySegment<string>(args, 1, args.Length - 1)).ToArray());
+                ProcessPack(new ArraySegment<string>(args, 1, args.Length - 1).ToArray());
             }
+
+            // check & create app directory
+            if (!Directory.Exists(FileName.ProfileDir))
+                Directory.CreateDirectory(FileName.ProfileDir);
+            if (!Directory.Exists(FileName.LogDir))
+                Directory.CreateDirectory(FileName.LogDir);
 
             ProfileService.Load();
 
@@ -82,22 +96,20 @@ namespace KartRider
                 $" - built on {File.GetLastWriteTime(Process.GetCurrentProcess().MainModule.FileName).ToString("yyyy/MM/dd HH:mm:ss K")}, #{ThisAssembly.Git.Commit}");
             Console.WriteLine("--------------------------------------------------");
 
-            // check & create app directory
-            if (!Directory.Exists(FileName.ProfileDir))
-                Directory.CreateDirectory(FileName.ProfileDir);
-
             // get country code
             string CountryCode = await Update.GetCountryAsync();
             if (CountryCode != "") // available country code
             {
                 // change country code & write to file
-                ProfileService.ProfileConfig.ServerSetting.CC = ((CountryCode)Enum.Parse(typeof(CountryCode), CountryCode));
+                ProfileService.ProfileConfig.ServerSetting.CC = (CountryCode)Enum.Parse(typeof(CountryCode), CountryCode);
                 ProfileService.Save();
             }
             Console.WriteLine($"最后一次打开于: {ProfileService.ProfileConfig.ServerSetting.CC.ToString()}");
 
             // check for update
             if (await Update.UpdateDataAsync()) return;
+
+            Console.WriteLine("--------------------------------------------------");
 
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
@@ -123,6 +135,8 @@ namespace KartRider
                 // game not found
                 MsgFileNotFound();
             }
+            Console.WriteLine($"游戏目录: {RootDirectory}");
+            Console.WriteLine("--------------------------------------------------");
 
             // load Data files
             try
@@ -136,6 +150,8 @@ namespace KartRider
             {
                 Console.WriteLine($"读取Data文件时出错: {ex.Message}");
             }
+
+            Console.WriteLine("--------------------------------------------------");
 
             // auto hide console window if not in debug mode
             if (!ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility)

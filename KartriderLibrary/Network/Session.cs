@@ -356,9 +356,9 @@ namespace KartRider.Common.Network
             uint hash = BitConverter.ToUInt32(pPacket.ToArray(), 0);
             string packetDetail = BitConverter.ToString(pPacket.ToArray()).Replace("-", "");
             if (ProfileService.ProfileConfig.ServerSetting.ShowPacketDetail)
-                Console.WriteLine($"[Send]{(PacketName)hash}: {packetDetail}");
+                Console.WriteLine($"[Send] {(PacketName)hash}: {packetDetail}");
             else
-                Console.WriteLine($"[Send]{(PacketName)hash}");
+                Console.WriteLine($"[Send] {(PacketName)hash}");
             try
             {
                 if (this.mDisconnected == 0)

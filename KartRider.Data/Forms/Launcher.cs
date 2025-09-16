@@ -21,6 +21,7 @@ using KartRider.IO.Packet;
 using Launcher.Properties;
 using Newtonsoft.Json;
 using Profile;
+using LoggerLibrary;
 using RHOParser;
 using static KartRider.Common.Data.PINFile;
 using static KartRider.LauncherSystem;
@@ -33,7 +34,6 @@ namespace KartRider
     {
         public static bool GetKart = true;
         public static bool Options = true;
-        public static short KartSN = 0;
 
         public static string KartRider = Path.GetFullPath(Path.Combine(Program.RootDirectory, FileName.KartRider));
         public static string PinFile = Path.GetFullPath(Path.Combine(Program.RootDirectory, FileName.PinFile));
@@ -41,6 +41,7 @@ namespace KartRider
 
         private Button Start_Button;
         private Button GetKart_Button;
+        private Button ConsoleLogger;
         private Label label_Client;
         private ComboBox Speed_comboBox;
         private Label Speed_label;
@@ -72,6 +73,7 @@ namespace KartRider
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Launcher));
             Start_Button = new Button();
             GetKart_Button = new Button();
+            ConsoleLogger = new Button();
             label_Client = new Label();
             ClientVersion = new Label();
             VersionLabel = new Label();
@@ -105,13 +107,23 @@ namespace KartRider
             GetKart_Button.UseVisualStyleBackColor = true;
             GetKart_Button.Click += GetKart_Button_Click;
             // 
+            // ConsoleLogger
+            // 
+            ConsoleLogger.Location = new Point(12, 74);
+            ConsoleLogger.Name = "ConsoleLogger";
+            ConsoleLogger.Size = new Size(199, 23);
+            ConsoleLogger.TabIndex = 375;
+            ConsoleLogger.Text = "打日志";
+            ConsoleLogger.UseVisualStyleBackColor = true;
+            ConsoleLogger.Click += ConsoleLogger_Click;
+            // 
             // label_Client
             // 
             label_Client.AutoSize = true;
             label_Client.BackColor = SystemColors.Control;
             label_Client.Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label_Client.ForeColor = Color.Blue;
-            label_Client.Location = new Point(2, 163);
+            label_Client.Location = new Point(2, 180);
             label_Client.Name = "label_Client";
             label_Client.Size = new Size(71, 12);
             label_Client.TabIndex = 367;
@@ -147,7 +159,7 @@ namespace KartRider
             // 
             Launcher_label.AutoSize = true;
             Launcher_label.ForeColor = Color.Blue;
-            Launcher_label.Location = new Point(2, 176);
+            Launcher_label.Location = new Point(2, 193);
             Launcher_label.Name = "Launcher_label";
             Launcher_label.Size = new Size(71, 12);
             Launcher_label.TabIndex = 373;
@@ -155,13 +167,13 @@ namespace KartRider
             // 
             // Speed_comboBox
             // 
+            Speed_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             Speed_comboBox.ForeColor = Color.Red;
             Speed_comboBox.FormattingEnabled = true;
-            Speed_comboBox.Location = new Point(12, 86);
+            Speed_comboBox.Location = new Point(76, 103);
             Speed_comboBox.Name = "Speed_comboBox";
-            Speed_comboBox.Size = new Size(199, 20);
+            Speed_comboBox.Size = new Size(135, 20);
             Speed_comboBox.TabIndex = 368;
-            Speed_comboBox.Text = "统合S1.5";
             Speed_comboBox.SelectedIndexChanged += Speed_comboBox_SelectedIndexChanged;
             // 
             // Speed_label
@@ -169,7 +181,7 @@ namespace KartRider
             Speed_label.AutoSize = true;
             Speed_label.Font = new Font("宋体", 9F);
             Speed_label.ForeColor = Color.Blue;
-            Speed_label.Location = new Point(12, 71);
+            Speed_label.Location = new Point(13, 109);
             Speed_label.Name = "Speed_label";
             Speed_label.Size = new Size(65, 12);
             Speed_label.TabIndex = 369;
@@ -179,7 +191,7 @@ namespace KartRider
             // 
             GitHub.AutoSize = true;
             GitHub.ForeColor = Color.Blue;
-            GitHub.Location = new Point(171, 164);
+            GitHub.Location = new Point(171, 181);
             GitHub.Name = "GitHub";
             GitHub.Size = new Size(41, 12);
             GitHub.TabIndex = 371;
@@ -191,7 +203,7 @@ namespace KartRider
             // 
             KartInfo.AutoSize = true;
             KartInfo.ForeColor = Color.Blue;
-            KartInfo.Location = new Point(159, 176);
+            KartInfo.Location = new Point(159, 193);
             KartInfo.Name = "KartInfo";
             KartInfo.Size = new Size(53, 12);
             KartInfo.TabIndex = 372;
@@ -203,7 +215,7 @@ namespace KartRider
             // 
             label_Docs.AutoSize = true;
             label_Docs.ForeColor = Color.Blue;
-            label_Docs.Location = new Point(135, 152);
+            label_Docs.Location = new Point(135, 169);
             label_Docs.Name = "label_Docs";
             label_Docs.Size = new Size(77, 12);
             label_Docs.TabIndex = 374;
@@ -214,7 +226,7 @@ namespace KartRider
             // 
             label_TimeAttackLog.AutoSize = true;
             label_TimeAttackLog.ForeColor = Color.Blue;
-            label_TimeAttackLog.Location = new Point(135, 140);
+            label_TimeAttackLog.Location = new Point(135, 157);
             label_TimeAttackLog.Name = "label_TimeAttackLog";
             label_TimeAttackLog.Size = new Size(77, 12);
             label_TimeAttackLog.TabIndex = 375;
@@ -223,7 +235,7 @@ namespace KartRider
             // 
             // button_More_Options
             // 
-            button_More_Options.Location = new Point(13, 112);
+            button_More_Options.Location = new Point(13, 129);
             button_More_Options.Name = "button_More_Options";
             button_More_Options.Size = new Size(200, 25);
             button_More_Options.TabIndex = 378;
@@ -236,7 +248,7 @@ namespace KartRider
             AutoScaleDimensions = new SizeF(6F, 12F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(224, 196);
+            ClientSize = new Size(224, 214);
             Controls.Add(button_More_Options);
             Controls.Add(label_TimeAttackLog);
             Controls.Add(label_Docs);
@@ -248,6 +260,7 @@ namespace KartRider
             Controls.Add(Speed_label);
             Controls.Add(ClientVersion);
             Controls.Add(label_Client);
+            Controls.Add(ConsoleLogger);
             Controls.Add(GetKart_Button);
             Controls.Add(Start_Button);
             Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
@@ -383,7 +396,7 @@ namespace KartRider
                 catch (System.ComponentModel.Win32Exception ex)
                 {
                     // 用户取消了UAC提示或没有权限
-                    // Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.Message);
                     Console.WriteLine("用户积极取消操作, 或者没有Administer权限.");
                 }
             })).Start();
@@ -829,6 +842,12 @@ namespace KartRider
             if (!Options) return;
             OptionsDlg = new();
             OptionsDlg.ShowDialog();
+        }
+
+        private void ConsoleLogger_Click(object sender, EventArgs e)
+        {
+            CachedConsoleWriter.SaveToFile();
+            CachedConsoleWriter.cachedWriter.ClearCache();
         }
     }
 }

@@ -23,6 +23,11 @@
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <NuGetAudit>False</NuGetAudit>
 
+    <!-- 启用应用程序清单 -->
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+    <!-- 可选：如果需要在调试时也以管理员身份运行 -->
+    <EnableClickOnceSecuritySettings>true</EnableClickOnceSecuritySettings>
+
     <!-- Versioning & Assembly Information -->
     <AssemblyName>Launcher</AssemblyName>
 	  <AssemblyTitle>Launcher</AssemblyTitle>
