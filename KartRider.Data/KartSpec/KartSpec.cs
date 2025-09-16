@@ -46,10 +46,10 @@ namespace KartRider
             public Action<decimal> SetKartProperty { get; }
 
             public KartSpecConfig(
-                string attributeName, 
-                decimal fallbackValue, 
-                decimal defaultValue, 
-                decimal scale, 
+                string attributeName,
+                decimal fallbackValue,
+                decimal defaultValue,
+                decimal scale,
                 Action<decimal> setKartProperty)
             {
                 AttributeName = attributeName;
@@ -232,10 +232,10 @@ namespace KartRider
             foreach (var config in KartSpecConfigs)
             {
                 var attrValueStr = GetAttributeValue(
-                    bodyParamElement, 
-                    config.AttributeName, 
-                    config.FallbackValue, 
-                    config.DefaultValue, 
+                    bodyParamElement,
+                    config.AttributeName,
+                    config.FallbackValue,
+                    config.DefaultValue,
                     config.Scale);
 
                 // 解析数值并赋值（失败则用默认值）
@@ -332,10 +332,10 @@ namespace KartRider
 
         /// <summary>获取XML属性值（处理布尔/特殊数值逻辑）</summary>
         public static string GetAttributeValue(
-            XmlElement element, 
-            string attributeName, 
-            decimal fallbackValue, 
-            decimal defaultValue, 
+            XmlElement element,
+            string attributeName,
+            decimal fallbackValue,
+            decimal defaultValue,
             decimal scale)
         {
             // 1. 处理布尔类型属性（转换为0/1）
@@ -367,8 +367,8 @@ namespace KartRider
             {
                 // 先获取instAccelGaugeLength的值
                 var lengthAttrValue = element.GetAttribute("instAccelGaugeLength");
-                var length = decimal.TryParse(lengthAttrValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var l) 
-                    ? l 
+                var length = decimal.TryParse(lengthAttrValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var l)
+                    ? l
                     : 0M;
 
                 // 缩放系数 = 原scale * length
@@ -381,10 +381,10 @@ namespace KartRider
 
         /// <summary>辅助方法：计算缩放后的属性值（value * scale + fallback）</summary>
         private static string GetScaledValue(
-            XmlElement element, 
-            string actualAttrName, 
-            decimal fallback, 
-            decimal defaultValue, 
+            XmlElement element,
+            string actualAttrName,
+            decimal fallback,
+            decimal defaultValue,
             decimal scale)
         {
             var attrValue = element.GetAttribute(actualAttrName);

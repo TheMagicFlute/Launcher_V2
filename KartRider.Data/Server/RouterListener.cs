@@ -43,37 +43,37 @@ namespace KartRider
             return new int[] { t.Days, (int)totalSeconds, oddMonthCount };
         }
 
-		public static void OnAcceptSocket(IAsyncResult ar)
-		{
-			try
-			{
-				Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-				Socket clientSocket = RouterListener.Listener.EndAcceptSocket(ar);
-				RouterListener.forceConnect = RouterListener.sIP;
-				if (RouterListener.ForceConnect != "")
-				{
-					RouterListener.forceConnect = RouterListener.ForceConnect;
-				}
-				RouterListener.MySession = new SessionGroup(clientSocket, null);
-				IPEndPoint clientEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
-				RouterListener.client = clientEndPoint;
-				Console.WriteLine($"Client: {RouterListener.client.Address.ToString()}:{RouterListener.client.Port.ToString()}");
-				if (File.Exists(Launcher.PinFileBak))
-				{
-					File.Delete(Launcher.PinFile);
-					File.Move(Launcher.PinFileBak, Launcher.PinFile);
-				}
-				GameSupport.PcFirstMessage();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"发生异常：{ex.Message}");
-			}
-			finally
-			{
-				RouterListener.Listener.BeginAcceptSocket(new AsyncCallback(RouterListener.OnAcceptSocket), null);
-			}
-		}
+        public static void OnAcceptSocket(IAsyncResult ar)
+        {
+            try
+            {
+                Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                Socket clientSocket = RouterListener.Listener.EndAcceptSocket(ar);
+                RouterListener.forceConnect = RouterListener.sIP;
+                if (RouterListener.ForceConnect != "")
+                {
+                    RouterListener.forceConnect = RouterListener.ForceConnect;
+                }
+                RouterListener.MySession = new SessionGroup(clientSocket, null);
+                IPEndPoint clientEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
+                RouterListener.client = clientEndPoint;
+                Console.WriteLine($"Client: {RouterListener.client.Address.ToString()}:{RouterListener.client.Port.ToString()}");
+                if (File.Exists(Launcher.PinFileBak))
+                {
+                    File.Delete(Launcher.PinFile);
+                    File.Move(Launcher.PinFileBak, Launcher.PinFile);
+                }
+                GameSupport.PcFirstMessage();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"发生异常：{ex.Message}");
+            }
+            finally
+            {
+                RouterListener.Listener.BeginAcceptSocket(new AsyncCallback(RouterListener.OnAcceptSocket), null);
+            }
+        }
 
         public static void Start()
         {

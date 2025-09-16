@@ -16,29 +16,29 @@ namespace KartRider
     /// A utility class for the launcher system, including message boxes and helper functions.
     /// </summary>
 	public static class LauncherSystem
-	{
+    {
         #region messages
 
         public static void MsgKartIsRunning()
-		{
-			MessageBox.Show("跑跑卡丁车已经运行了!", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-		}
+        {
+            MessageBox.Show("跑跑卡丁车已经运行了!", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
 
-		public static void MsgMultiInstance()
-		{
-			MessageBox.Show("已经有一个启动器在运行了! 不可以同时运行多个启动器进行端口侦听!\n点击确认退出程序.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			Environment.Exit(1);
-		}
+        public static void MsgMultiInstance()
+        {
+            MessageBox.Show("已经有一个启动器在运行了! 不可以同时运行多个启动器进行端口侦听!\n点击确认退出程序.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Environment.Exit(1);
+        }
 
-		public static void MsgFileNotFound()
-		{
+        public static void MsgFileNotFound()
+        {
             Console.WriteLine($"Error: 找不到 {Launcher.KartRider} 或 {Launcher.PinFile}.");
             MessageBox.Show(Launcher.KartRider + " 或 " + Launcher.PinFile + " 找不到文件!\n点击确认退出程序.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			Environment.Exit(1);
-		}
+            Environment.Exit(1);
+        }
 
-		public static void TryKillKart()
-		{
+        public static void TryKillKart()
+        {
             Process[] gameProcesses = Process.GetProcessesByName("KartRider");
             if (gameProcesses.Length > 0)
             {

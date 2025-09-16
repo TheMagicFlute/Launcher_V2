@@ -331,7 +331,7 @@ namespace KartRider
                 Console.WriteLine(PinFileBak);
                 if (File.Exists(PinFileBak))
                 {
-                    File.Delete( PinFile);
+                    File.Delete(PinFile);
                     File.Move(PinFileBak, PinFile);
                 }
                 File.Copy(PinFile, PinFileBak);

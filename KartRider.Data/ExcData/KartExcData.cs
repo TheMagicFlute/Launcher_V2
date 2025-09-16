@@ -11,16 +11,16 @@ using Profile;
 
 namespace ExcData
 {
-	public static class KartExcData
-	{
-		public static List<List<short>> TuneList = new List<List<short>>();
-		public static List<List<short>> PlantList = new List<List<short>>();
-		public static List<List<short>> LevelList = new List<List<short>>();
-		public static List<List<short>> PartsList = new List<List<short>>();
-		public static List<List<short>> Parts12List = new List<List<short>>();
-		public static List<List<short>> Level12List = new List<List<short>>();
-		public static List<List<short>> NewKart = new List<List<short>>();
-		public static List<List<short>> Dictionary = new List<List<short>>();
+    public static class KartExcData
+    {
+        public static List<List<short>> TuneList = new List<List<short>>();
+        public static List<List<short>> PlantList = new List<List<short>>();
+        public static List<List<short>> LevelList = new List<List<short>>();
+        public static List<List<short>> PartsList = new List<List<short>>();
+        public static List<List<short>> Parts12List = new List<List<short>>();
+        public static List<List<short>> Level12List = new List<List<short>>();
+        public static List<List<short>> NewKart = new List<List<short>>();
+        public static List<List<short>> Dictionary = new List<List<short>>();
 
         public static Dictionary<int, string> KartName = new Dictionary<int, string>();
         public static Dictionary<string, XmlDocument> KartSpec = new Dictionary<string, XmlDocument>();

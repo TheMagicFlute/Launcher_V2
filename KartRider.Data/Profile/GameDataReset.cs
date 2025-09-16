@@ -99,8 +99,8 @@ namespace KartRider
             FlyingPet.StartForwardAccelForceItem = 0f;
             FlyingPet.StartForwardAccelForceSpeed = 0f;
         }
-        
-		public static void Kart_DataReset()
+
+        public static void Kart_DataReset()
         {
             Kart.draftMulAccelFactor = 0f;
             Kart.draftTick = 0;

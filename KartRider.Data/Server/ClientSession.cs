@@ -2803,7 +2803,6 @@ namespace KartRider
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqLogin", 0))
                     {
                         GameDataReset.DataReset();
-                        Console.WriteLine("Login...OK!");
                         using (OutPacket outPacket = new OutPacket("PrLogin"))
                         {
                             outPacket.WriteInt(0);
@@ -2909,6 +2908,7 @@ namespace KartRider
                             outPacket.WriteByte(ProfileService.ProfileConfig.Rider.IdentificationType);
                             RouterListener.MySession.Client.Send(outPacket);
                         }
+                        Console.WriteLine("[Login] OK!");
                         return;
                     }
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqSyncJackpotPointCS", 0))

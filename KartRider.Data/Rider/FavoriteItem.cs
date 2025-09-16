@@ -10,13 +10,13 @@ using RHOParser;
 
 namespace RiderData
 {
-	public static class FavoriteItem
-	{
-		public static List<List<short>> FavoriteItemList = new List<List<short>>();
-		public static List<List<string>> FavoriteTrackList = new List<List<string>>();
-		public static List<string> MissionList = new List<string>();
-		public static List<string> Competitive = new List<string>();
-		public static Dictionary<uint, TrackData> TrackDictionary = new Dictionary<uint, TrackData>();
+    public static class FavoriteItem
+    {
+        public static List<List<short>> FavoriteItemList = new List<List<short>>();
+        public static List<List<string>> FavoriteTrackList = new List<List<string>>();
+        public static List<string> MissionList = new List<string>();
+        public static List<string> Competitive = new List<string>();
+        public static Dictionary<uint, TrackData> TrackDictionary = new Dictionary<uint, TrackData>();
 
         public static void Favorite_Item()
         {

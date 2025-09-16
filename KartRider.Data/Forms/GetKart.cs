@@ -71,7 +71,7 @@ namespace KartRider
                 }
             }
             )).Start();
-            Console.WriteLine($"[Item]Add Item: Type:{ItemType.Text}, ID:{ItemID.Text}");
+            Console.WriteLine($"[Add Item] Add Item: Type:{ItemType.Text}, ID:{ItemID.Text}");
         }
 
         public static void Save_NewKartList(List<List<short>> NewKart)
@@ -124,7 +124,7 @@ namespace KartRider
                 if (KartExcData.items.TryGetValue(selectedOuterKey, out Dictionary<short, string> innerDictionary))
                 {
                     GetKart.Item_Code = innerDictionary.FirstOrDefault(pair => pair.Value == selectedInnerValue).Key;
-                    Console.WriteLine($"[Item]Select Item: Type:{ItemType.Text}, ID:{ItemID.Text}");
+                    Console.WriteLine($"[Add Item] Select Item: Type:{ItemType.Text}, ID:{ItemID.Text}");
                 }
             }
         }

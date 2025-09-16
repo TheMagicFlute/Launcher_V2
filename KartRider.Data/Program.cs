@@ -32,17 +32,17 @@ namespace KartRider
         public const bool DBG = false;
 #endif
 
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool AllocConsole();
 
-        [DllImport("user32.dll")]
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll", SetLastError = true)]
         public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-        [DllImport("user32.dll")]
+        [DllImport("user32.dll", SetLastError = true)]
         public static extern bool IsWindowVisible(IntPtr hWnd);
-
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr GetConsoleWindow();
 
         public const int SW_HIDE = 0;
         public const int SW_SHOW = 5;

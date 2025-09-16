@@ -68,8 +68,8 @@ namespace KartRider
         public static string zipName = simpleName + ".zip";
         public static string exeName = simpleName + ".exe";
 
-        public static GitHubReleaseRoot releaseData = null;
-        public static GitHubReleaseAsset launcherAsset = null;
+        public static GitHubReleaseRoot ?releaseData;
+        public static GitHubReleaseAsset ?launcherAsset;
 
         public static string currentVersion = GetCurrentVersion();
         private static string update_url = "";
@@ -79,6 +79,12 @@ namespace KartRider
             $"move \"{Path.GetFullPath(Path.Combine(FileName.Update_Folder, exeName))}\" \"{Path.GetFullPath(FileName.AppDir)}\"{Environment.NewLine}" +
             $"del \"{Path.GetFullPath(FileName.AppDir)}\" /f /q{Environment.NewLine}" +
             $"start \"{Path.GetFullPath(Path.Combine(FileName.AppDir, exeName))}\"{Environment.NewLine}";
+
+        private static readonly List<string> proxyUrlList =
+        [
+            "https://ghproxy.net/",
+            "https://gh-proxy.com/",
+        ];
 
         /// <summary>check and try to apply update</summary>
         /// <returns>true if update should be applied</returns>
@@ -117,7 +123,13 @@ namespace KartRider
 
             // 检查更新: 由于版本号使用日期格式，当天多次发布的版本号相同，故选择直接比较Digest
             // 如目前版本的SHA256与最新版本的SHA256不同，则说明需要更新
-            if (CheckFileHash(Path.Combine(FileName.AppDir, Process.GetCurrentProcess().MainModule.FileName), launcherAsset.Digest))
+            string? currentExeFile = Process.GetCurrentProcess().MainModule.FileName ?? Assembly.GetExecutingAssembly().Location;
+            if (String.IsNullOrEmpty(currentExeFile))
+            {
+                Console.WriteLine("无法获取当前可执行文件路径，更新检查失败。");
+                return false;
+            }
+            if (CheckFileHash(Path.Combine(FileName.AppDir, currentExeFile), launcherAsset.Digest))
             {
                 // ask user whether to update
                 Console.WriteLine($"发现 {releaseData.Tag_Name} 中有更新!");
@@ -125,21 +137,11 @@ namespace KartRider
                 Console.WriteLine($"更新信息: \n{releaseData.Body}");
                 Console.WriteLine("-------------------------");
                 Console.Write("请问是否需要更新? (Y/n): ");
-                string usrInput = null;
-                while (usrInput != "y" && usrInput != "n")
+                string? usrInput = Console.ReadLine().ToLower();
+                if (usrInput != "y")
                 {
-                    usrInput = Console.ReadLine();
-                    usrInput = usrInput.ToLower();
-                    if (usrInput == "n")
-                    {
-                        return false; // cancel update
-                    }
-                    else if (usrInput == "y")
-                    {
-                        break;
-                    }
-                    // usrInput is invalid, ask again.
-                    Console.Write("请输入 (Y for yes / n for no): ");
+                    Console.WriteLine($"用户取消更新. 如果仍想更新, 请重新启动本程序, 或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
+                    return false; // cancel update
                 }
                 // 尝试下载最新的版本
                 update_url = await ProcessUrlAsync(launcherAsset.Browser_Download_Url);
@@ -161,16 +163,10 @@ namespace KartRider
                 if (country != "" && country == "CN")
                 {
                     Console.WriteLine("Using proxy...");
-                    List<string> urls = new List<string>()
+                    foreach (string proxyUrl in proxyUrlList)
                     {
-                        "https://ghproxy.net/",
-                        "https://gh-proxy.com/",
-                    };
-                    foreach (string url_ in urls)
-                    {
-                        string testUrl = url;
-                        testUrl = url_ + url;
-                        // testUrl = url_ + url.Replace("https://", "");
+                        string testUrl = proxyUrl + url;
+                        // testUrl = proxyUrl + url.Replace("https://", ""); // another api format without "https://"
 
                         if (await GetUrl(testUrl))
                         {
@@ -276,7 +272,7 @@ namespace KartRider
             }
         }
 
-        public static async Task<GitHubReleaseRoot> GetReleaseDetailAsync()
+        public static async Task<GitHubReleaseRoot?> GetReleaseDetailAsync()
         {
             try
             {
@@ -295,6 +291,10 @@ namespace KartRider
                     jsonContent,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true } // 忽略JSON字段大小写（适配API的camelCase）
                 );
+                foreach (var asset in releaseData.Assets)
+                {
+                    asset.Digest = asset.Digest.Replace("sha256:", "").ToLower(); // 只保留哈希值部分，并转换为小写
+                }
                 return releaseData;
             }
             catch (JsonException ex)

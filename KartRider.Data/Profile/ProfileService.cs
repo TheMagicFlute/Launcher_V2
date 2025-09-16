@@ -14,7 +14,7 @@ namespace Profile
     public class ProfileService
     {
         public static ProfileConfig ProfileConfig { get; set; } = new();
-        
+
         /// <summary>
         /// Clamp values to valid ranges before saving and after loading.
         /// </summary>
