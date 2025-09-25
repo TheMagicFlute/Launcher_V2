@@ -97,10 +97,13 @@ namespace KartRider
             ClientVersion.Text = $"P{ProfileService.ProfileConfig.GameOption.Version.ToString()}";
             VersionLabel.Text = currentVersion;
 
+            Console.WriteLine($"[INFO] Client Version: {PinFileData.Header.MinorVersion}");
+            Console.WriteLine($"[INFO] Compile Time: {CompileTime.Time}");
+
             if (DBG)
                 Console.WriteLine($"Config:\n{JsonConvert.SerializeObject(ProfileService.ProfileConfig, Newtonsoft.Json.Formatting.Indented)}");
 
-            Console.WriteLine($"Process: {KartRider}");
+            Console.WriteLine($"[INFO] Process: {KartRider}");
 
             try
             {

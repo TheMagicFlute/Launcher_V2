@@ -962,7 +962,7 @@ namespace RiderData
                 }
             }
         }
-        
+
         #endregion
     }
 }

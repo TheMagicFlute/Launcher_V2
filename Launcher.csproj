@@ -50,6 +50,7 @@
     <Platforms>AnyCPU;x64;x86;arm64</Platforms>
     <UserSecretsId>14b62e2f-0b80-4024-9d73-02b052518861</UserSecretsId>
   </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>9999</WarningLevel>
     <PublishDir>.\</PublishDir>
@@ -91,6 +92,20 @@
     <PublishDir>.\</PublishDir>
     <DebugType>none</DebugType>
   </PropertyGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <PropertyGroup>
+      <!-- 生成统一的 yymmdd 日期格式 -->
+      <CurrentDate>$([System.DateTime]::Now.ToString("yyMMdd"))</CurrentDate>
+    </PropertyGroup>
+
+    <!-- Windows 平台：使用 cmd 兼容的引号转义 -->
+    <Exec Command="echo namespace KartRider { public static class CompileTime { public const string Time = &quot;$(CurrentDate)&quot;; } } &gt; &quot;$(ProjectDir)CompileTime.cs&quot;" Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))" />
+
+    <!-- Linux/macOS 平台：使用单引号包裹命令，内部用双引号 -->
+    <Exec Command="echo 'namespace KartRider { public static class CompileTime { public const string Time = &quot;$(CurrentDate)&quot;; } }' &gt; &quot;$(ProjectDir)CompileTime.cs&quot;" Condition="!$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="GitInfo" Version="3.5.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
