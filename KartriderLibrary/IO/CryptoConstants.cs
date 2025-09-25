@@ -1,5 +1,3 @@
-using System;
-
 namespace KartRider.IO.Packet
 {
     public class CryptoConstants
@@ -32,8 +30,8 @@ namespace KartRider.IO.Packet
 
         public static byte[] decodeBytes(byte[] bytes)
         {
-            byte[] numArray = new byte[(int)bytes.Length];
-            for (byte i = 0; i < (int)bytes.Length; i = (byte)(i + 1))
+            byte[] numArray = new byte[bytes.Length];
+            for (byte i = 0; i < bytes.Length; i = (byte)(i + 1))
             {
                 numArray[i] = (byte)(CryptoConstants.specKeys1[bytes[i]] - i);
             }
@@ -47,8 +45,8 @@ namespace KartRider.IO.Packet
 
         public static byte[] encryptBytes(byte[] original)
         {
-            byte[] numArray = new byte[(int)original.Length];
-            for (byte i = 0; i < (int)original.Length; i = (byte)(i + 1))
+            byte[] numArray = new byte[original.Length];
+            for (byte i = 0; i < original.Length; i = (byte)(i + 1))
             {
                 numArray[i] = CryptoConstants.specKeys2[(i + original[i]) % 255];
             }

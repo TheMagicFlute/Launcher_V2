@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KartLibrary.Encrypt
 {
@@ -70,8 +64,8 @@ namespace KartLibrary.Encrypt
             BaseStream.Flush();
         }
 
-        // 通用向量加载方法（替代Sse2.LoadVector128）
-        private unsafe static Vector128<T> LoadVector128<T>(void* address) where T : unmanaged
+        // 通用向量加载方法 (替代Sse2.LoadVector128)
+        private static unsafe Vector128<T> LoadVector128<T>(void* address) where T : unmanaged
         {
             // 将void*显式转换为T*类型指针
             T* typedPtr = (T*)address;
@@ -80,35 +74,35 @@ namespace KartLibrary.Encrypt
             return Vector128.Load<T>(typedPtr);
         }
 
-        // 通用向量存储方法（替代Sse2.Store）
-        private unsafe static void StoreVector128<T>(void* address, Vector128<T> vector) where T : unmanaged
+        // 通用向量存储方法 (替代Sse2.Store)
+        private static unsafe void StoreVector128<T>(void* address, Vector128<T> vector) where T : unmanaged
         {
             // 将void*转换为类型化指针T*
             T* typedPtr = (T*)address;
 
-            // 向量实例的Store方法：将向量数据写入指针指向的内存
+            // 向量实例的Store方法: 将向量数据写入指针指向的内存
             vector.Store(typedPtr);
         }
 
         /// <summary>
-        /// 模拟Sse2.ShiftRightLogical128BitLane的功能：按64位lane向右逻辑移位
+        /// 模拟Sse2.ShiftRightLogical128BitLane的功能: 按64位lane向右逻辑移位
         /// </summary>
         /// <param name="vector">128位输入向量</param>
-        /// <param name="shiftCount">移位计数（0或1，单位：64位lane）</param>
+        /// <param name="shiftCount">移位计数 (0或1, 单位: 64位lane)</param>
         /// <returns>移位后的128位向量</returns>
         private static Vector128<byte> ShiftRightLogical128BitLane(Vector128<byte> vector, byte shiftCount)
         {
-            // 仅支持移位0或1个lane（SSE2指令的限制）
+            // 仅支持移位0或1个lane (SSE2指令的限制)
             shiftCount = (byte)(shiftCount & 0x1); // 确保移位值为0或1
 
             if (shiftCount == 0)
-                return vector; // 移位0：返回原向量
+                return vector; // 移位0: 返回原向量
 
-            // 移位1个lane（8字节）：[lane0, lane1] → [lane1, 0]
-            // 1. 提取原向量的高64位（lane1）
+            // 移位1个lane (8字节): [lane0, lane1] → [lane1, 0]
+            // 1. 提取原向量的高64位 (lane1)
             Vector64<byte> highLane = Vector128.GetUpper(vector);
 
-            // 2. 创建新的低64位（原高64位）和高64位（全0）
+            // 2. 创建新的低64位 (原高64位)和高64位 (全0)
             Vector64<byte> newLowLane = highLane;
             Vector64<byte> newHighLane = Vector64<byte>.Zero;
 
@@ -142,7 +136,7 @@ namespace KartLibrary.Encrypt
                         }
                         else
                         {
-                            int bIndex = bufferRead & ~(0xF);
+                            int bIndex = bufferRead & ~0xF;
                             int nIndex = bufferRead & 0xF;
                             Vector128<byte> bufVec = Vector128<byte>.Zero;
                             if (Sse2.IsSupported)
@@ -272,10 +266,10 @@ namespace KartLibrary.Encrypt
             _position = BaseStream.Position;
             BaseStream.Read(buffer, 0, bufferLength);
 
-            // 使用通用向量API，自动适配当前架构
+            // 使用通用向量API, 自动适配当前架构
             if (Vector256.IsHardwareAccelerated)
             {
-                // 优先使用256位向量（如AVX2或ARM NEON的256位扩展）
+                // 优先使用256位向量 (如AVX2或ARM NEON的256位扩展)
                 fixed (byte* keyPtr = extendedKey, bufPtr = buffer)
                 {
                     int vectorSize = Vector256<byte>.Count; // 通常为32字节
@@ -283,13 +277,13 @@ namespace KartLibrary.Encrypt
 
                     for (int i = 0; i < iterations; i++)
                     {
-                        Vector256<byte> keyVec = Vector256.Load<byte>(keyPtr + i * vectorSize);
-                        Vector256<byte> bufVec = Vector256.Load<byte>(bufPtr + i * vectorSize);
+                        Vector256<byte> keyVec = Vector256.Load<byte>(keyPtr + (i * vectorSize));
+                        Vector256<byte> bufVec = Vector256.Load<byte>(bufPtr + (i * vectorSize));
                         bufVec = Vector256.Xor(bufVec, keyVec);
-                        bufVec.Store(bufPtr + i * vectorSize);
+                        bufVec.Store(bufPtr + (i * vectorSize));
                     }
 
-                    // 处理剩余字节（不足一个向量长度的部分）
+                    // 处理剩余字节 (不足一个向量长度的部分)
                     for (int i = iterations * vectorSize; i < bufferLength; i++)
                     {
                         buffer[i] ^= extendedKey[i];
@@ -298,7 +292,7 @@ namespace KartLibrary.Encrypt
             }
             else if (Vector128.IsHardwareAccelerated)
             {
-                // 使用128位向量（如SSE2或ARM NEON）
+                // 使用128位向量 (如SSE2或ARM NEON)
                 fixed (byte* keyPtr = extendedKey, bufPtr = buffer)
                 {
                     int vectorSize = Vector128<byte>.Count; // 通常为16字节
@@ -306,10 +300,10 @@ namespace KartLibrary.Encrypt
 
                     for (int i = 0; i < iterations; i++)
                     {
-                        Vector128<byte> keyVec = Vector128.Load<byte>(keyPtr + i * vectorSize);
-                        Vector128<byte> bufVec = Vector128.Load<byte>(bufPtr + i * vectorSize);
+                        Vector128<byte> keyVec = Vector128.Load<byte>(keyPtr + (i * vectorSize));
+                        Vector128<byte> bufVec = Vector128.Load<byte>(bufPtr + (i * vectorSize));
                         bufVec = Vector128.Xor(bufVec, keyVec);
-                        bufVec.Store(bufPtr + i * vectorSize);
+                        bufVec.Store(bufPtr + (i * vectorSize));
                     }
 
                     // 处理剩余字节

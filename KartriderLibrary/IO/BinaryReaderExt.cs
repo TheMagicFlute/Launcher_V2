@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Text;
 using KartLibrary.Consts;
 using KartLibrary.Record;
@@ -96,7 +93,7 @@ namespace KartLibrary.IO
         public static DateTime ReadKRDateTime(this BinaryReader br)
         {
             DateTime dt = new DateTime(1900, 1, 1);
-            uint date = (uint)br.ReadUInt16();
+            uint date = br.ReadUInt16();
             uint time = (uint)br.ReadUInt16() * 4;
             dt = dt.AddDays(date);
             dt = dt.AddSeconds(time);
@@ -134,7 +131,7 @@ namespace KartLibrary.IO
             ki.Unknown5 = br.ReadInt32();
             ki.Unknown6 = br.ReadByte();
             if (ki.RecordHeaderVersion >= 9)
-                ki.Speed = (SpeedType)(br.ReadByte());
+                ki.Speed = (SpeedType)br.ReadByte();
             int playerCount = br.ReadInt32();
             PlayerInfo[] players = new PlayerInfo[playerCount];
             for (int i = 0; i < playerCount; i++)

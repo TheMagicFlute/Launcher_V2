@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml;
 using ExcData;
 using KartRider;
 using KartRider.IO.Packet;
@@ -70,10 +65,10 @@ namespace RiderData
             if (KartExcData.items.TryGetValue(3, out Dictionary<short, string> resultDict))
             {
                 List<short> kart = new List<short>(resultDict.Keys);
-                int times = kart.Count / range + (kart.Count % range > 0 ? 1 : 0);
+                int times = (kart.Count / range) + (kart.Count % range > 0 ? 1 : 0);
                 for (int i = 0; i < times; i++)
                 {
-                    var tempList = kart.GetRange(i * range, (i + 1) * range > kart.Count ? (kart.Count - i * range) : range);
+                    var tempList = kart.GetRange(i * range, (i + 1) * range > kart.Count ? (kart.Count - (i * range)) : range);
                     int Count = tempList.Count;
                     using (OutPacket outPacket = new OutPacket("PrRequestKartInfoPacket"))
                     {
@@ -100,10 +95,10 @@ namespace RiderData
         public static void NewKart2()
         {
             int range = 100; // 分批次数
-            int times = KartExcData.NewKart.Count / range + (KartExcData.NewKart.Count % range > 0 ? 1 : 0);
+            int times = (KartExcData.NewKart.Count / range) + (KartExcData.NewKart.Count % range > 0 ? 1 : 0);
             for (int i = 0; i < times; i++)
             {
-                var tempList = KartExcData.NewKart.GetRange(i * range, (i + 1) * range > KartExcData.NewKart.Count ? (KartExcData.NewKart.Count - i * range) : range);
+                var tempList = KartExcData.NewKart.GetRange(i * range, (i + 1) * range > KartExcData.NewKart.Count ? (KartExcData.NewKart.Count - (i * range)) : range);
                 int Count = tempList.Count;
                 using (OutPacket outPacket = new OutPacket("PrRequestKartInfoPacket"))
                 {
@@ -208,7 +203,7 @@ namespace RiderData
                     oPacket.WriteInt(count);
                     foreach (var kvp in resultDict)
                     {
-                        short id = (short)kvp.Key;
+                        short id = kvp.Key;
                         oPacket.WriteShort(72);
                         oPacket.WriteShort(id);
                         oPacket.WriteShort(0);
@@ -253,7 +248,7 @@ namespace RiderData
                     oPacket.WriteInt(count);
                     foreach (var kvp in resultDict)
                     {
-                        short id = (short)kvp.Key;
+                        short id = kvp.Key;
                         oPacket.WriteShort(73);
                         oPacket.WriteShort(id);
                         oPacket.WriteShort(0);
@@ -298,7 +293,7 @@ namespace RiderData
                     oPacket.WriteInt(count);
                     foreach (var kvp in resultDict)
                     {
-                        short id = (short)kvp.Key;
+                        short id = kvp.Key;
                         oPacket.WriteShort(74);
                         oPacket.WriteShort(id);
                         oPacket.WriteShort(0);
@@ -343,7 +338,7 @@ namespace RiderData
                     oPacket.WriteInt(count);
                     foreach (var kvp in resultDict)
                     {
-                        short id = (short)kvp.Key;
+                        short id = kvp.Key;
                         oPacket.WriteShort(75);
                         oPacket.WriteShort(id);
                         oPacket.WriteShort(0);
@@ -384,7 +379,7 @@ namespace RiderData
                 oPacket.WriteInt(1);
                 oPacket.WriteInt(40);
                 byte Grade = 1;
-                //----------------------------------------------------------------- Gen X Unique Parts  X 유니크 파츠 
+                #region Gen X Unique Parts  X 유니크 파츠 
                 for (short i = 1053; i <= 1080; i += 3)
                 {
                     oPacket.WriteShort(63);
@@ -442,6 +437,7 @@ namespace RiderData
                     oPacket.WriteShort(i);
                 }
                 RouterListener.MySession.Client.Send(oPacket);
+                #endregion
             }
         }
 
@@ -453,7 +449,7 @@ namespace RiderData
                 oPacket.WriteInt(1);
                 oPacket.WriteInt(40);
                 byte Grade = 2;
-                //----------------------------------------------------------------- Gen X Legend Parts  X 레전드 파츠
+                #region  Gen X Legend Parts  X 레전드 파츠
                 for (short i = 1005; i <= 1050; i += 5)
                 {
                     oPacket.WriteShort(63);
@@ -511,6 +507,7 @@ namespace RiderData
                     oPacket.WriteShort(i);
                 }
                 RouterListener.MySession.Client.Send(oPacket);
+                #endregion
             }
         }
 
@@ -522,7 +519,7 @@ namespace RiderData
                 oPacket.WriteInt(1);
                 oPacket.WriteInt(40);
                 byte Grade = 3;
-                //----------------------------------------------------------------- Gen X Rear Parts  X 레어 파츠
+                #region Gen X Rear Parts  X 레어 파츠
                 for (short i = 910; i <= 1000; i += 10)
                 {
                     oPacket.WriteShort(63);
@@ -580,6 +577,7 @@ namespace RiderData
                     oPacket.WriteShort(i);
                 }
                 RouterListener.MySession.Client.Send(oPacket);
+                #endregion
             }
         }
 
@@ -591,7 +589,7 @@ namespace RiderData
                 oPacket.WriteInt(1);
                 oPacket.WriteInt(40);
                 byte Grade = 4;
-                //----------------------------------------------------------------- Gen X General Parts  X 일반 파츠
+                #region Gen X General Parts  X 일반 파츠
                 for (short i = 810; i <= 900; i += 10)
                 {
                     oPacket.WriteShort(63);
@@ -649,10 +647,11 @@ namespace RiderData
                     oPacket.WriteShort(i);
                 }
                 RouterListener.MySession.Client.Send(oPacket);
+                #endregion
             }
         }
 
-        //----------------------------------------------------------------------------------------------- Gen V1 Parts Related  V1 파츠 관련
+        #region Gen V1 Parts Related  V1 파츠 관련
         public static void V1UniquePartsData()
         {
             using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
@@ -661,7 +660,7 @@ namespace RiderData
                 oPacket.WriteInt(1);
                 oPacket.WriteInt(40);
                 byte Grade = 1;
-                //----------------------------------------------------------------- V1 Unique Parts  V1 유니크 파츠
+                #region V1 Unique Parts  V1 유니크 파츠
                 for (short i = 1153; i <= 1180; i += 3)
                 {
                     oPacket.WriteShort(63);
@@ -719,6 +718,7 @@ namespace RiderData
                     oPacket.WriteShort(i);
                 }
                 RouterListener.MySession.Client.Send(oPacket);
+                #endregion
             }
         }
 
@@ -730,7 +730,7 @@ namespace RiderData
                 oPacket.WriteInt(1);
                 oPacket.WriteInt(40);
                 byte Grade = 2;
-                //----------------------------------------------------------------- Gen V1 Legend Parts  V1 레전드 파츠
+                #region  Gen V1 Legend Parts  V1 레전드 파츠
                 for (short i = 1105; i <= 1150; i += 5)
                 {
                     oPacket.WriteShort(63);
@@ -788,6 +788,7 @@ namespace RiderData
                     oPacket.WriteShort(i);
                 }
                 RouterListener.MySession.Client.Send(oPacket);
+                #endregion
             }
         }
 
@@ -799,7 +800,7 @@ namespace RiderData
                 oPacket.WriteInt(1);
                 oPacket.WriteInt(40);
                 byte Grade = 3;
-                //----------------------------------------------------------------- Gen V1 Rear Parts  V1 레어 파츠
+                #region Gen V1 Rear Parts  V1 레어 파츠
                 for (short i = 1010; i <= 1100; i += 10)
                 {
                     oPacket.WriteShort(63);
@@ -857,6 +858,7 @@ namespace RiderData
                     oPacket.WriteShort(i);
                 }
                 RouterListener.MySession.Client.Send(oPacket);
+                #endregion
             }
         }
 
@@ -868,7 +870,7 @@ namespace RiderData
                 oPacket.WriteInt(1);
                 oPacket.WriteInt(40);
                 byte Grade = 4;
-                //----------------------------------------------------------------- Gen V1 General Parts  V1 일반 파츠
+                #region Gen V1 General Parts  V1 일반 파츠
                 for (short i = 910; i <= 1000; i += 10)
                 {
                     oPacket.WriteShort(63);
@@ -926,16 +928,17 @@ namespace RiderData
                     oPacket.WriteShort(i);
                 }
                 RouterListener.MySession.Client.Send(oPacket);
+                #endregion
             }
         }
 
         public static void LoRpGetRiderItemPacket(short itemCat, List<List<ushort>> item)
         {
             int range = 100; // 分批次数
-            int times = item.Count / range + (item.Count % range > 0 ? 1 : 0);
+            int times = (item.Count / range) + (item.Count % range > 0 ? 1 : 0);
             for (int i = 0; i < times; i++)
             {
-                var tempList = item.GetRange(i * range, (i + 1) * range > item.Count ? (item.Count - i * range) : range);
+                var tempList = item.GetRange(i * range, (i + 1) * range > item.Count ? (item.Count - (i * range)) : range);
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
                 {
                     oPacket.WriteInt(1);
@@ -959,5 +962,7 @@ namespace RiderData
                 }
             }
         }
+        
+        #endregion
     }
 }

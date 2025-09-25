@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using KartLibrary.Encrypt;
-using KartLibrary.File;
 using KartLibrary.IO;
 
 namespace KartLibrary.File
@@ -77,7 +70,7 @@ namespace KartLibrary.File
                 if (part2Hash != checkHash)
                     throw new NotSupportedException($"Exception: This file:{FileName} was modified. [ Part 2 Hash not euqal ]");
                 int MagicCode = br.ReadInt32();
-                if (Version == 1.0d && MagicCode != 0x00010000 || Version == 1.1d && MagicCode != 0x00010001)
+                if ((Version == 1.0d && MagicCode != 0x00010000) || (Version == 1.1d && MagicCode != 0x00010001))
                     throw new NotSupportedException($"Exception: This file:{FileName} is not Rho File. [ Header check failure ]");
                 BlockCount = br.ReadInt32(); // 10
                 BlockWhiteningKey = br.ReadUInt32(); //14 // BlockInfoKey = RhoFileKey ^  BlockWhiteningKey. 

@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 
 namespace KartRider.IO.Packet
@@ -30,7 +29,7 @@ namespace KartRider.IO.Packet
         {
             StringBuilder stringBuilder = new StringBuilder();
             byte[] array = this.ToArray();
-            for (int i = 0; i < (int)array.Length; i++)
+            for (int i = 0; i < array.Length; i++)
             {
                 stringBuilder.AppendFormat("{0:X2} ", array[i]);
             }

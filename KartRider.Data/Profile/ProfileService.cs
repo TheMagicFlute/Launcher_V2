@@ -1,13 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using KartRider;
 using Newtonsoft.Json;
-using RiderData;
 
 namespace Profile
 {
@@ -20,24 +12,27 @@ namespace Profile
         /// </summary>
         public static void ClampValue()
         {
-            ProfileService.ProfileConfig.Rider.Lucci = Math.Min(ProfileService.ProfileConfig.Rider.Lucci, SessionGroup.LucciMax);
-            ProfileService.ProfileConfig.GameOption.Set_BGM = Math.Clamp(ProfileService.ProfileConfig.GameOption.Set_BGM, 0f, 1f);
-            ProfileService.ProfileConfig.GameOption.Set_Sound = Math.Clamp(ProfileService.ProfileConfig.GameOption.Set_Sound, 0f, 1f);
+            ProfileConfig.Rider.Lucci = Math.Clamp(ProfileConfig.Rider.Lucci, 0, SessionGroup.LucciMax);
+            ProfileConfig.GameOption.Set_BGM = Math.Clamp(ProfileConfig.GameOption.Set_BGM, 0f, 1f);
+            ProfileConfig.GameOption.Set_Sound = Math.Clamp(ProfileConfig.GameOption.Set_Sound, 0f, 1f);
         }
 
+        /// <summary>
+        /// Save the current config to the config file.
+        /// </summary>
         public static void Save()
         {
             ClampValue();
             try
             {
-                var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings
+                var jsonSettings = new JsonSerializerSettings
                 {
-                    Formatting = Newtonsoft.Json.Formatting.Indented,
+                    Formatting = Formatting.Indented,
                 };
 
-                using (StreamWriter streamWriter = new StreamWriter(FileName.ConfigFile, false))
+                using (StreamWriter streamWriter = new(FileName.ConfigFile, false))
                 {
-                    streamWriter.Write(Newtonsoft.Json.JsonConvert.SerializeObject(ProfileConfig, jsonSettings));
+                    streamWriter.Write(JsonConvert.SerializeObject(ProfileConfig, jsonSettings));
                 }
             }
             catch (Exception ex)
@@ -46,6 +41,9 @@ namespace Profile
             }
         }
 
+        /// <summary>
+        /// Load the config from the config file.
+        /// </summary>
         public static void Load()
         {
             try

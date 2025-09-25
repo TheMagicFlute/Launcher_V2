@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using KartRider;
@@ -44,10 +39,10 @@ namespace ExcData
         public static void Tune_ExcData()
         {
             int range = 26; // 分批次数
-            int times = TuneList.Count / range + (TuneList.Count % range > 0 ? 1 : 0);
+            int times = (TuneList.Count / range) + (TuneList.Count % range > 0 ? 1 : 0);
             for (int i = 0; i < times; i++)
             {
-                var tempList = TuneList.GetRange(i * range, (i + 1) * range > TuneList.Count ? (TuneList.Count - i * range) : range);
+                var tempList = TuneList.GetRange(i * range, (i + 1) * range > TuneList.Count ? (TuneList.Count - (i * range)) : range);
                 int TuneCount = tempList.Count;
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderExcDataPacket"))
                 {
@@ -95,10 +90,10 @@ namespace ExcData
         public static void Plant_ExcData()
         {
             int range = 26; // 分批次数
-            int times = PlantList.Count / range + (PlantList.Count % range > 0 ? 1 : 0);
+            int times = (PlantList.Count / range) + (PlantList.Count % range > 0 ? 1 : 0);
             for (int i = 0; i < times; i++)
             {
-                var tempList = PlantList.GetRange(i * range, (i + 1) * range > PlantList.Count ? (PlantList.Count - i * range) : range);
+                var tempList = PlantList.GetRange(i * range, (i + 1) * range > PlantList.Count ? (PlantList.Count - (i * range)) : range);
                 int PlantCount = tempList.Count;
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderExcDataPacket"))
                 {
@@ -145,10 +140,10 @@ namespace ExcData
         public static void Level_ExcData()
         {
             int range = 26; // 分批次数
-            int times = LevelList.Count / range + (LevelList.Count % range > 0 ? 1 : 0);
+            int times = (LevelList.Count / range) + (LevelList.Count % range > 0 ? 1 : 0);
             for (int i = 0; i < times; i++)
             {
-                var tempList = LevelList.GetRange(i * range, (i + 1) * range > LevelList.Count ? (LevelList.Count - i * range) : range);
+                var tempList = LevelList.GetRange(i * range, (i + 1) * range > LevelList.Count ? (LevelList.Count - (i * range)) : range);
                 int LevelCount = tempList.Count;
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderExcDataPacket"))
                 {
@@ -193,10 +188,10 @@ namespace ExcData
         public static void Parts_ExcData()
         {
             int range = 26; // 分批次数
-            int times = PartsList.Count / range + (PartsList.Count % range > 0 ? 1 : 0);
+            int times = (PartsList.Count / range) + (PartsList.Count % range > 0 ? 1 : 0);
             for (int i = 0; i < times; i++)
             {
-                var tempList = PartsList.GetRange(i * range, (i + 1) * range > PartsList.Count ? (PartsList.Count - i * range) : range);
+                var tempList = PartsList.GetRange(i * range, (i + 1) * range > PartsList.Count ? (PartsList.Count - (i * range)) : range);
                 int parts = tempList.Count;
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderExcDataPacket"))
                 {
@@ -255,10 +250,10 @@ namespace ExcData
         public static void Level12_ExcData()
         {
             int range = 26; // 分批次数
-            int times = Level12List.Count / range + (Level12List.Count % range > 0 ? 1 : 0);
+            int times = (Level12List.Count / range) + (Level12List.Count % range > 0 ? 1 : 0);
             for (int i = 0; i < times; i++)
             {
-                var tempList = Level12List.GetRange(i * range, (i + 1) * range > Level12List.Count ? (Level12List.Count - i * range) : range);
+                var tempList = Level12List.GetRange(i * range, (i + 1) * range > Level12List.Count ? (Level12List.Count - (i * range)) : range);
                 int Parts = tempList.Count;
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderExcDataPacket"))
                 {
@@ -308,10 +303,10 @@ namespace ExcData
         public static void Parts12_ExcData()
         {
             int range = 26; // 分批次数
-            int times = Parts12List.Count / range + (Parts12List.Count % range > 0 ? 1 : 0);
+            int times = (Parts12List.Count / range) + (Parts12List.Count % range > 0 ? 1 : 0);
             for (int i = 0; i < times; i++)
             {
-                var tempList = Parts12List.GetRange(i * range, (i + 1) * range > Parts12List.Count ? (Parts12List.Count - i * range) : range);
+                var tempList = Parts12List.GetRange(i * range, (i + 1) * range > Parts12List.Count ? (Parts12List.Count - (i * range)) : range);
                 int parts12 = tempList.Count;
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderExcDataPacket"))
                 {

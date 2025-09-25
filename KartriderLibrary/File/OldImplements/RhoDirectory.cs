@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using KartLibrary.Encrypt;
+﻿using System.Text;
 
 namespace KartLibrary.File
 {
@@ -67,7 +61,7 @@ namespace KartLibrary.File
                     rfi.FileSize = msReader.ReadInt32();
                     for (int j = 0; j < 4; j++)
                     {
-                        tempChar = (char)(extInt >> (j << 3) & 0xFF);
+                        tempChar = (char)((extInt >> (j << 3)) & 0xFF);
                         if (tempChar != '\0')
                             strBuilder.Append(tempChar);
                     }

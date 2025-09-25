@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Dynamic;
 using System.Numerics;
 using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 using System.Xml;
 using KartLibrary.IO;
 using KartLibrary.Text;
@@ -127,7 +120,7 @@ namespace KartLibrary.Xml
             string End = "";
             string addition = "";
             bool OneLine = true;
-            if ((HaveText || HaveSubTag))
+            if (HaveText || HaveSubTag)
             {
                 End = $"</{Name}>";
                 OneLine = !HaveSubTag;
@@ -184,7 +177,7 @@ namespace KartLibrary.Xml
         public override bool TrySetMember(SetMemberBinder binder, object? value)
         {
             string attributeName = binder.Name;
-            string attributeValue = value?.ToString() as string ?? "";
+            string attributeValue = value?.ToString() ?? "";
             SetAttribute(attributeName, attributeValue);
             return true;
         }

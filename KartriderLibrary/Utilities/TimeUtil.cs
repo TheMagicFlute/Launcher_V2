@@ -1,4 +1,3 @@
-using System;
 using System.Xml;
 
 namespace KartNew.Utilities
@@ -44,7 +43,7 @@ namespace KartNew.Utilities
                     }
                     else
                     {
-                        flag = (TimeUtil._monthTable[num] >= date ? true : date > TimeUtil._monthTable[num + 1]);
+                        flag = TimeUtil._monthTable[num] >= date ? true : date > TimeUtil._monthTable[num + 1];
                     }
                     if (!flag)
                     {
@@ -64,7 +63,7 @@ namespace KartNew.Utilities
                     }
                     else
                     {
-                        flag1 = (TimeUtil._monthLeapYearTable[num] >= date ? true : date > TimeUtil._monthLeapYearTable[num + 1]);
+                        flag1 = TimeUtil._monthLeapYearTable[num] >= date ? true : date > TimeUtil._monthLeapYearTable[num + 1];
                     }
                     if (!flag1)
                     {
@@ -116,8 +115,8 @@ namespace KartNew.Utilities
         public static bool IsInYear(string period, DateTime time)
         {
             string[] strArrays = period.Split(new char[] { '~' });
-            DateTime dateTime = (strArrays[0] == "*" ? DateTime.MinValue : XmlConvert.ToDateTime(strArrays[0], XmlDateTimeSerializationMode.RoundtripKind));
-            return (dateTime >= time ? false : time < (strArrays[1] == "*" ? DateTime.MaxValue : XmlConvert.ToDateTime(strArrays[1], XmlDateTimeSerializationMode.RoundtripKind)));
+            DateTime dateTime = strArrays[0] == "*" ? DateTime.MinValue : XmlConvert.ToDateTime(strArrays[0], XmlDateTimeSerializationMode.RoundtripKind);
+            return dateTime >= time ? false : time < (strArrays[1] == "*" ? DateTime.MaxValue : XmlConvert.ToDateTime(strArrays[1], XmlDateTimeSerializationMode.RoundtripKind));
         }
 
         public static bool IsLeapYear(int year)
@@ -129,7 +128,7 @@ namespace KartNew.Utilities
             }
             else
             {
-                flag = (year % 100 != 0 ? true : year % 400 == 0);
+                flag = year % 100 != 0 ? true : year % 400 == 0;
             }
             return flag;
         }

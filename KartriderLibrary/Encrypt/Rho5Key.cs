@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace KartLibrary.Encrypt
 {
@@ -545,12 +541,12 @@ namespace KartLibrary.Encrypt
    //4B9FD0, arg1: key, arg2: u1
    //function 4B9DF0(unsigned char *key, double u2)
    //4C19A0 1.23516 ver
-        public unsafe static byte[] GetPackedFileKey(byte[] fileChksum, int u1, string FileName)
+        public static unsafe byte[] GetPackedFileKey(byte[] fileChksum, int u1, string FileName)
         {
             //if (!Sse2.IsSupported)
             //    throw new NotSupportedException("Your computer is not support SSE2.");
             if (!Vector128.IsHardwareAccelerated)
-                Console.WriteLine("警告：当前环境不支持硬件加速向量操作，性能可能下降");
+                Console.WriteLine("警告: 当前环境不支持硬件加速向量操作, 性能可能下降");
             byte[] fileNameData = Encoding.GetEncoding("UTF-16").GetBytes(FileName);
             uint temp_ebx = (uint)u1;
             double[] arr1 = new double[] { 0d, 4294967296d };
@@ -579,7 +575,7 @@ namespace KartLibrary.Encrypt
             while (temp_ebx != 0)
             {
                 ulong a = 0xCCCCCCCDul * temp_ebx;
-                uint b = (uint)((a >> 32) >> 3); //edx
+                uint b = (uint)(a >> 32 >> 3); //edx
                 arr2[i--] = ((byte)temp_ebx) - (byte)((((b << 2) & 0xFF) + b) << 1);
                 temp_ebx = b;
             }
@@ -594,7 +590,7 @@ namespace KartLibrary.Encrypt
                 int c = (int)(((sbyte)arr2[(i + 2) % arr2.Length] + i) & 0x8000000F); //esi at 4BA09F
                 if (c < 0)
                     c = ((c - 1) | -10) + 1;
-                int outByte = ((b + i) % 5);//ecx at 4BA0BC
+                int outByte = (b + i) % 5;//ecx at 4BA0BC
                 outByte = (sbyte)((outByte + fileChksum[c] + a) & 0xFF);
                 outByte *= (sbyte)fileNameData[(i % FileName.Length) << 1];
                 outByte += i;
@@ -603,7 +599,7 @@ namespace KartLibrary.Encrypt
             return output;
         }
 
-        private unsafe static Vector128<double> func_E321D0(Vector128<double> _inxmm0)
+        private static unsafe Vector128<double> func_E321D0(Vector128<double> _inxmm0)
         {
             Vector128<double> xmm0 = _inxmm0;
             double temp_1 = 0; //the varible that stored at address:esp
@@ -694,27 +690,27 @@ namespace KartLibrary.Encrypt
             return new Vector128<double>();
         }
 
-        private unsafe static Vector128<double> func_g(Vector128<double> _inxmm0)
+        private static unsafe Vector128<double> func_g(Vector128<double> _inxmm0)
         {
             Vector128<double> xmm0 = _inxmm0;
             double temp_1 = 0;
 
             // 存储向量低64位到内存
             Vector64<double> lower64 = Vector128.GetLower(xmm0);
-            *(double*)&temp_1 = lower64.GetElement(0);
+            *&temp_1 = lower64.GetElement(0);
 
             int temp_edx = 0;
             while (true)
             {
                 Vector128<double> xmm5 = xmm0;
-                // 手动实现UnpackLow功能：将两个向量的低半部分元素交错组合
+                // 手动实现UnpackLow功能: 将两个向量的低半部分元素交错组合
                 xmm0 = UnpackLow(xmm0, xmm0);
 
                 // 处理移位操作
                 xmm5 = Vector128.AsDouble(
                     Vector128.ShiftRightLogical(
                         Vector128.AsInt64(xmm5), 0x34)
-                );
+               );
 
                 // 提取元素
                 int temp_ecx = Vector128.AsUInt16(xmm5).GetElement(0);
@@ -813,35 +809,35 @@ namespace KartLibrary.Encrypt
                 else
                 {
                     // 从内存加载低64位到向量
-                    Vector64<double> loadedLow = Vector64.Create(*(double*)&temp_1);
+                    Vector64<double> loadedLow = Vector64.Create(*&temp_1);
                     xmm0 = Vector128.WithLower(xmm0, loadedLow);
                 }
             }
         }
 
-        // 手动实现UnpackLow功能：将两个向量的低半部分元素交错组合
+        // 手动实现UnpackLow功能: 将两个向量的低半部分元素交错组合
         private static Vector128<double> UnpackLow(Vector128<double> left, Vector128<double> right)
         {
-            // 对于double类型的Vector128，每个向量包含2个元素
+            // 对于double类型的Vector128, 每个向量包含2个元素
             double left0 = left.GetElement(0);
             double right0 = right.GetElement(0);
 
-            // 组合成新的向量：[left0, right0]
+            // 组合成新的向量: [left0, right0]
             return Vector128.Create(left0, right0);
         }
 
-        // 手动实现UnpackHigh功能：将两个向量的高半部分元素交错组合
+        // 手动实现UnpackHigh功能: 将两个向量的高半部分元素交错组合
         private static Vector128<double> UnpackHigh(Vector128<double> left, Vector128<double> right)
         {
-            // 对于double类型的Vector128，每个向量包含2个元素
+            // 对于double类型的Vector128, 每个向量包含2个元素
             double left1 = left.GetElement(1);
             double right1 = right.GetElement(1);
 
-            // 组合成新的向量：[left1, right1]
+            // 组合成新的向量: [left1, right1]
             return Vector128.Create(left1, right1);
         }
 
-        private unsafe static Vector128<double> LoadVector128LH(double* address)
+        private static unsafe Vector128<double> LoadVector128LH(double* address)
         {
             Vector128<double> output = Vector128<double>.Zero;
             if (Sse2.IsSupported)
@@ -851,19 +847,19 @@ namespace KartLibrary.Encrypt
             }
             else
             {
-                // 从地址加载128位向量（低64位 + 高64位）
+                // 从地址加载128位向量 (低64位 + 高64位)
                 output = Vector128.Load<double>(address);
-                // 从相同地址加载64位数据作为新的高64位，并用WithUpper替换
-                // 注意：原SSE2.LoadHigh是从address加载64位到高部分，这里保持相同逻辑
+                // 从相同地址加载64位数据作为新的高64位, 并用WithUpper替换
+                // 注意: 原SSE2.LoadHigh是从address加载64位到高部分, 这里保持相同逻辑
                 Vector64<double> highPart = Vector64.Create(*address); // 从address加载64位数据
                 output = Vector128.WithUpper(output, highPart); // 替换高64位
             }
             return output;
         }
 
-        private unsafe static Vector128<double> LoadVector128FromByteArray(byte[] arr, int index)
+        private static unsafe Vector128<double> LoadVector128FromByteArray(byte[] arr, int index)
         {
-            // 验证输入，确保不会越界
+            // 验证输入, 确保不会越界
             if (index < 0 || index + 16 > arr.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), "索引超出数组范围或剩余空间不足 16 字节");
             if (Sse2.IsSupported)
@@ -878,49 +874,49 @@ namespace KartLibrary.Encrypt
             {
                 fixed (byte* address = arr)
                 {
-                    // 使用通用的 Vector128 加载方法，不依赖特定架构指令
-                    // 将字节指针转换为 double*，然后加载 128 位向量
+                    // 使用通用的 Vector128 加载方法, 不依赖特定架构指令
+                    // 将字节指针转换为 double*, 然后加载 128 位向量
                     double* doubleAddress = (double*)(address + index);
                     return Vector128.Load<double>(doubleAddress);
                 }
             }
         }
 
-        // 通用方法：将128位整数向量转换为双精度浮点数向量（支持int类型）
+        // 通用方法: 将128位整数向量转换为双精度浮点数向量 (支持int类型)
         private static Vector128<double> ConvertToVector128Double(Vector128<int> intVector)
         {
-            // 提取 int 向量的 4 个元素（32 位 int，共 128 位）
+            // 提取 int 向量的 4 个元素 (32 位 int, 共 128 位)
             int int0 = intVector.GetElement(0);
             int int1 = intVector.GetElement(1);
             int int2 = intVector.GetElement(2);
             int int3 = intVector.GetElement(3);
 
-            // 将 4 个 int 合并为 2 个 long（每个 long 由 2 个 int 组成）
-            long long0 = (long)((uint)int1 << 32 | (uint)int0);
-            long long1 = (long)((uint)int3 << 32 | (uint)int2);
+            // 将 4 个 int 合并为 2 个 long (每个 long 由 2 个 int 组成)
+            long long0 = ((uint)int1 << 32) | (uint)int0;
+            long long1 = ((uint)int3 << 32) | (uint)int2;
 
-            // 转换为 double 向量（2 个元素，每个对应一个 long）
+            // 转换为 double 向量 (2 个元素, 每个对应一个 long)
             return Vector128.Create(
-            (double)long0,
+            long0,
             (double)long1
-            );
+           );
         }
 
-        // 通用方法：将128位长整数向量转换为双精度浮点数向量（支持long类型）
+        // 通用方法: 将128位长整数向量转换为双精度浮点数向量 (支持long类型)
         private static Vector128<double> ConvertToVector128Double(Vector128<long> longVector)
         {
-            // 提取long向量的2个元素（Vector128<long>包含2个64位long）
+            // 提取long向量的2个元素 (Vector128<long>包含2个64位long)
             long long0 = longVector.GetElement(0);
             long long1 = longVector.GetElement(1);
 
-            // 逐个转换为double，再组合为Vector128<double>
+            // 逐个转换为double, 再组合为Vector128<double>
             return Vector128.Create(
-                (double)long0,
+                long0,
                 (double)long1
-            );
+           );
         }
 
-        public unsafe static int GetFileKey_U1(string anotherData)
+        public static unsafe int GetFileKey_U1(string anotherData)
         {
             int output = unchecked((int)0x811C9DC5);
             foreach (char cha in anotherData)

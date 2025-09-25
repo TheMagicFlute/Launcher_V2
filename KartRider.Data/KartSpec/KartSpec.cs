@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using ExcData;
-using KartRider;
 using Profile;
 using RiderData;
 
@@ -15,8 +9,8 @@ namespace KartRider
 {
     public class KartSpec
     {
-        #region 常量定义（消除硬编码）
-        /// <summary>布尔类型的XML属性名集合（统一管理）</summary>
+        #region 常量定义 (消除硬编码)
+        /// <summary>布尔类型的XML属性名集合 (统一管理)</summary>
         private static readonly HashSet<string> BooleanAttributes = new(StringComparer.OrdinalIgnoreCase)
         {
             "UseTransformBooster", "motorcycleType", "BikeRearWheel", "UseExtendedAfterBooster",
@@ -24,21 +18,21 @@ namespace KartRider
             "PartsBoosterLock", "PartsCoatingLock", "PartsTailLampLock", "useExtendedAfterBoosterMore"
         };
 
-        /// <summary>部件默认类型（EngineType/HandleType等的默认值1）</summary>
+        /// <summary>部件默认类型 (EngineType/HandleType等的默认值1)</summary>
         private const byte DefaultPartType = 1;
         /// <summary>模型尺寸默认值</summary>
         private const float DefaultModelDimension = 0f;
         #endregion
 
-        #region 配置类（优化数据映射）
-        /// <summary>卡丁车规格属性配置类（关联XML属性与Kart字段赋值）</summary>
+        #region 配置类 (优化数据映射)
+        /// <summary>卡丁车规格属性配置类 (关联XML属性与Kart字段赋值)</summary>
         private class KartSpecConfig
         {
             /// <summary>XML属性名</summary>
             public string AttributeName { get; }
-            /// <summary> fallback值（计算时叠加）</summary>
+            /// <summary> fallback值 (计算时叠加)</summary>
             public decimal FallbackValue { get; }
-            /// <summary>默认值（解析失败时使用）</summary>
+            /// <summary>默认值 (解析失败时使用)</summary>
             public decimal DefaultValue { get; }
             /// <summary>缩放系数</summary>
             public decimal Scale { get; }
@@ -61,8 +55,8 @@ namespace KartRider
         }
         #endregion
 
-        #region 规格配置集合（统一管理属性映射）
-        /// <summary>所有卡丁车规格属性的配置（替代原attributes数组，避免索引依赖）</summary>
+        #region 规格配置集合 (统一管理属性映射)
+        /// <summary>所有卡丁车规格属性的配置 (替代原attributes数组, 避免索引依赖)</summary>
         private static IEnumerable<KartSpecConfig> KartSpecConfigs => new List<KartSpecConfig>
         {
             new("draftMulAccelFactor", 0M, 1M, 1M, val => Kart.draftMulAccelFactor = (float)val),
@@ -150,7 +144,7 @@ namespace KartRider
         };
         #endregion
 
-        #region 对外接口（主逻辑）
+        #region 对外接口 (主逻辑)
         /// <summary>获取卡丁车规格入口方法</summary>
         public static void GetKartSpec()
         {
@@ -159,7 +153,7 @@ namespace KartRider
                 // 1. 处理卡丁车ID为0的默认情况
                 if (StartGameData.Kart_id == 0)
                 {
-                    Console.WriteLine("[KartSpec] 卡丁车ID=0，加载默认学校规格");
+                    Console.WriteLine("[KartSpec] 卡丁车ID=0, 加载默认学校规格");
                     ApplyDefaultSpec();
                 }
                 // 2. 处理非默认卡丁车ID
@@ -169,43 +163,43 @@ namespace KartRider
                     // 2.1 检查KartName字典是否存在该ID
                     if (!KartExcData.KartName.TryGetValue(kartId, out var kartName))
                     {
-                        Console.WriteLine($"[KartSpec] 警告：KartName中未找到ID={kartId}，加载默认规格");
+                        Console.WriteLine($"[KartSpec] 警告: KartName中未找到ID={kartId}, 加载默认规格");
                         ApplyDefaultSpec();
                         return;
                     }
 
-                    Console.WriteLine($"[KartSpec] 加载卡丁车：ID={kartId}，名称={kartName}");
+                    Console.WriteLine($"[KartSpec] 加载卡丁车: ID={kartId}, 名称={kartName}");
 
                     // 2.2 检查KartSpec字典是否存在该规格
                     if (!KartExcData.KartSpec.TryGetValue(kartName, out var kartSpecDoc))
                     {
-                        Console.WriteLine($"[KartSpec] 警告：KartSpec中未找到名称={kartName}的规格，加载默认规格");
+                        Console.WriteLine($"[KartSpec] 警告: KartSpec中未找到名称={kartName}的规格, 加载默认规格");
                         ApplyDefaultSpec();
                         return;
                     }
 
                     // 2.3 解析规格XML并赋值
                     ParseKartSpecXml(kartId, kartSpecDoc);
-                    // 3. 初始化V2规格（保持原逻辑）
+                    // 3. 初始化V2规格 (保持原逻辑)
                     new V2Spec().ExceedSpec();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[KartSpec] 错误：获取规格时异常 - {ex.Message}\n堆栈：{ex.StackTrace}");
-                // 异常降级：确保加载默认规格，避免程序崩溃
+                Console.WriteLine($"[KartSpec] 错误: 获取规格时异常 - {ex.Message}\n堆栈: {ex.StackTrace}");
+                // 异常降级: 确保加载默认规格, 避免程序崩溃
                 ApplyDefaultSpec();
             }
         }
         #endregion
 
-        #region 私有辅助方法（拆分复杂逻辑）
-        /// <summary>应用默认规格（消除重复调用）</summary>
+        #region 私有辅助方法 (拆分复杂逻辑)
+        /// <summary>应用默认规格 (消除重复调用)</summary>
         private static void ApplyDefaultSpec()
         {
             SchoolSpec.DefaultSpec();
             new V2Spec().ExceedSpec();
-            // 原注释代码：若后续需要恢复，可取消注释并添加用途说明
+            // 原注释代码: 若后续需要恢复, 可取消注释并添加用途说明
             // StartGameData.Start_KartSpac();
         }
 
@@ -220,12 +214,12 @@ namespace KartRider
             }
             else
             {
-                Console.WriteLine($"[KartSpec] 警告：ID={kartId}的规格XML中无BodyParam节点，加载默认规格");
+                Console.WriteLine($"[KartSpec] 警告: ID={kartId}的规格XML中无BodyParam节点, 加载默认规格");
                 ApplyDefaultSpec();
             }
         }
 
-        /// <summary>给Kart静态字段赋值（核心数据映射）</summary>
+        /// <summary>给Kart静态字段赋值 (核心数据映射)</summary>
         private static void AssignKartProperties(short kartId, XmlElement bodyParamElement)
         {
             // 1. 赋值基础规格属性
@@ -238,57 +232,57 @@ namespace KartRider
                     config.DefaultValue,
                     config.Scale);
 
-                // 解析数值并赋值（失败则用默认值）
+                // 解析数值并赋值 (失败则用默认值)
                 if (decimal.TryParse(attrValueStr, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedVal))
                 {
                     config.SetKartProperty(parsedVal);
                 }
                 else
                 {
-                    Console.WriteLine($"[KartSpec] 警告：属性{config.AttributeName}值{attrValueStr}无效，用默认值{config.DefaultValue}");
+                    Console.WriteLine($"[KartSpec] 警告: 属性{config.AttributeName}值{attrValueStr}无效, 用默认值{config.DefaultValue}");
                     config.SetKartProperty(config.DefaultValue);
                 }
             }
 
-            // 2. 加载模型尺寸（单独处理ModelMax.xml）
+            // 2. 加载模型尺寸 (单独处理ModelMax.xml)
             var (modelMaxX, modelMaxY) = LoadModelMaxDimensions(kartId);
             Kart.modelMaxX = modelMaxX;
             Kart.modelMaxY = modelMaxY;
 
-            // 3. 设置默认部件类型（Engine/Handle等）
+            // 3. 设置默认部件类型 (Engine/Handle等)
             Kart.EngineType = DefaultPartType;
             Kart.HandleType = DefaultPartType;
             Kart.WheelType = DefaultPartType;
             Kart.BoosterType = DefaultPartType;
 
-            // 4. 初始化物品ID（保持原逻辑）
+            // 4. 初始化物品ID (保持原逻辑)
             Kart.startItemTableId = 0;
             Kart.startItemId = 0;
         }
 
-        /// <summary>加载ModelMax.xml中的模型尺寸（modelMaxX/modelMaxY）</summary>
+        /// <summary>加载ModelMax.xml中的模型尺寸 (modelMaxX/modelMaxY)</summary>
         private static (float modelMaxX, float modelMaxY) LoadModelMaxDimensions(short kartId)
         {
             // 检查文件是否存在
             if (!File.Exists(FileName.ModelMax_LoadFile))
             {
-                Console.WriteLine($"[KartSpec] 警告：ModelMax.xml不存在 - 路径：{FileName.ModelMax_LoadFile}");
+                Console.WriteLine($"[KartSpec] 警告: ModelMax.xml不存在 - 路径: {FileName.ModelMax_LoadFile}");
                 return (DefaultModelDimension, DefaultModelDimension);
             }
 
             try
             {
-                // 只对文件流使用using，XDocument不实现IDisposable，不需要using
+                // 只对文件流使用using, XDocument不实现IDisposable, 不需要using
                 using (var fileStream = File.OpenRead(FileName.ModelMax_LoadFile))
                 {
                     var xdoc = XDocument.Load(fileStream);
 
-                    // 查找对应ID的节点（如id123）
+                    // 查找对应ID的节点 (如id123)
                     var targetNodeName = $"id{kartId}";
                     var targetNode = xdoc.Descendants(targetNodeName).FirstOrDefault();
                     if (targetNode == null)
                     {
-                        Console.WriteLine($"[KartSpec] 警告：ModelMax.xml中无节点{targetNodeName}（ID={kartId}）");
+                        Console.WriteLine($"[KartSpec] 警告: ModelMax.xml中无节点{targetNodeName}(ID={kartId})");
                         return (DefaultModelDimension, DefaultModelDimension);
                     }
 
@@ -302,22 +296,22 @@ namespace KartRider
             }
             catch (XmlException ex)
             {
-                Console.WriteLine($"[KartSpec] 错误：解析ModelMax.xml失败 - {ex.Message}");
+                Console.WriteLine($"[KartSpec] 错误: 解析ModelMax.xml失败 - {ex.Message}");
                 return (DefaultModelDimension, DefaultModelDimension);
             }
             catch (IOException ex)
             {
-                Console.WriteLine($"[KartSpec] 错误：读取ModelMax.xml失败 - {ex.Message}");
+                Console.WriteLine($"[KartSpec] 错误: 读取ModelMax.xml失败 - {ex.Message}");
                 return (DefaultModelDimension, DefaultModelDimension);
             }
         }
 
-        /// <summary>辅助方法：将XAttribute解析为float（失败返回默认值）</summary>
+        /// <summary>辅助方法: 将XAttribute解析为float (失败返回默认值)</summary>
         private static float ParseAttributeToFloat(XAttribute attr, string attrName, short kartId)
         {
             if (attr == null)
             {
-                Console.WriteLine($"[KartSpec] 警告：ID={kartId}的{attrName}属性不存在");
+                Console.WriteLine($"[KartSpec] 警告: ID={kartId}的{attrName}属性不存在");
                 return DefaultModelDimension;
             }
 
@@ -326,11 +320,11 @@ namespace KartRider
                 return result;
             }
 
-            Console.WriteLine($"[KartSpec] 警告：ID={kartId}的{attrName}值{attr.Value}无效");
+            Console.WriteLine($"[KartSpec] 警告: ID={kartId}的{attrName}值{attr.Value}无效");
             return DefaultModelDimension;
         }
 
-        /// <summary>获取XML属性值（处理布尔/特殊数值逻辑）</summary>
+        /// <summary>获取XML属性值 (处理布尔/特殊数值逻辑)</summary>
         public static string GetAttributeValue(
             XmlElement element,
             string attributeName,
@@ -338,7 +332,7 @@ namespace KartRider
             decimal defaultValue,
             decimal scale)
         {
-            // 1. 处理布尔类型属性（转换为0/1）
+            // 1. 处理布尔类型属性 (转换为0/1)
             if (BooleanAttributes.Contains(attributeName))
             {
                 var attrValue = element.GetAttribute(attributeName);
@@ -346,23 +340,23 @@ namespace KartRider
                 {
                     return (boolVal ? 1M : 0M).ToString(CultureInfo.InvariantCulture);
                 }
-                Console.WriteLine($"[KartSpec] 警告：布尔属性{attributeName}值{attrValue}无效，用默认值{defaultValue}");
+                Console.WriteLine($"[KartSpec] 警告: 布尔属性{attributeName}值{attrValue}无效, 用默认值{defaultValue}");
                 return defaultValue.ToString(CultureInfo.InvariantCulture);
             }
 
-            // 2. 处理特殊属性：StartForwardAccelForceItem（读取Factor属性）
+            // 2. 处理特殊属性: StartForwardAccelForceItem (读取Factor属性)
             if (attributeName == "StartForwardAccelForceItem")
             {
                 return GetScaledValue(element, "StartForwardAccelFactorItem", fallbackValue, defaultValue, scale);
             }
 
-            // 3. 处理特殊属性：StartForwardAccelForceSpeed（读取Factor属性）
+            // 3. 处理特殊属性: StartForwardAccelForceSpeed (读取Factor属性)
             if (attributeName == "StartForwardAccelForceSpeed")
             {
                 return GetScaledValue(element, "StartForwardAccelFactorSpeed", fallbackValue, defaultValue, scale);
             }
 
-            // 4. 处理特殊属性：instAccelGaugeMinUsable（依赖instAccelGaugeLength）
+            // 4. 处理特殊属性: instAccelGaugeMinUsable (依赖instAccelGaugeLength)
             if (attributeName == "instAccelGaugeMinUsable")
             {
                 // 先获取instAccelGaugeLength的值
@@ -379,7 +373,7 @@ namespace KartRider
             return GetScaledValue(element, attributeName, fallbackValue, defaultValue, scale);
         }
 
-        /// <summary>辅助方法：计算缩放后的属性值（value * scale + fallback）</summary>
+        /// <summary>辅助方法: 计算缩放后的属性值 (value * scale + fallback)</summary>
         private static string GetScaledValue(
             XmlElement element,
             string actualAttrName,
@@ -390,11 +384,11 @@ namespace KartRider
             var attrValue = element.GetAttribute(actualAttrName);
             if (decimal.TryParse(attrValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedVal))
             {
-                var result = parsedVal * scale + fallback;
+                var result = (parsedVal * scale) + fallback;
                 return result.ToString(CultureInfo.InvariantCulture);
             }
 
-            Console.WriteLine($"[KartSpec] 警告：属性{actualAttrName}值{attrValue}无效，用默认值{defaultValue}");
+            Console.WriteLine($"[KartSpec] 警告: 属性{actualAttrName}值{attrValue}无效, 用默认值{defaultValue}");
             return defaultValue.ToString(CultureInfo.InvariantCulture);
         }
         #endregion

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace KartLibrary.Encrypt
 {
@@ -487,8 +483,8 @@ namespace KartLibrary.Encrypt
                 int index = i % readsCount;
                 int mul = (int)((i * 0x55555556L) >> 32);
                 mul = (mul >> 0x1F) + mul;
-                mul = (byte)((byte)(i) - (byte)(mul * 3) + 2);
-                output[i] = (byte)(data[(newStr.Length - index - 1) * 2] * mul + i);
+                mul = (byte)((byte)i - (byte)(mul * 3) + 2);
+                output[i] = (byte)((data[(newStr.Length - index - 1) * 2] * mul) + i);
             }
             return output;
         }
@@ -506,7 +502,7 @@ namespace KartLibrary.Encrypt
             {
                 uint tempNum = 0;
                 for (int j = 0; j < 4; j++)
-                    tempNum = (tempNum << 8) | (uint)((int)((sbyte)(key[(i << 2) + j])));
+                    tempNum = (tempNum << 8) | (uint)(int)(sbyte)key[(i << 2) + j];
                 var_0[i] = var_0[i + 0x8] = tempNum;
                 var_0[i + 0x4] = var_0[i + 0x0C] = ~tempNum;
             }

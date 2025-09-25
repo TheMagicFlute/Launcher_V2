@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KartLibrary.Record
+﻿namespace KartLibrary.Record
 {
     public class PlayerEquipment
     {
@@ -13,11 +7,11 @@ namespace KartLibrary.Record
         public short CharacterColor { get; set; }
         public short Kart { get; set; }
         public short Plate { get; set; }
-        public short Goggle { get; set; } //goggle
+        public short Goggle { get; set; } // goggle
         public short Balloon { get; set; }
         public short Equ2 { get; set; }
-        public short Headband { get; set; } //headBand
-        public short Replay { get; set; } //headPhone
+        public short Headband { get; set; } // headBand
+        public short Replay { get; set; } // headPhone
         public short Cane { get; set; }
         public short Equ3 { get; set; }
         public short Apparel { get; set; }

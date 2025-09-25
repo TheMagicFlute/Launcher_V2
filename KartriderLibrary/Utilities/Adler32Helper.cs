@@ -1,14 +1,9 @@
-using System;
 using System.Text;
 
 namespace KartRider.Common.Utilities
 {
-    public class Adler32Helper
+    public static class Adler32Helper
     {
-        public Adler32Helper()
-        {
-        }
-
         public static uint GenerateAdler32(byte[] str, uint a1 = 0)
         {
             uint num;
@@ -16,25 +11,25 @@ namespace KartRider.Common.Utilities
             uint length = (uint)str.Length;
             uint num2 = a1 >> 16;
             uint num3 = (ushort)a1;
-            if ((int)str.Length == 1)
+            if (str.Length == 1)
             {
                 int num4 = (int)(str[0] + num3);
                 if (num4 >= 65521)
                 {
                     num4 -= 65521;
                 }
-                int num5 = (int)((ulong)num4 + (ulong)num2);
+                int num5 = (int)((ulong)num4 + num2);
                 if (num5 >= 65521)
                 {
                     num5 -= 65521;
                 }
-                num = (uint)(num4 | num5 << 16);
+                num = (uint)(num4 | (num5 << 16));
             }
             else if (str == null)
             {
                 num = 1;
             }
-            else if ((int)str.Length < 16)
+            else if (str.Length < 16)
             {
                 if (str.Length != 0)
                 {
@@ -52,13 +47,13 @@ namespace KartRider.Common.Utilities
                 {
                     num3 -= 65521;
                 }
-                num = num3 | num2 % 65521 << 16;
+                num = num3 | ((num2 % 65521) << 16);
             }
             else
             {
-                if ((int)str.Length >= 5552)
+                if (str.Length >= 5552)
                 {
-                    uint length1 = (uint)((int)str.Length / 5552);
+                    uint length1 = (uint)(str.Length / 5552);
                     do
                     {
                         length -= 5552;
@@ -163,7 +158,7 @@ namespace KartRider.Common.Utilities
                     num3 %= 65521;
                     num2 %= 65521;
                 }
-                num = num3 | num2 << 16;
+                num = num3 | (num2 << 16);
             }
             return num;
         }
@@ -185,7 +180,7 @@ namespace KartRider.Common.Utilities
             uint num = 1;
             uint num1 = 0;
             byte[] numArray = bytes;
-            for (int i = 0; i < (int)numArray.Length; i++)
+            for (int i = 0; i < numArray.Length; i++)
             {
                 num = (num + numArray[i]) % 65521;
                 num1 = (num1 + num) % 65521;

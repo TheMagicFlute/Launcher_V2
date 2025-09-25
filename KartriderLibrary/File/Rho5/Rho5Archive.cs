@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using KartLibrary.Consts;
 using KartLibrary.Encrypt;
 using KartLibrary.IO;
@@ -238,7 +231,7 @@ namespace KartLibrary.File
             }
             if (!_dataBeginPoses.ContainsKey(dataPackID))
                 _dataBeginPoses.Add(dataPackID, 0);
-            _dataBeginPoses[dataPackID] = (int)decryptStream.Position + 0x3FF & 0x7FFFFC00;
+            _dataBeginPoses[dataPackID] = ((int)decryptStream.Position + 0x3FF) & 0x7FFFFC00;
 
             _rho5Streams.Add(dataPackID, rho5Stream);
 
@@ -264,7 +257,7 @@ namespace KartLibrary.File
             }
 
             // Enqueue all files 
-            maxSize = (int)Math.Round((double)maxSize * 1.05); // * 1.3. dataLenSum is sum of "uncompressed data" length.
+            maxSize = (int)Math.Round(maxSize * 1.05); // * 1.3. dataLenSum is sum of "uncompressed data" length.
             int filesInfoDataLen = 0;
             int dataLenSum = 0;
             Queue<Rho5File> fileQueue = new Queue<Rho5File>();
@@ -273,7 +266,7 @@ namespace KartLibrary.File
                 if (dataLenSum >= maxSize)
                     break;
                 Rho5File file = allFileQueue.Dequeue();
-                filesInfoDataLen += (0x28) + (file.FullName.Length << 1);
+                filesInfoDataLen += 0x28 + (file.FullName.Length << 1);
                 if (!file.HasDataSource)
                     throw new Exception();
                 dataLenSum += file.Size;
@@ -354,7 +347,7 @@ namespace KartLibrary.File
                     }
                     _fileHandlers.Add(file.FullName, fileHandler);
                 }
-                dataOffset = dataOffset + processedData.Length + 0x3FF & 0x7FFFFC00;
+                dataOffset = (dataOffset + processedData.Length + 0x3FF) & 0x7FFFFC00;
                 outEncryptStream.SetLength(dataOffset);
             }
 
@@ -398,7 +391,7 @@ namespace KartLibrary.File
             fileName = fileName.ToLower();
             int sum = 0;
             foreach (char c in fileName) sum += c;
-            long mpl = sum * 0xA41A41A5L >> 32;
+            long mpl = (sum * 0xA41A41A5L) >> 32;
             int result = sum - (int)mpl;
             result >>= 1;
             result += (int)mpl;
@@ -414,7 +407,7 @@ namespace KartLibrary.File
             int sum = 0;
             foreach (char c in fileName) sum += c;
             sum *= 3;
-            long mpl = sum * 0x3521CFB3L >> 32;
+            long mpl = (sum * 0x3521CFB3L) >> 32;
             int result = sum - (int)mpl;
             result >>= 1;
             result += (int)mpl;

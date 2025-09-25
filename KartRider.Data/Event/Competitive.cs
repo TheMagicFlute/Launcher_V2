@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 using KartRider.Common.Utilities;
 using Profile;
@@ -38,11 +34,11 @@ namespace RHOParser
             XDocument doc = new XDocument(
                 new XDeclaration("1.0", "utf-8", "yes"),
                 new XElement("CompetitiveDataList")
-            );
+           );
             doc.Save(FileName.Competitive_LoadFile);
         }
 
-        // 保存数据，如果Track重复则比较Time，Time小则替换
+        // 保存数据, 如果Track重复则比较Time, Time小则替换
         public void SaveData(CompetitiveData data)
         {
             if (data == null)
@@ -57,11 +53,11 @@ namespace RHOParser
 
             if (existingElement != null)
             {
-                // 存在相同Track，比较Time
+                // 存在相同Track, 比较Time
                 uint existingTime = (uint)existingElement.Attribute("Time");
                 if (data.Time < existingTime)
                 {
-                    // Time更小，替换数据
+                    // Time更小, 替换数据
                     existingElement.Attribute("Track").SetValue(data.Track);
                     existingElement.Attribute("Kart").SetValue(data.Kart);
                     existingElement.Attribute("Time").SetValue(data.Time);
@@ -75,7 +71,7 @@ namespace RHOParser
             }
             else
             {
-                // 不存在相同Track，添加新数据
+                // 不存在相同Track, 添加新数据
                 root.Add(new XElement("Data",
                     new XAttribute("Track", data.Track),
                     new XAttribute("Kart", data.Kart),
@@ -85,7 +81,7 @@ namespace RHOParser
                     new XAttribute("Crash", data.Crash),
                     new XAttribute("CrashPoint", data.CrashPoint),
                     new XAttribute("Point", data.Point)
-                ));
+               ));
             }
 
             doc.Save(FileName.Competitive_LoadFile);
@@ -123,7 +119,7 @@ namespace RHOParser
         /// <summary>
         /// 获取当前周期内的赛道ID列表
         /// </summary>
-        /// <returns>符合条件的赛道ID的列表，或空列表（异常）</returns>
+        /// <returns>符合条件的赛道ID的列表, 或空列表 (异常)</returns>
         public List<string> GetCurrentWeekTrackIds(XDocument doc)
         {
             try
@@ -145,7 +141,7 @@ namespace RHOParser
                 string openPeriod = currentCompetitive.Attribute("openPeriod").Value;
                 DateTime startTime = ParsePeriodStart(openPeriod);
 
-                // 计算当前时间属于第几周（1-4）
+                // 计算当前时间属于第几周 (1-4)
                 int weekNumber = CalculateWeekNumber(startTime, curTime);
 
                 // 查找对应的Set节点
@@ -177,7 +173,7 @@ namespace RHOParser
         /// 判断时间是否在周期内
         /// </summary>
         /// <param name="time">时间</param>
-        /// <param name="period">周期，格式为yyyy-M-dTHH:mm:ss</param>
+        /// <param name="period">周期, 格式为yyyy-M-dTHH:mm:ss</param>
         private bool IsTimeInPeriod(DateTime time, string period)
         {
             string[] periodParts = period.Split('~');
@@ -198,7 +194,7 @@ namespace RHOParser
         /// <summary>
         /// 解析周期开始时间
         /// </summary>
-        /// <param name="period">周期，格式为yyyy-M-dTHH:mm:ss</param>
+        /// <param name="period">周期, 格式为yyyy-M-dTHH:mm:ss</param>
         /// <returns>该周期开始时间</returns>
         private DateTime ParsePeriodStart(string period)
         {
@@ -208,7 +204,7 @@ namespace RHOParser
         }
 
         /// <summary>
-        /// 计算当前时间属于当月第几周（1-4）
+        /// 计算当前时间属于当月第几周 (1-4)
         /// </summary>
         /// <param name="startTime">当月开始时间</param>
         /// <param name="currentTime">当前时间</param>
@@ -264,7 +260,7 @@ namespace RHOParser
         }
 
         /// <summary>
-        /// 计算指定赛道的详细得分（碰撞得分只取最高优先级）
+        /// 计算指定赛道的详细得分 (碰撞得分只取最高优先级)
         /// </summary>
         public TrackScoreDetails CalculateTrackScoreDetails(
             uint trackId,
@@ -295,7 +291,7 @@ namespace RHOParser
         }
 
         /// <summary>
-        /// 计算加速得分（累加所有符合条件的分数）
+        /// 计算加速得分 (累加所有符合条件的分数)
         /// </summary>
         private uint CalculateBoostScore(List<DriveBonus> bonuses, short actualBoostCount)
         {
@@ -312,18 +308,18 @@ namespace RHOParser
 
         /// <summary>
         /// 计算碰撞得分
-        /// （只取最高优先级的符合条件分数）
-        /// 优先级：count值越小，优先级越高（条件越严格）
+        ///  (只取最高优先级的符合条件分数)
+        /// 优先级: count值越小, 优先级越高 (条件越严格)
         /// </summary>
         private uint CalculateCrashScoreWithPriority(List<DriveBonus> bonuses, short actualCrashCount)
         {
-            // 获取所有crash类型的奖励，并按count升序排序（优先级从高到低）
+            // 获取所有crash类型的奖励, 并按count升序排序 (优先级从高到低)
             var crashBonuses = bonuses
                 .Where(b => b.Type == "crash")
                 .OrderBy(b => b.Count)
                 .ToList();
 
-            // 依次检查，返回第一个符合条件的分数（最高优先级）
+            // 依次检查, 返回第一个符合条件的分数 (最高优先级)
             foreach (var bonus in crashBonuses)
             {
                 if (actualCrashCount < bonus.Count)
@@ -341,12 +337,12 @@ namespace RHOParser
         /// </summary>
         /// <param name="standardTime">标准时间</param>
         /// <param name="actualTime">实际用时</param>
-        /// <returns>时间成绩得分，或者0（异常）</returns>
+        /// <returns>时间成绩得分, 或者0 (异常)</returns>
         private uint CalculateTimeScore(uint standardTime, uint actualTime)
         {
             try
             {
-                // 输出计算过程，方便调试
+                // 输出计算过程, 方便调试
                 Console.WriteLine($"\n时间得分计算过程:");
                 Console.WriteLine($"标准时间: {standardTime}, 实际时间: {actualTime}");
 
@@ -357,14 +353,14 @@ namespace RHOParser
                 double score;
                 if (deviation < 0)
                 {
-                    // 实际时间更少，加分
+                    // 实际时间更少, 加分
                     double bonus = Math.Abs(deviation) * 0.5;
                     score = 10000 + bonus;
                     Console.WriteLine($"加分计算: 10000 + {Math.Abs(deviation)} × 0.5 = {10000} + {bonus} = {score}");
                 }
                 else
                 {
-                    // 实际时间更多，扣分
+                    // 实际时间更多, 扣分
                     double penalty = deviation * 0.2;
                     score = 10000 - penalty;
                     Console.WriteLine($"扣分计算: 10000 - {deviation} × 0.2 = {10000} - {penalty} = {score}");
@@ -381,7 +377,7 @@ namespace RHOParser
         }
     }
 
-    // 赛道得分明细类（包含时间成绩）
+    // 赛道得分明细类 (包含时间成绩)
     public class TrackScoreDetails
     {
         public uint TrackId { get; set; }

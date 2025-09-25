@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KartLibrary.Encrypt
+﻿namespace KartLibrary.Encrypt
 {
     public static class RhoEncrypt
     {
@@ -27,7 +20,7 @@ namespace KartLibrary.Encrypt
             return output;
         }
 
-        public unsafe static void DecryptData(uint Key, byte[] Data, int Offset, int Length)
+        public static unsafe void DecryptData(uint Key, byte[] Data, int Offset, int Length)
         {
             if ((Offset + Length) > Data.Length)
                 throw new Exception("Over range.");

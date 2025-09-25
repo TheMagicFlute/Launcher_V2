@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-
 namespace KartRider.Common.Utilities
 {
     public sealed class LockFreeQueue<T>
@@ -14,7 +11,7 @@ namespace KartRider.Common.Utilities
         {
             get
             {
-                return (this.mHead.Next == null ? default(T) : this.mHead.Next.Item);
+                return this.mHead.Next == null ? default(T) : this.mHead.Next.Item;
             }
         }
 

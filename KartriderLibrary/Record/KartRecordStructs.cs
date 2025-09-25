@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KartLibrary.Record
+﻿namespace KartLibrary.Record
 {
     public enum SpeedType
     {
@@ -12,7 +6,7 @@ namespace KartLibrary.Record
         HighSpeed,
         SuperSpeed,
         Slow,
-        Nolimit
+        NoLimit
     }
 
     public enum ContestType
@@ -28,5 +22,4 @@ namespace KartLibrary.Record
         FlagIndividual,
         TimeAttack
     }
-
 }

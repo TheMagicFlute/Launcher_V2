@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KartLibrary.IO
+﻿namespace KartLibrary.IO
 {
     public class ByteArraysStream : Stream
     {
@@ -61,7 +54,7 @@ namespace KartLibrary.IO
                 byte[] curArr = _byteArrays[_curIndex];
                 int copyLen = Math.Min(readCount, curArr.Length - curArrIndex);
                 Array.Copy(curArr, curArrIndex, buffer, bufferIndex, copyLen);
-                if ((readCount >= (curArr.Length - curArrIndex)))
+                if (readCount >= (curArr.Length - curArrIndex))
                     _curIndex++;
                 _position += copyLen;
                 readCount -= copyLen;
@@ -86,7 +79,7 @@ namespace KartLibrary.IO
             }
             if (_position > _length || _position < 0)
                 throw new Exception();
-            _curIndex = findArraysIndex((int)_position);
+            _curIndex = findArraysIndex(_position);
             return _position;
         }
 

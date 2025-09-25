@@ -1,13 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using ExcData;
-using KartLibrary.Consts;
 using KartLibrary.File;
 using KartLibrary.Xml;
 using KartRider;
@@ -37,7 +31,7 @@ namespace RHOParser
                     {
                         Console.WriteLine(fullName);
                         string name = fullName.Substring(10, fullName.Length - 23);
-                        if (!(KartExcData.flyingSpec.ContainsKey(name)))
+                        if (!KartExcData.flyingSpec.ContainsKey(name))
                         {
                             byte[] data = packFileInfo.GetData();
                             BinaryXmlDocument bxd = new BinaryXmlDocument();
@@ -81,7 +75,7 @@ namespace RHOParser
                                     XmlElement xe = (XmlElement)xn;
                                     string track = xe.GetAttribute("id");
                                     uint id = Adler32Helper.GenerateAdler32_UNICODE(track, 0);
-                                    if (!(KartExcData.track.ContainsKey(id)))
+                                    if (!KartExcData.track.ContainsKey(id))
                                     {
                                         KartExcData.track.Add(id, track);
                                     }
@@ -109,7 +103,7 @@ namespace RHOParser
                                     XmlElement xe = (XmlElement)xn;
                                     string track = xe.GetAttribute("id");
                                     uint id = Adler32Helper.GenerateAdler32_UNICODE(track, 0);
-                                    if (!(KartExcData.track.ContainsKey(id)))
+                                    if (!KartExcData.track.ContainsKey(id))
                                     {
                                         KartExcData.track.Add(id, track);
                                     }
@@ -132,7 +126,7 @@ namespace RHOParser
                                 {
                                     int id = int.Parse(kart.Attribute("id").Value);
                                     string name = kart.Attribute("name").Value;
-                                    if (!(KartExcData.KartName.ContainsKey(id)))
+                                    if (!KartExcData.KartName.ContainsKey(id))
                                     {
                                         KartExcData.KartName.Add(id, name);
                                     }
@@ -146,7 +140,7 @@ namespace RHOParser
                                 {
                                     int id = int.Parse(flyingPet.Attribute("id").Value);
                                     string name = flyingPet.Attribute("name").Value;
-                                    if (!(KartExcData.flyingName.ContainsKey(id)))
+                                    if (!KartExcData.flyingName.ContainsKey(id))
                                     {
                                         KartExcData.flyingName.Add(id, name);
                                     }
@@ -228,7 +222,7 @@ namespace RHOParser
                         Console.WriteLine(fullName);
                         byte[] data = ReplaceBytes(packFileInfo.GetData());
                         string name = fullName.Substring(6, fullName.Length - 19);
-                        if (!(KartExcData.KartSpec.ContainsKey(name)))
+                        if (!KartExcData.KartSpec.ContainsKey(name))
                         {
                             if (data[2] == 13 && data[3] == 0 && data[4] == 10 && data[5] == 0)
                             {
@@ -261,7 +255,7 @@ namespace RHOParser
                         bool containsTarget = packFolderInfo1.GetFilesInfo().Any(PackFileInfo => ReplacePath(PackFileInfo.FullName) == "kart_/" + name + "/param@" + regionCode + ".xml");
                         if (!containsTarget)
                         {
-                            if (!(KartExcData.KartSpec.ContainsKey(name)))
+                            if (!KartExcData.KartSpec.ContainsKey(name))
                             {
                                 Console.WriteLine(fullName);
                                 if (data[2] == 13 && data[3] == 0 && data[4] == 10 && data[5] == 0)
@@ -308,7 +302,7 @@ namespace RHOParser
                                 {
                                     XmlElement xe = (XmlElement)xn;
                                     int id = int.Parse(xe.GetAttribute("id"));
-                                    if (!(KartExcData.quest.Contains(id)))
+                                    if (!KartExcData.quest.Contains(id))
                                     {
                                         KartExcData.quest.Add(id);
                                     }
@@ -350,7 +344,7 @@ namespace RHOParser
                                 {
                                     XmlElement xe = (XmlElement)xn;
                                     int id = int.Parse(xe.GetAttribute("id"));
-                                    if (!(KartExcData.scenario.Contains(id)))
+                                    if (!KartExcData.scenario.Contains(id))
                                     {
                                         KartExcData.scenario.Add(id);
                                     }
@@ -423,10 +417,10 @@ namespace RHOParser
                             XDocument doc = XDocument.Load(stream);
                             XElement aiItem = doc.Descendants("aiItem").First();
 
-                            // 角色Dictionary：键为short类型的角色ID
+                            // 角色Dictionary: 键为short类型的角色ID
                             var aiCharacterDict = aiItem.Elements("character")
                                 .ToDictionary(
-                                    c => short.Parse(c.Attribute("id").Value),  // 键：short类型ID
+                                    c => short.Parse(c.Attribute("id").Value),  // 键: short类型ID
                                     c => new AICharacter
                                     {
                                         Id = short.Parse(c.Attribute("id").Value),
@@ -450,20 +444,20 @@ namespace RHOParser
                                             Item = int.Parse(g.Attribute("item").Value)
                                         }).ToList()
                                     }
-                                );
+                               );
                             KartExcData.aiCharacterDict = aiCharacterDict;
 
-                            // 卡丁车Dictionary：键为short类型的卡丁车ID
+                            // 卡丁车Dictionary: 键为short类型的卡丁车ID
                             var aiKartDict = aiItem.Elements("kart")
                                 .ToDictionary(
-                                    k => short.Parse(k.Attribute("id").Value),  // 键：short类型ID
+                                    k => short.Parse(k.Attribute("id").Value),  // 键: short类型ID
                                     k => new AIKart
                                     {
                                         Id = short.Parse(k.Attribute("id").Value),
                                         Speed = int.Parse(k.Attribute("speed").Value),
                                         Item = int.Parse(k.Attribute("item").Value),
                                     }
-                                );
+                               );
                             KartExcData.aiKartDict = aiKartDict;
                         }
                     }

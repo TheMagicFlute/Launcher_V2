@@ -1,17 +1,11 @@
-using System;
-
 namespace KartRider.Common.Security
 {
-    public class KRCrypto
+    public static class KRCrypto
     {
-        public KRCrypto()
-        {
-        }
-
         public static byte[] ApplyCrypto(byte[] input, uint key)
         {
-            byte[] numArray = new byte[(int)input.Length];
-            Buffer.BlockCopy(input, 0, numArray, 0, (int)input.Length);
+            byte[] numArray = new byte[input.Length];
+            Buffer.BlockCopy(input, 0, numArray, 0, input.Length);
             int i = 0;
             uint[] numArray1 = new uint[17];
             byte[] numArray2 = new byte[68];
@@ -24,14 +18,14 @@ namespace KartRider.Common.Security
             {
                 Buffer.BlockCopy(BitConverter.GetBytes(numArray1[i]), 0, numArray2, i * 4, 4);
             }
-            for (i = 0; i + 64 <= (int)numArray.Length; i += 64)
+            for (i = 0; i + 64 <= numArray.Length; i += 64)
             {
                 for (int j = 0; j < 16; j++)
                 {
-                    Buffer.BlockCopy(BitConverter.GetBytes(numArray1[j] ^ BitConverter.ToUInt32(numArray, i + 4 * j)), 0, numArray, i + 4 * j, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(numArray1[j] ^ BitConverter.ToUInt32(numArray, i + (4 * j))), 0, numArray, i + (4 * j), 4);
                 }
             }
-            for (int k = i; k < (int)numArray.Length; k++)
+            for (int k = i; k < numArray.Length; k++)
             {
                 numArray[k] = (byte)(numArray[k] ^ numArray2[k - i]);
             }

@@ -1,5 +1,7 @@
+using System.Net;
+using System.Text;
+using System.Xml;
 using ExcData;
-using KartRider;
 using KartRider.Common.Network;
 using KartRider.Common.Utilities;
 using KartRider.IO.Packet;
@@ -7,19 +9,12 @@ using KartRider_PacketName;
 using Profile;
 using RHOParser;
 using RiderData;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Windows.Forms;
-using System.Xml;
-using System.Xml.Linq;
 
 namespace KartRider
 {
+    /// <summary>
+    /// 处理客户端连接的会话的类
+    /// </summary>
     public class ClientSession : Session
     {
         public SessionGroup Parent { get; set; }
@@ -34,6 +29,7 @@ namespace KartRider
         public override void OnDisconnect()
         {
             this.Parent.Client.Disconnect();
+            Console.WriteLine("[Client] Client Disconnected!");
         }
 
         public override void OnPacket(InPacket iPacket)
@@ -44,12 +40,12 @@ namespace KartRider
                 iPacket.Position = 0;
                 uint hash = iPacket.ReadUInt();
                 string packetDetail = BitConverter.ToString(iPacket.ToArray()).Replace("-", "");
-                if (hash != 1950550337) // PqServerSideUdpBindCheck
+                if (hash != Adler32Helper.GenerateAdler32_ASCII("PqServerSideUdpBindCheck", 0)) // hash != 1950550337
                 {
                     if (ProfileService.ProfileConfig.ServerSetting.ShowPacketDetail)
-                        Console.WriteLine($"[Handling]{(PacketName)hash}: {packetDetail}");
+                        Console.WriteLine($"[Handling] {(PacketName)hash}: {packetDetail}");
                     else
-                        Console.WriteLine($"[Handling]{(PacketName)hash}");
+                        Console.WriteLine($"[Handling] {(PacketName)hash}");
                 }
                 if (hash == Adler32Helper.GenerateAdler32_ASCII("PqCnAuthenLogin", 0))
                 {
@@ -63,17 +59,34 @@ namespace KartRider
                     }
                     return;
                 }
-                if (hash == Adler32Helper.GenerateAdler32(Encoding.ASCII.GetBytes("PcReportRaidOccur"), 0) ? false : hash != 1340475309)//PqGameReportMyBadUdp
+                if (hash != Adler32Helper.GenerateAdler32(Encoding.ASCII.GetBytes("PcReportRaidOccur"), 0)
+                 && hash != Adler32Helper.GenerateAdler32_ASCII("PqGameReportMyBadUdp", 0)) // hash != 1340475309
                 {
-                    if (hash == Adler32Helper.GenerateAdler32_ASCII("GrRiderTalkPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqEnterMagicHatPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoPingRequestPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventInitPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqCountdownBoxPeriodPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqServerSideUdpBindCheck", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqVipGradeCheck", 0))
+                    if (hash == Adler32Helper.GenerateAdler32_ASCII("GrRiderTalkPacket", 0)
+                     || hash == Adler32Helper.GenerateAdler32_ASCII("PqEnterMagicHatPacket", 0)
+                     || hash == Adler32Helper.GenerateAdler32_ASCII("LoPingRequestPacket", 0)
+                     || hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventInitPacket", 0)
+                     || hash == Adler32Helper.GenerateAdler32_ASCII("PqCountdownBoxPeriodPacket", 0)
+                     || hash == Adler32Helper.GenerateAdler32_ASCII("PqServerSideUdpBindCheck", 0)
+                     || hash == Adler32Helper.GenerateAdler32_ASCII("PqVipGradeCheck", 0))
                     {
                         return;
                     }
-                    else if (hash == Adler32Helper.GenerateAdler32_ASCII("LoRqUpdateRiderSchoolDataPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("RmRiderTalkPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqNeedTimerGiftEvent", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("GameBoosterAddPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqCheckReplayItemPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqGetRecommandChatServerInfo", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoCheckLoginEvent", 0))
+                    else if (hash == Adler32Helper.GenerateAdler32_ASCII("LoRqUpdateRiderSchoolDataPacket", 0)
+                        || hash == Adler32Helper.GenerateAdler32_ASCII("RmRiderTalkPacket", 0)
+                        || hash == Adler32Helper.GenerateAdler32_ASCII("PqNeedTimerGiftEvent", 0)
+                        || hash == Adler32Helper.GenerateAdler32_ASCII("GameBoosterAddPacket", 0)
+                        || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqCheckReplayItemPacket", 0)
+                        || hash == Adler32Helper.GenerateAdler32_ASCII("PqGetRecommandChatServerInfo", 0)
+                        || hash == Adler32Helper.GenerateAdler32_ASCII("LoCheckLoginEvent", 0))
                     {
                         return;
                     }
-                    else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqBlockWordLogPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqWriteActionLogPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventTimerPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("VipPlaytimeCheck", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqEventRewardPacket", 0))
+                    else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqBlockWordLogPacket", 0)
+                        || hash == Adler32Helper.GenerateAdler32_ASCII("PqWriteActionLogPacket", 0)
+                        || hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventTimerPacket", 0)
+                        || hash == Adler32Helper.GenerateAdler32_ASCII("VipPlaytimeCheck", 0)
+                        || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqEventRewardPacket", 0))
                     {
                         // PqGetRecommandChatServerInfo = 라이더 챗 // Chat
                         return;
@@ -146,7 +159,7 @@ namespace KartRider
                         int TimeAttackStartTicks = iPacket.ReadInt();
                         this.Parent.TimeAttackStartTicks = TimeAttackStartTicks;
                         this.Parent.PlaneCheck1 = (byte)this.Parent.TimeAttackStartTicks;
-                        uint key = CryptoConstants.GetKey(CryptoConstants.GetKey((uint)this.Parent.TimeAttackStartTicks)) % 5 + 6;
+                        uint key = (CryptoConstants.GetKey(CryptoConstants.GetKey((uint)this.Parent.TimeAttackStartTicks)) % 5) + 6;
                         ALLnum = (int)key;
                         this.Parent.SendPlaneCount = (int)key;
                         this.Parent.TotalSendPlaneCount = 0;
@@ -178,7 +191,7 @@ namespace KartRider
                         int hash4 = iPacket.ReadInt();
                         byte[] hashArray3 = iPacket.ReadBytes(16);
                         this.Parent.TotalSendPlaneCount += PlaneCheck;
-                        Console.WriteLine("PlaneCheck: {0}, Total: {1}, Max: {2}, Dist: {3}", PlaneCheck, this.Parent.TotalSendPlaneCount, this.Parent.SendPlaneCount, single3);
+                        Console.WriteLine($"PlaneCheck: {PlaneCheck}, Total: {this.Parent.TotalSendPlaneCount}, Max: {this.Parent.SendPlaneCount}, Dist: {single3}");
                         return;
                     }
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("SpRqRenameRidPacket", 0))
@@ -417,7 +430,7 @@ namespace KartRider
                         ProfileService.ProfileConfig.GameOption.AutoBoost = iPacket.ReadByte();
                         ProfileService.ProfileConfig.GameOption.GameType = iPacket.ReadByte();
                         ProfileService.ProfileConfig.GameOption.SetGhost = iPacket.ReadByte();
-                        // 速度由客户端控制，游戏内调整速度不生效
+                        // 速度由客户端控制, 游戏内调整速度不生效
                         // ProfileService.ProfileConfig.GameOption.SpeedType = iPacket.ReadByte();
                         iPacket.ReadByte();
                         ProfileService.ProfileConfig.GameOption.RoomChat = iPacket.ReadByte();
@@ -701,7 +714,7 @@ namespace KartRider
                         short SN = iPacket.ReadShort();
                         iPacket.ReadBytes(6);
                         byte[] data = iPacket.ReadBytes(28);
-                        Console.WriteLine("DisassembleXPartsItem: " + Kart + " " + SN);
+                        Console.WriteLine($"[DisassembleXPartsItem] Kart: {Kart} SN: {SN}");
                         using (OutPacket outPacket = new OutPacket("PrDisassembleXPartsItem"))
                         {
                             outPacket.WriteInt(0);
@@ -1112,7 +1125,7 @@ namespace KartRider
                             }
                             else
                             {
-                                existingList[6] = (short)((int)existingList[6] - 1);
+                                existingList[6] = (short)(existingList[6] - 1);
                             }
                             if (existingList[8] == 0)
                             {
@@ -1120,16 +1133,16 @@ namespace KartRider
                             }
                             else
                             {
-                                existingList[8] = (short)((int)existingList[8] - 1);
+                                existingList[8] = (short)(existingList[8] - 1);
                             }
-                            Console.WriteLine("TuneProtect: " + existingList[5] + ", " + existingList[7]);
-                            Console.WriteLine("TuneProtectCount: " + existingList[6] + ", " + existingList[8]);
+                            Console.WriteLine($"TuneProtect: {existingList[5]}, {existingList[7]}");
+                            Console.WriteLine($"TuneProtectCount: {existingList[6]}, {existingList[8]}");
                             for (int i = 2; i <= 4; i++)
                             {
-                                if (existingList[5] != -1 && (int)(existingList[5]) + 2 == i)
+                                if (existingList[5] != -1 && existingList[5] + 2 == i)
                                 {
                                 }
-                                else if (existingList[7] != -1 && (int)(existingList[7]) + 2 == i)
+                                else if (existingList[7] != -1 && existingList[7] + 2 == i)
                                 {
                                 }
                                 else
@@ -1137,7 +1150,7 @@ namespace KartRider
                                     existingList[i] = 0;
                                 }
                             }
-                            Console.WriteLine("TuneList: " + existingList[2] + ", " + existingList[3] + ", " + existingList[4]);
+                            Console.WriteLine($"TuneList: {existingList[2]}, {existingList[3]}, {existingList[4]}");
                             KartExcData.SaveTuneList(KartExcData.TuneList);
                             ExcSpec.Use_ExcSpec(Kart, KartSN);
                         }
@@ -1208,7 +1221,7 @@ namespace KartRider
                             this.Parent.Client.Send(outPacket);
                         }
                         KartExcData.AddPartsList(Kart, KartSN, Item_Cat_Id, Item_Id, Grade, PartsValue);
-                        Console.WriteLine("ClientSession : Kart: {0}, KartSN: {1}, Item: {2}:{3}, Quantity: {4}, Grade: {5}, PartsValue: {6}", Kart, KartSN, Item_Cat_Id, Item_Id, Quantity, Grade, PartsValue);
+                        Console.WriteLine($"ClientSession : Kart: {Kart}, KartSN: {KartSN}, Item: {Item_Cat_Id}:{Item_Id}, Quantity: {Quantity}, Grade: {Grade}, PartsValue: {PartsValue}");
                         ExcSpec.Use_PartsSpec(Kart, KartSN);
                         return;
                     }
@@ -1224,7 +1237,7 @@ namespace KartRider
                             outPacket.WriteInt(0);
                             outPacket.WriteInt(0);
                             outPacket.WriteByte(0); // 完成赛道
-                            outPacket.WriteByte(0); // 使用加速器道具（完成时累积）
+                            outPacket.WriteByte(0); // 使用加速器道具 (完成时累积)
                             outPacket.WriteByte(0); // 撞击次数%s次以内
                             outPacket.WriteByte(0); // 达成赛道纪录
                             this.Parent.Client.Send(outPacket);
@@ -1253,7 +1266,7 @@ namespace KartRider
                     }
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqAdjustDuelMissionDifficulty", 0))
                     {
-                        Console.WriteLine("PqAdjustDuelMissionDifficulty: {0}", iPacket);
+                        Console.WriteLine($"PqAdjustDuelMissionDifficulty: {iPacket}");
                         int type = iPacket.ReadInt();
                         int unk = iPacket.ReadInt();
                         using (OutPacket outPacket = new OutPacket("PrAdjustDuelMissionDifficulty"))
@@ -1298,7 +1311,7 @@ namespace KartRider
                         {
                             short theme = iPacket.ReadShort();  // 主题代码 Theme Code
                             int track = iPacket.ReadInt();      // 赛道代码 Track Code
-                            byte Add_Del = iPacket.ReadByte();  // 1添加，2删除 1:ADD, 2:DEL
+                            byte Add_Del = iPacket.ReadByte();  // 1添加, 2删除 1:ADD, 2:DEL
                             if (Add_Del == 1)
                             {
                                 FavoriteItem.Favorite_Track_Add(theme, track);
@@ -1340,7 +1353,7 @@ namespace KartRider
                             ProfileService.ProfileConfig.Rider.Lucci -= 1000;
                             ProfileService.Save();
                         }
-                        Console.WriteLine("StartTimeAttack: {0} / {1} / {2} / {3} / {4} / {5} / {6} / {7}", StartGameData.StartTimeAttack_SpeedType, StartGameData.StartTimeAttack_GameType, StartGameData.Kart_id, StartGameData.FlyingPet_id, RandomTrack.GetTrackName(StartGameData.StartTimeAttack_Track), StartGameData.StartTimeAttack_StartType, StartGameData.StartTimeAttack_RankingTimaAttackType, StartGameData.StartTimeAttack_TimaAttackMpdeType);
+                        Console.WriteLine($"StartTimeAttack: {StartGameData.StartTimeAttack_SpeedType} / {StartGameData.StartTimeAttack_GameType} / {StartGameData.Kart_id} / {StartGameData.FlyingPet_id} / {RandomTrack.GetTrackName(StartGameData.StartTimeAttack_Track)} / {StartGameData.StartTimeAttack_StartType} / {StartGameData.StartTimeAttack_RankingTimaAttackType} / {StartGameData.StartTimeAttack_TimaAttackMpdeType}");
                         GameType.StartType = 3;
                         RandomTrack.SetGameType();
                         StartGameData.Start_KartSpac();
@@ -1357,7 +1370,7 @@ namespace KartRider
                         iPacket.ReadInt();
                         Time = iPacket.ReadUInt();
                         GameType.min = Time / 60000;
-                        uint sec = Time - GameType.min * 60000;
+                        uint sec = Time - (GameType.min * 60000);
                         GameType.sec = sec / 1000;
                         GameType.mil = Time % 1000;
                         if (GameType.RewardType == 0)
@@ -1372,7 +1385,7 @@ namespace KartRider
                         }
                         ProfileService.ProfileConfig.Rider.RP += GameType.TimeAttack_RP;
                         ProfileService.ProfileConfig.Rider.Lucci += GameType.TimeAttack_Lucci;
-                        Console.WriteLine("FinishTimeAttack: {0} / {1} / {2} / {3} / {4}:{5}:{6}", GameType.RewardType, GameType.TimeAttack_RP, GameType.TimeAttack_Lucci, RandomTrack.GetTrackName(StartGameData.StartTimeAttack_Track), GameType.min, GameType.sec, GameType.mil);
+                        Console.WriteLine($"FinishTimeAttack: {GameType.RewardType} / {GameType.TimeAttack_RP} / {GameType.TimeAttack_Lucci} / {RandomTrack.GetTrackName(StartGameData.StartTimeAttack_Track)} / {GameType.min}:{GameType.sec}:{GameType.mil}");
                         using (OutPacket outPacket = new OutPacket("PrFinishTimeAttack"))
                         {
                             outPacket.WriteInt(type);
@@ -1382,7 +1395,7 @@ namespace KartRider
                                 outPacket.WriteInt(0);
                                 outPacket.WriteInt(0);
                                 outPacket.WriteByte(0); // 完成赛道
-                                outPacket.WriteByte(0); // 使用加速器道具（完成时累积）
+                                outPacket.WriteByte(0); // 使用加速器道具 (完成时累积)
                                 outPacket.WriteByte(0); // 撞击次数%s次以内
                                 outPacket.WriteByte(0); // 达成赛道纪录
                                 outPacket.WriteInt(0);
@@ -1419,7 +1432,7 @@ namespace KartRider
                         int Lucci = iPacket.ReadInt();
                         int TimeAttack_StartTicks = iPacket.ReadInt();
                         uint Track = iPacket.ReadUInt();
-                        Console.WriteLine("RewardTimeAttack : ResultType: {0}, RP: {1}, Lucci: {2}, Track: {3}", RewardType, RP, Lucci, RandomTrack.GetTrackName(Track));
+                        Console.WriteLine($"RewardTimeAttack : ResultType: {RewardType}, RP: {RP}, Lucci: {Lucci}, Track: {RandomTrack.GetTrackName(Track)}");
                         if (RewardType == 0)
                         {
                             ProfileService.ProfileConfig.Rider.RP += 10;
@@ -1464,7 +1477,7 @@ namespace KartRider
                     }
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqGetTrainingMissionReward", 0))
                     {
-                        Console.WriteLine("PqGetTrainingMissionReward: {0}", iPacket);
+                        Console.WriteLine($"PqGetTrainingMissionReward: {iPacket}");
                         return;
                     }
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqRequestKartInfoPacket", 0))
@@ -2126,7 +2139,7 @@ namespace KartRider
                             oPacket.WriteByte(1); // 엠블럼 체크 Badge Check
                             oPacket.WriteByte(step);
                             oPacket.WriteByte(6);
-                            oPacket.WriteByte((byte)((int)step + 1));
+                            oPacket.WriteByte((byte)(step + 1));
                             oPacket.WriteInt(0);
                             oPacket.WriteInt(0);
                             oPacket.WriteInt(0);
@@ -3061,10 +3074,10 @@ namespace KartRider
                                 outPacket.WriteShort(3);
                                 outPacket.WriteShort(kart);
                                 outPacket.WriteShort(sn);
-                                short Level = (short)((int)existingParts[2] + 1);
+                                short Level = (short)(existingParts[2] + 1);
                                 existingParts[2] = Level;
                                 outPacket.WriteShort(Level); // 1-1, 2-3, 3-6, 4-10, 5-15
-                                short Point = (short)((int)existingParts[9] + (int)Level);
+                                short Point = (short)(existingParts[9] + Level);
                                 existingParts[9] = Point;
                                 outPacket.WriteShort(Point);
                                 outPacket.WriteShort(0);
@@ -3073,7 +3086,7 @@ namespace KartRider
                                 outPacket.WriteInt(0);
                                 outPacket.WriteInt(0);
                                 outPacket.WriteInt(0);
-                                outPacket.WriteUInt(money[(int)Level]);
+                                outPacket.WriteUInt(money[Level]);
                                 outPacket.WriteUInt(ProfileService.ProfileConfig.Rider.Lucci);
                                 this.Parent.Client.Send(outPacket);
                                 KartExcData.AddLevel12List(kart, sn, Level, -1, -1, -1, Point);
@@ -3218,13 +3231,13 @@ namespace KartRider
                                     outPacket.WriteShort(kart);
                                     outPacket.WriteShort(sn);
                                     outPacket.WriteShort(field);
-                                    outPacket.WriteShort((short)((int)skilllevel + 1));
+                                    outPacket.WriteShort((short)(skilllevel + 1));
                                     outPacket.WriteByte(1);
-                                    outPacket.WriteShort((short)((int)point - 1));
+                                    outPacket.WriteShort((short)(point - 1));
                                     outPacket.WriteByte(1);
                                     this.Parent.Client.Send(outPacket);
                                 }
-                                KartExcData.AddLevel12List(kart, sn, -1, field, -1, (short)((int)skilllevel + 1), (short)((int)point - 1));
+                                KartExcData.AddLevel12List(kart, sn, -1, field, -1, (short)(skilllevel + 1), (short)(point - 1));
                             }
                             else if (AddDel == 0)
                             {
@@ -3233,13 +3246,13 @@ namespace KartRider
                                     outPacket.WriteShort(kart);
                                     outPacket.WriteShort(sn);
                                     outPacket.WriteShort(field);
-                                    outPacket.WriteShort((short)((int)skilllevel - 1));
+                                    outPacket.WriteShort((short)(skilllevel - 1));
                                     outPacket.WriteByte(0);
-                                    outPacket.WriteShort((short)((int)point + 1));
+                                    outPacket.WriteShort((short)(point + 1));
                                     outPacket.WriteByte(0);
                                     this.Parent.Client.Send(outPacket);
                                 }
-                                KartExcData.AddLevel12List(kart, sn, -1, field, -1, (short)((int)skilllevel - 1), (short)((int)point + 1));
+                                KartExcData.AddLevel12List(kart, sn, -1, field, -1, (short)(skilllevel - 1), (short)(point + 1));
                             }
                         }
                         return;
@@ -3376,7 +3389,7 @@ namespace KartRider
                             existing12List[17] = (short)ExceedType;
                             KartExcData.SaveParts12List(KartExcData.Parts12List);
                         }
-                        Console.WriteLine("ExceedType: " + ExceedType);
+                        Console.WriteLine($"ExceedType: {ExceedType}");
                         return;
                     }
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqMissionAttendNRUserStatePacket", 0))

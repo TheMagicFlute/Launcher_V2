@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using KartLibrary.Record;
-using KartLibrary.Xml;
 
 namespace KartLibrary.IO
 {
@@ -137,10 +133,10 @@ namespace KartLibrary.IO
             bw.Write((short)(data.Y * 10));
             bw.Write((short)(data.Z * 10));
 
-            bw.Write((short)((data.Angle.W) * 100));
+            bw.Write((short)(data.Angle.W * 100));
             bw.Write((short)(data.Angle.X * 100));
             bw.Write((short)(data.Angle.Y * 100));
-            bw.Write((short)((data.Angle.Z) * 100));
+            bw.Write((short)(data.Angle.Z * 100));
             /*
             bw.Write((short)((data.angle_W) * 100));
             bw.Write((short)(data.angle_X * 100));
@@ -155,7 +151,7 @@ namespace KartLibrary.IO
             DateTime dt = new DateTime(1900, 1, 1);
             TimeSpan ts = dateTime - dt;
             uint date = (uint)ts.TotalDays;
-            uint time = (uint)(dateTime.Hour * 3600 + dateTime.Minute * 60 + dateTime.Second) >> 2;
+            uint time = (uint)((dateTime.Hour * 3600) + (dateTime.Minute * 60) + dateTime.Second) >> 2;
             bw.Write((ushort)date);
             bw.Write((ushort)time);
         }
@@ -188,11 +184,11 @@ namespace KartLibrary.IO
                 {
                     if ((j & 1) == 1)
                     {
-                        oddSum += (uint)curStamps[j].Status;
+                        oddSum += curStamps[j].Status;
                     }
                     else
                     {
-                        evenSum += (uint)curStamps[j].Status;
+                        evenSum += curStamps[j].Status;
                     }
                 }
             }

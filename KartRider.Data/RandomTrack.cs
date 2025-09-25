@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Xml;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using ExcData;
 using KartRider.Common.Utilities;
 
@@ -15,9 +12,9 @@ namespace KartRider
 
         public static string GetTrackName(uint trackId)
         {
-            if (KartExcData.track.ContainsKey(trackId))
+            if (KartExcData.track.TryGetValue(trackId, out string? value))
             {
-                return KartExcData.track[trackId];
+                return value;
             }
             else
             {
@@ -302,7 +299,7 @@ namespace KartRider
             if (RandomTrack.SetRandomTrack != "Unknown")
             {
                 StartGameData.StartTimeAttack_Track = Adler32Helper.GenerateAdler32_UNICODE(RandomTrack.GameTrack, 0);
-                Console.WriteLine("RandomTrack: {0} / {1} / {2}", RandomTrack.GameType, RandomTrack.SetRandomTrack, RandomTrack.GameTrack);
+                Console.WriteLine($"RandomTrack: {RandomTrack.GameType} / {RandomTrack.SetRandomTrack} / {RandomTrack.GameTrack}");
             }
             SpeedType.SpeedTypeData();
         }

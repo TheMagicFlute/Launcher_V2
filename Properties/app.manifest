@@ -4,7 +4,7 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-        <!-- 要求以管理员身份运行 -->
+        <!-- Require Administrator Permission -->
         <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
       </requestedPrivileges>
     </security>

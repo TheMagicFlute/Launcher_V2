@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Pipes;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Numerics;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.Xml;
-using System.Text;
+﻿using System.Text;
 using KartLibrary.Encrypt;
 using KartLibrary.IO;
 
@@ -20,7 +8,7 @@ namespace KartLibrary.File
     /// <see cref="RhoFile"/> represents a Rho type archive. You can open and save Rho file with this class.
     /// </summary>
     /// <summary lang="zh-tw">
-    /// <see cref="RhoFile"/>用來表示一個Rho檔案。你能藉此類型來開啟及儲存Rho類型檔案.
+    /// <see cref="RhoFile"/>用來表示一個Rho檔案.你能藉此類型來開啟及儲存Rho類型檔案.
     /// </summary>
     public partial class RhoArchive : IRhoArchive<RhoFolder, RhoFile>
     {
@@ -268,7 +256,7 @@ namespace KartLibrary.File
                 _fileHandlers = new Dictionary<uint, RhoFileHandler>(dataSavingQueue.Count);
             // Begin write to out file.
             FileStream outFileStream = new FileStream(fullName, FileMode.Create);
-            int dataInfoSize = (((dataSavingQueue.Count) * 0x20) + 0xFF) & (0x7FFFFF00);
+            int dataInfoSize = ((dataSavingQueue.Count * 0x20) + 0xFF) & (0x7FFFFF00);
             int dataBeginOffset = 0x100 + dataInfoSize;
             dataEndOffset += dataBeginOffset;
 
@@ -294,11 +282,11 @@ namespace KartLibrary.File
                 }
                 else if (_layerVersion == 1)
                 {
-                    memWriter.Write((int)1);
+                    memWriter.Write(1);
                     memWriter.Write(outRhoKey - 0x397E40C3);
                     memWriter.Write(outDataHash);
                     memWriter.Write(0xFC1F9778);
-                    memWriter.Write((int)0x7E);
+                    memWriter.Write(0x7E);
                 }
                 memStream.Seek(0, SeekOrigin.Begin);
                 memStream.Read(rhoHeaderData, 4, (int)memStream.Length);
@@ -487,7 +475,7 @@ namespace KartLibrary.File
                     byte[] fileData = subFile.DataSource.GetBytes();
                     uint fileChksum = 0;
 
-                    while (((usedIndex.Contains(fileDataIndex) || usedIndex.Contains(fileDataIndex + 1))))
+                    while (usedIndex.Contains(fileDataIndex) || usedIndex.Contains(fileDataIndex + 1))
                         fileDataIndex += 0x4D21CB4F;
 
                     if (subFile.FileEncryptionProperty == RhoFileProperty.Encrypted || subFile.FileEncryptionProperty == RhoFileProperty.CompressedEncrypted)

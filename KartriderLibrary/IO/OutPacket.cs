@@ -1,6 +1,4 @@
-using System;
 using System.Globalization;
-using System.IO;
 using System.Net;
 using System.Text;
 using KartNew.Utilities;
@@ -38,7 +36,7 @@ namespace KartRider.IO.Packet
             }
             set
             {
-                this.m_stream.Position = (long)value;
+                this.m_stream.Position = value;
             }
         }
 
@@ -89,7 +87,7 @@ namespace KartRider.IO.Packet
         public void WriteBool(bool value)
         {
             this.ThrowIfDisposed();
-            this.WriteByte((byte)((value ? 1 : 0)));
+            this.WriteByte((byte)(value ? 1 : 0));
         }
 
         public void WriteByte(byte value = 0)
@@ -101,7 +99,7 @@ namespace KartRider.IO.Packet
         public void WriteBytes(params byte[] value)
         {
             this.ThrowIfDisposed();
-            this.m_stream.Write(value, 0, (int)value.Length);
+            this.m_stream.Write(value, 0, value.Length);
         }
 
         public void WriteEncByte(byte value)
@@ -164,7 +162,7 @@ namespace KartRider.IO.Packet
         public void WriteInt(int value = 0)
         {
             this.ThrowIfDisposed();
-            this.Append((long)value, 4);
+            this.Append(value, 4);
         }
 
         public void WriteLong(long value = 0L)
@@ -181,7 +179,7 @@ namespace KartRider.IO.Packet
         public void WriteShort(short value = 0)
         {
             this.ThrowIfDisposed();
-            this.Append((long)value, 2);
+            this.Append(value, 2);
         }
 
         public void WriteString(string value)
@@ -197,7 +195,7 @@ namespace KartRider.IO.Packet
         public void WriteString(string value, int length)
         {
             int i;
-            if ((value == null || length < 0 ? true : length > value.Length))
+            if (value == null || length < 0 ? true : length > value.Length)
             {
                 throw new ArgumentNullException("value");
             }
@@ -217,16 +215,16 @@ namespace KartRider.IO.Packet
 
         public void WriteTime(DateTime time)
         {
-            this.WriteTime((time == DateTime.MinValue ? (long)-1 : time.Ticks));
+            this.WriteTime(time == DateTime.MinValue ? -1 : time.Ticks);
         }
 
         public void WriteTime(long ticks)
         {
-            if (ticks != (long)-1)
+            if (ticks != -1)
             {
                 DateTime dateTime = new DateTime(ticks);
                 this.WriteShort((short)(TimeUtil.GetDays(dateTime) - 1));
-                this.WriteShort((short)(dateTime.Second / 4 + dateTime.Minute * 15 + dateTime.Hour * 900));
+                this.WriteShort((short)((dateTime.Second / 4) + (dateTime.Minute * 15) + (dateTime.Hour * 900)));
             }
             else
             {

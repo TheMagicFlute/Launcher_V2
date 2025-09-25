@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KartLibrary.IO
+﻿namespace KartLibrary.IO
 {
     public unsafe class BytesReader
     {
@@ -34,10 +28,10 @@ namespace KartLibrary.IO
         {
             if (_pos + 2 >= _baseData.Length)
                 throw new IndexOutOfRangeException();
-            fixed (byte* ptr = &(_baseData[_pos]))
+            fixed (byte* ptr = &_baseData[_pos])
             {
                 _pos += 2;
-                return *((short*)ptr);
+                return *(short*)ptr;
             }
         }
 
@@ -45,10 +39,10 @@ namespace KartLibrary.IO
         {
             if (_pos + 2 >= _baseData.Length)
                 throw new IndexOutOfRangeException();
-            fixed (byte* ptr = &(_baseData[_pos]))
+            fixed (byte* ptr = &_baseData[_pos])
             {
                 _pos += 2;
-                return *((ushort*)ptr);
+                return *(ushort*)ptr;
             }
         }
 
@@ -56,10 +50,10 @@ namespace KartLibrary.IO
         {
             if (_pos + 4 >= _baseData.Length)
                 throw new IndexOutOfRangeException();
-            fixed (byte* ptr = &(_baseData[_pos]))
+            fixed (byte* ptr = &_baseData[_pos])
             {
                 _pos += 4;
-                return *((int*)ptr);
+                return *(int*)ptr;
             }
         }
 
@@ -67,10 +61,10 @@ namespace KartLibrary.IO
         {
             if (_pos + 4 >= _baseData.Length)
                 throw new IndexOutOfRangeException();
-            fixed (byte* ptr = &(_baseData[_pos]))
+            fixed (byte* ptr = &_baseData[_pos])
             {
                 _pos += 4;
-                return *((uint*)ptr);
+                return *(uint*)ptr;
             }
         }
 
@@ -78,10 +72,10 @@ namespace KartLibrary.IO
         {
             if (_pos + 8 >= _baseData.Length)
                 throw new IndexOutOfRangeException();
-            fixed (byte* ptr = &(_baseData[_pos]))
+            fixed (byte* ptr = &_baseData[_pos])
             {
                 _pos += 8;
-                return *((long*)ptr);
+                return *(long*)ptr;
             }
         }
 
@@ -89,10 +83,10 @@ namespace KartLibrary.IO
         {
             if (_pos + 8 >= _baseData.Length)
                 throw new IndexOutOfRangeException();
-            fixed (byte* ptr = &(_baseData[_pos]))
+            fixed (byte* ptr = &_baseData[_pos])
             {
                 _pos += 8;
-                return *((ulong*)ptr);
+                return *(ulong*)ptr;
             }
         }
     }

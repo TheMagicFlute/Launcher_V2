@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using KartLibrary.IO;
-
-namespace KartLibrary.File
+﻿namespace KartLibrary.File
 {
     public class Rho5Folder : IRhoFolder<Rho5Folder, Rho5File>, IModifiableRhoFolder<Rho5Folder, Rho5File>
     {

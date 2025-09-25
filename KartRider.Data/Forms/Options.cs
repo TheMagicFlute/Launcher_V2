@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using KartRider;
-using KartRider.IO.Packet;
+﻿using KartRider.IO.Packet;
 using Profile;
 using static KartRider.LauncherSystem;
 using static KartRider.Program;
-using static KartRider.Update;
 
 namespace KartRider
 {

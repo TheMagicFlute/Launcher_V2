@@ -1,5 +1,3 @@
-using System;
-using System.Xml;
 using ExcData;
 using KartRider;
 using KartRider.IO.Packet;

@@ -1,6 +1,4 @@
-﻿using System;
-using KartRider;
-using Profile;
+﻿using Profile;
 
 namespace ExcData
 {

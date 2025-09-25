@@ -1,4 +1,3 @@
-using System;
 using System.Net;
 using System.Text;
 using KartNew.Utilities;
@@ -15,7 +14,7 @@ namespace KartRider.IO.Packet
         {
             get
             {
-                return (int)this._buffer.Length - this._index;
+                return _buffer.Length - this._index;
             }
         }
 
@@ -23,7 +22,7 @@ namespace KartRider.IO.Packet
         {
             get
             {
-                return (int)this._buffer.Length;
+                return _buffer.Length;
             }
         }
 
@@ -47,7 +46,7 @@ namespace KartRider.IO.Packet
 
         private void CheckLength(int length)
         {
-            if ((this._index + length > (int)this._buffer.Length ? true : length < 0))
+            if (this._index + length > _buffer.Length ? true : length < 0)
             {
                 throw new PacketReadException("Not enough space");
             }
@@ -104,7 +103,7 @@ namespace KartRider.IO.Packet
 
         public IPEndPoint ReadEndPoint()
         {
-            IPEndPoint pEndPoint = new IPEndPoint(new IPAddress(this.ReadBytes(4)), (int)this.ReadUShort());
+            IPEndPoint pEndPoint = new IPEndPoint(new IPAddress(this.ReadBytes(4)), this.ReadUShort());
             return pEndPoint;
         }
 
@@ -190,7 +189,7 @@ namespace KartRider.IO.Packet
                 num *= 2;
             }
             this.CheckLength(num);
-            str = (!ascii ? Encoding.Unicode.GetString(this.ReadBytes(num)) : Encoding.ASCII.GetString(this.ReadBytes(num)));
+            str = !ascii ? Encoding.Unicode.GetString(this.ReadBytes(num)) : Encoding.ASCII.GetString(this.ReadBytes(num));
             return str;
         }
 
@@ -201,7 +200,7 @@ namespace KartRider.IO.Packet
             ushort num1 = this.ReadUShort();
             if (num != 65535)
             {
-                uint num2 = (uint)(num * 21600 + num1);
+                uint num2 = (uint)((num * 21600) + num1);
                 int num3 = (int)(num2 / 21600);
                 int year = TimeUtil.GetYear(ref num3) + 1900;
                 int month = TimeUtil.GetMonth(ref num3, TimeUtil.IsLeapYear(year)) + 1;
@@ -225,8 +224,8 @@ namespace KartRider.IO.Packet
 
         public override byte[] ToArray()
         {
-            byte[] numArray = new byte[(int)this._buffer.Length];
-            Buffer.BlockCopy(this._buffer, 0, numArray, 0, (int)this._buffer.Length);
+            byte[] numArray = new byte[_buffer.Length];
+            Buffer.BlockCopy(this._buffer, 0, numArray, 0, _buffer.Length);
             return numArray;
         }
     }

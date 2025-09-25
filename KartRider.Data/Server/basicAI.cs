@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-
 namespace KartRider
 {
-    // 配件类（气球/头带/护目镜）
+    // 配件类 (气球/头带/护目镜)
     public class AIAccessory
     {
         public short Id { get; set; }      // ID改为short
@@ -17,7 +12,7 @@ namespace KartRider
     public class AICharacter
     {
         public short Id { get; set; }              // 角色ID
-        public List<string> Rids { get; set; }     // rid名称列表（按XML顺序）
+        public List<string> Rids { get; set; }     // rid名称列表 (按XML顺序)
         public List<AIAccessory> Balloons { get; set; }
         public List<AIAccessory> Headbands { get; set; }
         public List<AIAccessory> Goggles { get; set; }
@@ -34,7 +29,7 @@ namespace KartRider
     // 卡丁车类
     public class AIKart
     {
-        public short Id { get; set; }              // 卡丁车ID（short）
+        public short Id { get; set; }              // 卡丁车ID (short)
         public int Speed { get; set; }
         public int Item { get; set; }
     }
@@ -44,11 +39,11 @@ namespace KartRider
         private static readonly Random _random = new Random();
 
         /// <summary>
-        /// 从角色Dictionary中随机获取不重复的ID（short类型）
+        /// 从角色Dictionary中随机获取不重复的ID (short类型)
         /// </summary>
         /// <param name="characterDict">角色Dictionary</param>
         /// <param name="count">需要的数量</param>
-        /// <returns>不重复的角色ID列表（short）</returns>
+        /// <returns>不重复的角色ID列表 (short)</returns>
         public List<short> GetRandomCharacterIds(Dictionary<short, AICharacter> characterDict, int count)
         {
             if (characterDict == null || characterDict.Count == 0 || count <= 0)
@@ -60,7 +55,7 @@ namespace KartRider
         }
 
         /// <summary>
-        /// 从指定角色中随机获取rid（按XML顺序索引）
+        /// 从指定角色中随机获取rid (按XML顺序索引)
         /// </summary>
         public short? GetRandomRidIndex(AICharacter character)
         {
@@ -70,7 +65,7 @@ namespace KartRider
         }
 
         /// <summary>
-        /// 从指定角色中随机获取配件ID（气球/头带/护目镜）
+        /// 从指定角色中随机获取配件ID (气球/头带/护目镜)
         /// </summary>
         public short? GetRandomAccessoryId(List<AIAccessory> accessories)
         {
@@ -80,11 +75,11 @@ namespace KartRider
         }
 
         /// <summary>
-        /// 从卡丁车Dictionary中随机获取不重复的ID（筛选speed≠0或item≠0）
+        /// 从卡丁车Dictionary中随机获取不重复的ID (筛选speed≠0或item≠0)
         /// </summary>
         /// <param name="kartDict">卡丁车Dictionary</param>
         /// <param name="count">需要的数量</param>
-        /// <returns>不重复的卡丁车ID列表（short）</returns>
+        /// <returns>不重复的卡丁车ID列表 (short)</returns>
         public List<short> GetRandomKartIds(Dictionary<short, AIKart> kartDict, int count,
                                            bool requireSpeed = false, bool requireItem = false)
         {
@@ -94,9 +89,9 @@ namespace KartRider
             // 根据参数筛选符合条件的卡丁车ID
             IEnumerable<short> validIds = kartDict.Values
                 .Where(k =>
-                    (!requireSpeed || k.Speed != 0) &&  // 如果要求Speed≠0，则筛选；否则不限制
-                    (!requireItem || k.Item != 0)      // 如果要求Item≠0，则筛选；否则不限制
-                )
+                    (!requireSpeed || k.Speed != 0) &&  // 如果要求Speed≠0, 则筛选 ; 否则不限制
+                    (!requireItem || k.Item != 0)      // 如果要求Item≠0, 则筛选 ; 否则不限制
+               )
                 .Select(k => k.Id);
 
             // 转换为列表

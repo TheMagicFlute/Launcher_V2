@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using ExcData;
 using KartRider.IO.Packet;
 using Profile;

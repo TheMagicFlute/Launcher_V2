@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Net;
 using Ionic.Zlib;
 using KartRider.Common.Utilities;
@@ -9,10 +7,6 @@ namespace KartRider.Common.Security
 {
     public class KREncodedBlock
     {
-        public KREncodedBlock()
-        {
-        }
-
         public static byte[] Decode(byte[] inputBytes)
         {
             byte[] numArray;
@@ -48,13 +42,13 @@ namespace KartRider.Common.Security
                 }
                 if ((int)(encodeFlag & KREncodedBlock.EncodeFlag.ZLib) != 0)
                 {
-                    if ((array[0] == 120 ? false : array[1] != 218))
+                    if (array[0] == 120 ? false : array[1] != 218)
                     {
                         throw new Exception("Invalid magic header! (zlib)");
                     }
-                    int num5 = BitConverter.ToInt32(array, (int)array.Length - 4);
-                    byte[] numArray1 = new byte[(int)array.Length - 2];
-                    Buffer.BlockCopy(array, 2, numArray1, 0, (int)numArray1.Length);
+                    int num5 = BitConverter.ToInt32(array, array.Length - 4);
+                    byte[] numArray1 = new byte[array.Length - 2];
+                    Buffer.BlockCopy(array, 2, numArray1, 0, numArray1.Length);
                     using (MemoryStream memoryStream = new MemoryStream())
                     {
                         using (MemoryStream memoryStream1 = new MemoryStream(numArray1))
@@ -67,7 +61,7 @@ namespace KartRider.Common.Security
                             }
                         }
                     }
-                    if ((ulong)num4 != (ulong)((int)array.Length))
+                    if (num4 != (ulong)array.Length)
                     {
                         throw new Exception("Length was not equal");
                     }
@@ -80,7 +74,7 @@ namespace KartRider.Common.Security
                 {
                     throw new Exception("Checksums didnt match.");
                 }
-                if (((int)(encodeFlag & KREncodedBlock.EncodeFlag.ZLib) == 0 ? false : (ulong)num4 != (ulong)((int)array.Length)))
+                if ((int)(encodeFlag & KREncodedBlock.EncodeFlag.ZLib) == 0 ? false : num4 != (ulong)array.Length)
                 {
                     throw new Exception("Lengths did not match");
                 }
@@ -124,7 +118,7 @@ namespace KartRider.Common.Security
                                         memoryStream2.CopyTo(deflateStream);
                                     }
                                     deflateStream.Close();
-                                    outPacket.WriteInt((int)inputBytes.Length);
+                                    outPacket.WriteInt(inputBytes.Length);
                                     byte[] numArray = memoryStream1.ToArray();
                                     binaryWriter.Write(new byte[] { 120, 218 });
                                     binaryWriter.Write(numArray);

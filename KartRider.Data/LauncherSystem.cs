@@ -1,7 +1,5 @@
-using System;
 using System.Diagnostics;
 using System.Text;
-using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
 using KartLibrary.Data;
@@ -26,14 +24,14 @@ namespace KartRider
 
         public static void MsgMultiInstance()
         {
-            MessageBox.Show("已经有一个启动器在运行了! 不可以同时运行多个启动器进行端口侦听!\n点击确认退出程序.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("已经有一个程序在侦听该端口了! 不可以同时运行多个程序对同一端口进行侦听!\n点击确认退出程序.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Environment.Exit(1);
         }
 
         public static void MsgFileNotFound()
         {
-            Console.WriteLine($"Error: 找不到 {Launcher.KartRider} 或 {Launcher.PinFile}.");
-            MessageBox.Show(Launcher.KartRider + " 或 " + Launcher.PinFile + " 找不到文件!\n点击确认退出程序.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Console.WriteLine($"Error: 找不到 {FileName.KartRider} 或 {FileName.PinFile}.");
+            MessageBox.Show(FileName.KartRider + " 或 " + FileName.PinFile + " 找不到文件!\n点击确认退出程序.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             Environment.Exit(1);
         }
 
@@ -42,7 +40,7 @@ namespace KartRider
             Process[] gameProcesses = Process.GetProcessesByName("KartRider");
             if (gameProcesses.Length > 0)
             {
-                if ((int)MessageBox.Show("确认要强制停止所有跑跑卡丁车游戏进程吗？", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) != 1)
+                if ((int)MessageBox.Show("确认要强制停止所有跑跑卡丁车游戏进程吗?", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) != 1)
                     return;
 
                 foreach (Process gProcess in gameProcesses)
@@ -96,30 +94,44 @@ namespace KartRider
             return true;
         }
 
+        /// <summary>
+        /// Print a dividing line with '-' in the console for better readability.
+        /// </summary>
+        /// <param name="count">The number of '-' in the line, 50 for default</param>
+        public static void PrintDivLine(ushort count = 50)
+        {
+            string line = "";
+            while (count-- > 0)
+                line += '-';
+            Console.WriteLine(line);
+        }
+
         #endregion
 
         #region Pack Tool
 
         private static readonly string[] dataPack =
-        {
+        [
             "boss", "character", "dialog", "dialog2", "effect", "etc_", "flyingPet", "gui", "item", "kart_", "myRoom",
             "pet", "sound", "stage", "stuff", "stuff2", "theme", "track", "trackThumb", "track_", "zeta", "zeta_"
-        };
+        ];
 
         private static readonly string[] whitelist =
-            {
-                "_I04_sn", "_I05_sn", "_R01_sn", "_R02_sn", "_I02_sn", "_I01_sn", "_I03_sn", "_L01_", "_L02_", "_L03_03_",
-                "_L03_", "_L04_", "bazzi_", "arthur_", "bero_", "brodi_", "camilla_", "chris_", "contender_", "crowdr_",
-                "CSO_", "dao_", "dizni_", "erini_", "ethi_", "Guazi_", "halloween_", "homrunDao_", "innerWearSonogong_",
-                "innerWearWonwon_", "Jianbing_", "kephi_", "kero_", "kwanwoo_", "Lingling_", "lodumani_", "mabi_", "Mahua_",
-                "marid_", "mobi_", "mos_", "narin_", "neoul_", "neo_", "nymph_", "olympos_", "panda_", "referee_", "ren_",
-                "Reto_", "run_", "zombie_", "santa_", "sophi_", "taki_", "tiera_", "tutu_", "twoTop_", "twotop_", "uni_",
-                "wonwon_", "zhindaru_", "zombie_", "flyingBook_", "flyingMechanic_", "flyingRedlight_", "crow_",
-                "dragonBoat_", "GiLin_", "maple_", "beach_", "village_", "china_", "factory_", "ice_", "mine_", "nemo_",
-                "world_", "forest_", "_I", "_R", "_S", "_F", "_P", "_K", "_D", "_jp", "_A0"
-            };
+        [
+            "_I04_sn", "_I05_sn", "_R01_sn", "_R02_sn",
+            "_I02_sn", "_I01_sn", "_I03_sn",
+            "_L01_", "_L02_", "_L03_03_", "_L03_", "_L04_",
+            "bazzi_", "arthur_", "bero_", "brodi_", "camilla_", "chris_", "contender_", "crowdr_", "CSO_", "dao_", "dizni_",
+            "erini_", "ethi_", "Guazi_", "halloween_", "homrunDao_", "innerWearSonogong_", "innerWearWonwon_", "Jianbing_",
+            "kephi_", "kero_", "kwanwoo_", "Lingling_", "lodumani_", "mabi_", "Mahua_", "marid_", "mobi_", "mos_", "narin_",
+            "neoul_", "neo_", "nymph_", "olympos_", "panda_", "referee_", "ren_", "Reto_", "run_", "zombie_", "santa_",
+            "sophi_", "taki_", "tiera_", "tutu_", "twoTop_", "twotop_", "uni_", "wonwon_", "zhindaru_", "zombie_", "flyingBook_",
+            "flyingMechanic_", "flyingRedlight_", "crow_", "dragonBoat_", "GiLin_",
+            "maple_", "beach_", "village_", "china_", "factory_", "ice_", "mine_", "nemo_", "world_", "forest_",
+            "_I", "_R", "_S", "_F", "_P", "_K", "_D", "_jp", "_A0"
+        ];
 
-        private static readonly string[] blacklist = { "character_" };
+        private static readonly string[] blacklist = ["character_"];
 
         public static void ProcessPack(string[] args)
         {
@@ -168,7 +180,12 @@ namespace KartRider
                         else
                         {
                             encodea(arg, arg);
-                            var parent = Path.GetDirectoryName(arg);
+                            string? parent = Path.GetDirectoryName(arg);
+                            if (parent == null)
+                            {
+                                Console.WriteLine($"Error: Unable to find .rho files in {parent}");
+                                return;
+                            }
                             files = Directory.GetFiles(parent, "*.rho");
                             AAAC(parent, files);
                         }
@@ -249,7 +266,7 @@ namespace KartRider
             }
             else
             {
-                Console.WriteLine($"路径不存在：{output}");
+                Console.WriteLine($"路径不存在: {output}");
             }
         }
 

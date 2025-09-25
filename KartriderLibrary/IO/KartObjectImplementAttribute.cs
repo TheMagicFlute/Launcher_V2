@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KartLibrary.IO
+﻿namespace KartLibrary.IO
 {
     /// <summary>
     /// The implement of KartObject. This attribute can be used on the class that derived of KartObject.

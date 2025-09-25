@@ -1,55 +1,45 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Security.Policy;
-using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Profile;
 
 namespace KartRider
 {
     /// <summary>
-    /// GitHub Releases API返回的根对象（仅包含需要的字段，其他字段已忽略）
+    /// GitHub Releases API返回的根对象 (仅包含需要的字段, 其他字段已忽略)
     /// </summary>
     public class GitHubReleaseRoot
     {
         /// <summary>
-        /// 发布版本下的所有资产文件（如exe、zip）
+        /// 发布版本下的所有资产文件 (如exe、zip)
         /// </summary>
         public GitHubReleaseAsset[] Assets { get; set; }
 
         /// <summary>
-        /// 发布版本的标签名（如250101）
+        /// 发布版本的标签名 (如250101)
         /// </summary>
         public string Tag_Name { get; set; }
 
         /// <summary>
-        /// 发布版本的详细信息（如更新日志）
+        /// 发布版本的详细信息 (如更新日志)
         /// </summary>
         public string Body { get; set; }
     }
 
     /// <summary>
-    /// GitHub Releases中的单个资产文件（如Launcher.exe）
+    /// GitHub Releases中的单个资产文件 (如Launcher.exe)
     /// </summary>
     public class GitHubReleaseAsset
     {
         /// <summary>
-        /// 文件名（如Launcher.exe）
+        /// 文件名 (如Launcher.exe)
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// 文件的SHA256哈希值（格式：sha256:xxxxxx）
+        /// 文件的SHA256哈希值 (格式: sha256:xxxxxx)
         /// </summary>
         public string Digest { get; set; }
 
@@ -68,8 +58,8 @@ namespace KartRider
         public static string zipName = simpleName + ".zip";
         public static string exeName = simpleName + ".exe";
 
-        public static GitHubReleaseRoot ?releaseData;
-        public static GitHubReleaseAsset ?launcherAsset;
+        public static GitHubReleaseRoot? releaseData;
+        public static GitHubReleaseAsset? launcherAsset;
 
         public static string currentVersion = GetCurrentVersion();
         private static string update_url = "";
@@ -102,7 +92,7 @@ namespace KartRider
             if (releaseData == null)
             {
                 Console.WriteLine("更新信息获取失败!");
-                Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
+                Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
                 return false;
             }
 
@@ -114,28 +104,28 @@ namespace KartRider
             launcherAsset = Array.Find(
                 releaseData.Assets,
                 asset => string.Equals(asset.Name, zipName, StringComparison.OrdinalIgnoreCase) // 忽略文件名大小写
-            );
+           );
             if (launcherAsset == null)
             {
                 Console.WriteLine($"错误: 在资产列表中找不到 {zipName}");
                 return false;
             }
 
-            // 检查更新: 由于版本号使用日期格式，当天多次发布的版本号相同，故选择直接比较Digest
-            // 如目前版本的SHA256与最新版本的SHA256不同，则说明需要更新
+            // 检查更新: 由于版本号使用日期格式, 当天多次发布的版本号相同, 故选择直接比较Digest
+            // 如目前版本的SHA256与最新版本的SHA256不同, 则说明需要更新
             string? currentExeFile = Process.GetCurrentProcess().MainModule.FileName ?? Assembly.GetExecutingAssembly().Location;
             if (String.IsNullOrEmpty(currentExeFile))
             {
-                Console.WriteLine("无法获取当前可执行文件路径，更新检查失败。");
+                Console.WriteLine("无法获取当前可执行文件路径, 更新检查失败.");
                 return false;
             }
             if (CheckFileHash(Path.Combine(FileName.AppDir, currentExeFile), launcherAsset.Digest))
             {
                 // ask user whether to update
                 Console.WriteLine($"发现 {releaseData.Tag_Name} 中有更新!");
-                Console.WriteLine("-------------------------");
+                LauncherSystem.PrintDivLine(25);
                 Console.WriteLine($"更新信息: \n{releaseData.Body}");
-                Console.WriteLine("-------------------------");
+                LauncherSystem.PrintDivLine(25);
                 Console.Write("请问是否需要更新? (Y/n): ");
                 string? usrInput = Console.ReadLine().ToLower();
                 if (usrInput != "y")
@@ -159,7 +149,7 @@ namespace KartRider
             try
             {
                 string country = ProfileService.ProfileConfig.ServerSetting.CC.ToString();
-                // 中国大陆需要使用代理下载，处理 url
+                // 中国大陆需要使用代理下载, 处理 url
                 if (country != "" && country == "CN")
                 {
                     Console.WriteLine("Using proxy...");
@@ -175,7 +165,7 @@ namespace KartRider
                         }
                     }
                 }
-                // 代理网址处理完成/无需处理，返回。
+                // 代理网址处理完成/无需处理, 返回.
                 return url;
             }
             catch (Exception ex)
@@ -228,18 +218,18 @@ namespace KartRider
                     Console.WriteLine($"期望 SHA256 为: {launcherAsset.Digest}");
                     if (!CheckFileHash(Path.Combine(FileName.Update_Folder, zipName), launcherAsset.Digest))
                     {
-                        Console.WriteLine($"文件 SHA256 校验失败，下载可能不完整或被篡改。");
-                        Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
+                        Console.WriteLine($"文件 SHA256 校验失败, 下载可能不完整或被篡改.");
+                        Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
                         return false;
                     }
-                    Console.WriteLine($"文件 SHA256 校验成功。");
+                    Console.WriteLine($"文件 SHA256 校验成功.");
                     return ApplyUpdate();
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"下载过程中出现错误: {ex.Message}");
-                Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
+                Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
                 return false;
             }
         }
@@ -253,7 +243,7 @@ namespace KartRider
                 try
                 {
                     File.WriteAllText(FileName.Update_File, updateScript, Program.targetEncoding);
-                    Console.WriteLine("\n写入更新脚本成功。");
+                    Console.WriteLine("\n写入更新脚本成功.");
                 }
                 catch (Exception ex)
                 {
@@ -267,7 +257,7 @@ namespace KartRider
             catch (Exception ex)
             {
                 Console.WriteLine($"\n应用更新时出错: {ex.Message}");
-                Console.WriteLine($"如果仍想更新，请重新启动本程序，或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
+                Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 https://github.com/{owner}/{repo}/releases/latest 手动下载最新版本");
                 return false;
             }
         }
@@ -276,24 +266,24 @@ namespace KartRider
         {
             try
             {
-                // 创建HttpClient（设置User-Agent，避免GitHub API拒绝请求）
+                // 创建HttpClient (设置User-Agent, 避免GitHub API拒绝请求)
                 using var httpClient = new HttpClient();
                 httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("GitHubReleaseParser/1.0"); // GitHub要求必须设置User-Agent
                 httpClient.Timeout = TimeSpan.FromSeconds(10); // 设置10秒超时
 
                 // 发送GET请求获取API响应
                 var response = await httpClient.GetAsync($"https://api.github.com/repos/{owner}/{repo}/releases/latest");
-                response.EnsureSuccessStatusCode(); // 若状态码不是200-299，抛出异常（如404、500）
+                response.EnsureSuccessStatusCode(); // 若状态码不是200-299, 抛出异常 (如404、500)
 
                 // 读取响应内容并反序列化为C#对象
                 var jsonContent = await response.Content.ReadAsStringAsync();
                 var releaseData = JsonSerializer.Deserialize<GitHubReleaseRoot>(
                     jsonContent,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true } // 忽略JSON字段大小写（适配API的camelCase）
-                );
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true } // 忽略JSON字段大小写 (适配API的camelCase)
+               );
                 foreach (var asset in releaseData.Assets)
                 {
-                    asset.Digest = asset.Digest.Replace("sha256:", "").ToLower(); // 只保留哈希值部分，并转换为小写
+                    asset.Digest = asset.Digest.Replace("sha256:", "").ToLower(); // 只保留哈希值部分, 并转换为小写
                 }
                 return releaseData;
             }
@@ -326,12 +316,19 @@ namespace KartRider
                     {
                         string json = await response.Content.ReadAsStringAsync();
                         JObject data = JObject.Parse(json);
-                        string country = data["country"]?.ToString();
-                        return country;
+                        if (data.TryGetValue("country", out JToken? countryToken))
+                        {
+                            return countryToken.ToString();
+                        }
+                        else
+                        {
+                            Console.WriteLine("响应中未找到 'country' 字段.");
+                            return "";
+                        }
                     }
                     else
                     {
-                        Console.WriteLine($"请求 IP 地址失败，状态码: {response.StatusCode}");
+                        Console.WriteLine($"请求 IP 地址失败, 状态码: {response.StatusCode}");
                         return "";
                     }
                 }
@@ -366,16 +363,18 @@ namespace KartRider
         {
             if (!File.Exists(filePath))
             {
-                Console.WriteLine($"文件 {filePath} 不存在。");
+                Console.WriteLine($"文件 {filePath} 不存在.");
                 return false;
             }
             using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
-                SHA256 sha256 = new SHA256Managed();
-                byte[] hash = sha256.ComputeHash(fileStream);
-                string actualHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                Console.WriteLine($"文件 SHA256 为：{actualHash}");
-                return actualHash == expectedHash;
+                using (SHA256 sha256 = SHA256.Create())
+                {
+                    byte[] hash = sha256.ComputeHash(fileStream);
+                    string actualHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                    Console.WriteLine($"文件 SHA256 为: {actualHash}");
+                    return actualHash == expectedHash;
+                }
             }
         }
 
@@ -393,7 +392,7 @@ namespace KartRider
             catch (Exception ex)
             {
                 Console.WriteLine($"请求 URL 时发生异常: {ex.Message}");
-                Console.WriteLine($"请检查你的网络是否连接正常。如连接正常，请在 https://github.com/{owner}/{repo}/issues 提问。");
+                Console.WriteLine($"请检查你的网络是否连接正常.如连接正常, 请在 https://github.com/{owner}/{repo}/issues 提问.");
                 return false;
             }
         }

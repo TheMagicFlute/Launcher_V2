@@ -1,6 +1,4 @@
-﻿using System;
-using ExcData;
-using KartRider;
+﻿using KartRider;
 
 namespace RiderData
 {
@@ -16,9 +14,9 @@ namespace RiderData
             Kart.SpeedSlotCapacity = 2;
             Kart.ItemSlotCapacity = 2;
             Kart.SpecialSlotCapacity = 1;
-            Kart.UseTransformBooster = (byte)(true ? 1 : 0);
-            Kart.motorcycleType = (byte)(false ? 1 : 0);
-            Kart.BikeRearWheel = (byte)(true ? 1 : 0);
+            Kart.UseTransformBooster = true ? 1 : 0;
+            Kart.motorcycleType = false ? 1 : 0;
+            Kart.BikeRearWheel = true ? 1 : 0;
             Kart.Mass = 100f;
             Kart.AirFriction = 3f;
             Kart.DragFactor = 0.667f;
@@ -50,20 +48,20 @@ namespace RiderData
             Kart.StartForwardAccelForceItem = 2304f;
             Kart.StartForwardAccelForceSpeed = 3745.588f;
             Kart.DriftGaguePreservePercent = 0.5f;
-            Kart.UseExtendedAfterBooster = (byte)(false ? 1 : 0);
+            Kart.UseExtendedAfterBooster = false ? 1 : 0;
             Kart.BoostAccelFactorOnlyItem = 1.5f;
             Kart.antiCollideBalance = 0.91f;
-            Kart.dualBoosterSetAuto = (byte)(false ? 1 : 0);
+            Kart.dualBoosterSetAuto = false ? 1 : 0;
             Kart.dualBoosterTickMin = 20;
             Kart.dualBoosterTickMax = 30;
             Kart.dualMulAccelFactor = 1.04f;
             Kart.dualTransLowSpeed = 100f;
-            Kart.PartsEngineLock = (byte)(true ? 1 : 0);
-            Kart.PartsWheelLock = (byte)(true ? 1 : 0);
-            Kart.PartsSteeringLock = (byte)(true ? 1 : 0);
-            Kart.PartsBoosterLock = (byte)(true ? 1 : 0);
-            Kart.PartsCoatingLock = (byte)(true ? 1 : 0);
-            Kart.PartsTailLampLock = (byte)(true ? 1 : 0);
+            Kart.PartsEngineLock = true ? 1 : 0;
+            Kart.PartsWheelLock = true ? 1 : 0;
+            Kart.PartsSteeringLock = true ? 1 : 0;
+            Kart.PartsBoosterLock = true ? 1 : 0;
+            Kart.PartsCoatingLock = true ? 1 : 0;
+            Kart.PartsTailLampLock = true ? 1 : 0;
             Kart.chargeInstAccelGaugeByBoost = 0.02f;
             Kart.chargeInstAccelGaugeByGrip = 0.06f;
             Kart.chargeInstAccelGaugeByWall = 0.15f;
@@ -73,7 +71,7 @@ namespace RiderData
             Kart.instAccelGaugeMinUsable = 750f;
             Kart.instAccelGaugeMinVelBound = 0f;
             Kart.instAccelGaugeMinVelLoss = 50f;
-            Kart.useExtendedAfterBoosterMore = (byte)(false ? 1 : 0);
+            Kart.useExtendedAfterBoosterMore = false ? 1 : 0;
             Kart.wallCollGaugeCooldownTime = 3000;
             Kart.wallCollGaugeMaxVelLoss = 200f;
             Kart.wallCollGaugeMinVelBound = 200f;

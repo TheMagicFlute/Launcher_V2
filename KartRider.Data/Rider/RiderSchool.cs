@@ -1,6 +1,4 @@
-﻿using System;
-using ExcData;
-using KartRider;
+﻿using KartRider;
 using KartRider.IO.Packet;
 
 namespace RiderData

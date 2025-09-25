@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KartLibrary.Encrypt
+﻿namespace KartLibrary.Encrypt
 {
     public class Rho5DecryptStream : Stream
     {
         public Stream BaseStream { get; set; }
+
         private Rho5KeyProvider KeyProvider { get; }
 
         public override bool CanRead => BaseStream.CanRead;

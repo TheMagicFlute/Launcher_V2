@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using KartRider.IO.Packet;
+﻿using KartRider.IO.Packet;
 
 namespace KartRider.Common.Data
 {
@@ -91,7 +88,7 @@ namespace KartRider.Common.Data
             }
         }
 
-        public BmlObject GetObject(string name)
+        public BmlObject? GetObject(string name)
         {
             foreach (Tuple<string, BmlObject> subObject in SubObjects)
             {
@@ -106,9 +103,9 @@ namespace KartRider.Common.Data
 
         public string GetString(string key, string def = "")
         {
-            if (Values.ContainsKey(key))
+            if (Values.TryGetValue(key, out string? value))
             {
-                return Values[key];
+                return value;
             }
 
             return def;
@@ -168,13 +165,9 @@ namespace KartRider.Common.Data
 
         public void SetKeyValuePair(string key, string value)
         {
-            if (Values.ContainsKey(key))
+            if (!Values.TryAdd(key, value))
             {
                 Values[key] = value;
-            }
-            else
-            {
-                Values.Add(key, value);
             }
         }
 

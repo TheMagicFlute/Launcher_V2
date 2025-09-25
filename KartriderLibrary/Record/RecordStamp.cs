@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 
 
 namespace KartLibrary.Record
@@ -31,9 +26,9 @@ namespace KartLibrary.Record
             if (gasStatus[Status & 7] != "")
                 output.Add(gasStatus[Status & 7]);
             if (characterStatus[(Status >> 3) & 7] != "")
-                output.Add(characterStatus[(Status >> 3 & 7)]);
+                output.Add(characterStatus[(Status >> 3) & 7]);
             if (effectStatus[(Status >> 6) & 3] != "")
-                output.Add(effectStatus[(Status >> 6 & 3)]);
+                output.Add(effectStatus[(Status >> 6) & 3]);
             return output.ToArray();
         }
     }

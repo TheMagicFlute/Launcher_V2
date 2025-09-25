@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Windows.Forms;
-using System.Xml;
+﻿using System.Xml;
 using ExcData;
 using KartRider.IO.Packet;
 using Profile;
@@ -13,12 +7,13 @@ namespace KartRider
 {
     public partial class GetKart : Form
     {
-        public static short Item_Type = 0;
-        public static short Item_Code = 0;
+        private static short Item_Type = 0;
+        private static short Item_Code = 0;
 
         public GetKart()
         {
             InitializeComponent();
+
             foreach (var outerKey in KartExcData.items.Keys)
             {
                 ItemType.Items.Add(outerKey);
@@ -29,13 +24,12 @@ namespace KartRider
         private void button_Add_Click(object sender, EventArgs e)
         {
             // try to parse ItemID when it is a number.
-            short tempValue = 0;
-            if (short.TryParse(ItemID.Text, out tempValue))
+            if (short.TryParse(ItemID.Text, out short tempValue))
             {
-                GetKart.Item_Code = tempValue;
+                Item_Code = tempValue;
             }
 
-            (new Thread(() =>
+            new Thread(() =>
             {
                 short ItemSN = 0; // default value for non-kart items.
                 if (Item_Type == 3) // type: kart. Need to handle NewKart.xml.
@@ -43,23 +37,23 @@ namespace KartRider
                     short KartSN = 2; // 1 is the default kart, so start from 2.
                     if (KartExcData.NewKart != null)
                     {
-                        var existingItems = KartExcData.NewKart.Where(list => list[0] == GetKart.Item_Code).ToList();
+                        var existingItems = KartExcData.NewKart.Where(list => list[0] == Item_Code).ToList();
                         if (existingItems != null)
                         {
-                            KartSN = (short)(existingItems.Count + (int)KartSN);
+                            KartSN = (short)(existingItems.Count + KartSN);
                         }
                     }
-                    KartExcData.NewKart.Add(new List<short> { GetKart.Item_Code, KartSN });
+                    KartExcData.NewKart.Add([Item_Code, KartSN]);
                     Save_NewKartList(KartExcData.NewKart);
                     ItemSN = KartSN;
                 }
 
-                using (OutPacket outPacket = new OutPacket("PrRequestKartInfoPacket"))
+                using (OutPacket outPacket = new("PrRequestKartInfoPacket"))
                 {
                     outPacket.WriteByte(1);
                     outPacket.WriteInt(1);
-                    outPacket.WriteShort(GetKart.Item_Type);
-                    outPacket.WriteShort(GetKart.Item_Code);
+                    outPacket.WriteShort(Item_Type);
+                    outPacket.WriteShort(Item_Code);
                     outPacket.WriteShort(ItemSN);
                     outPacket.WriteUShort(1); // 数量 수량
                     outPacket.WriteShort(0);
@@ -69,9 +63,8 @@ namespace KartRider
                     outPacket.WriteShort(0);
                     RouterListener.MySession.Client.Send(outPacket);
                 }
-            }
-            )).Start();
-            Console.WriteLine($"[Add Item] Add Item: Type:{ItemType.Text}, ID:{ItemID.Text}");
+            }).Start();
+            Console.WriteLine($"[Get Item] Add: Type:{ItemType.Text}, ID:{ItemID.Text}");
         }
 
         public static void Save_NewKartList(List<List<short>> NewKart)
@@ -85,7 +78,7 @@ namespace KartRider
             writer.Close();
             for (var i = 0; i < NewKart.Count; i++)
             {
-                XmlDocument xmlDoc = new XmlDocument();
+                XmlDocument xmlDoc = new();
                 xmlDoc.Load(FileName.NewKart_LoadFile);
                 XmlNode root = xmlDoc.SelectSingleNode("NewKart");
                 XmlElement xe1 = xmlDoc.CreateElement("Kart");
@@ -100,11 +93,11 @@ namespace KartRider
         {
             if (ItemType.SelectedItem != null)
             {
-                GetKart.Item_Type = (short)ItemType.SelectedItem;
+                Item_Type = (short)ItemType.SelectedItem;
                 ItemID.Items.Clear();
                 ItemID.Text = "";
 
-                if (KartExcData.items.TryGetValue(GetKart.Item_Type, out Dictionary<short, string> innerDictionary))
+                if (KartExcData.items.TryGetValue(Item_Type, out Dictionary<short, string> innerDictionary))
                 {
                     foreach (var innerValue in innerDictionary.Values)
                     {
@@ -123,8 +116,8 @@ namespace KartRider
 
                 if (KartExcData.items.TryGetValue(selectedOuterKey, out Dictionary<short, string> innerDictionary))
                 {
-                    GetKart.Item_Code = innerDictionary.FirstOrDefault(pair => pair.Value == selectedInnerValue).Key;
-                    Console.WriteLine($"[Add Item] Select Item: Type:{ItemType.Text}, ID:{ItemID.Text}");
+                    Item_Code = innerDictionary.FirstOrDefault(pair => pair.Value == selectedInnerValue).Key;
+                    Console.WriteLine($"[Get Item] Select: Type:{ItemType.Text}, ID:{ItemID.Text}");
                 }
             }
         }

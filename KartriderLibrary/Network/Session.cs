@@ -1,8 +1,5 @@
-using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using KartRider.Common.Security;
 using KartRider.Common.Utilities;
 using KartRider.IO.Packet;
@@ -76,16 +73,16 @@ namespace KartRider.Common.Network
 
         public void Append(byte[] pBuffer)
         {
-            this.Append(pBuffer, 0, (int)pBuffer.Length);
+            this.Append(pBuffer, 0, pBuffer.Length);
         }
 
         public void Append(byte[] pBuffer, int pStart, int pLength)
         {
             try
             {
-                if ((int)this.mBuffer.Length - this.mCursor < pLength)
+                if (mBuffer.Length - this.mCursor < pLength)
                 {
-                    int length = (int)this.mBuffer.Length * 2;
+                    int length = mBuffer.Length * 2;
                     while (length < this.mCursor + pLength)
                     {
                         length *= 2;
@@ -102,7 +99,7 @@ namespace KartRider.Common.Network
 
         public void BeginReceive()
         {
-            if ((this.mDisconnected != 0 ? false : this._socket.Connected))
+            if (this.mDisconnected != 0 ? false : this._socket.Connected)
             {
                 try
                 {
@@ -128,15 +125,15 @@ namespace KartRider.Common.Network
                 {
                     this.mSendSegments.Dequeue();
                 }
-                else if ((int)next.Buffer.Length >= next.Length)
+                else if (next.Buffer.Length >= next.Length)
                 {
                     byte[] buffer = next.Buffer;
-                    byte[] numArray = new byte[(int)buffer.Length + (this._SIV != 0 ? 8 : 4)];
+                    byte[] numArray = new byte[buffer.Length + (this._SIV != 0 ? 8 : 4)];
                     if (this._SIV != 0)
                     {
                         uint num = KRPacketCrypto.HashEncrypt(buffer, (uint)buffer.Length, this._SIV);
-                        Buffer.BlockCopy(BitConverter.GetBytes((int)((ulong)this._SIV ^ (ulong)((int)buffer.Length + 4) ^ (ulong)4164199944)), 0, numArray, 0, 4);
-                        Buffer.BlockCopy(BitConverter.GetBytes(this._SIV ^ num ^ 3388492432), 0, numArray, (int)numArray.Length - 4, 4);
+                        Buffer.BlockCopy(BitConverter.GetBytes((int)(_SIV ^ (ulong)(buffer.Length + 4) ^ 4164199944)), 0, numArray, 0, 4);
+                        Buffer.BlockCopy(BitConverter.GetBytes(this._SIV ^ num ^ 3388492432), 0, numArray, numArray.Length - 4, 4);
                         this._SIV += 21446425;
                         if (this._SIV == 0)
                         {
@@ -145,10 +142,10 @@ namespace KartRider.Common.Network
                     }
                     else
                     {
-                        Buffer.BlockCopy(BitConverter.GetBytes((int)buffer.Length), 0, numArray, 0, 4);
+                        Buffer.BlockCopy(BitConverter.GetBytes(buffer.Length), 0, numArray, 0, 4);
                     }
-                    Buffer.BlockCopy(buffer, 0, numArray, 4, (int)buffer.Length);
-                    this.mWriteEventArgs.SetBuffer(numArray, 0, (int)numArray.Length);
+                    Buffer.BlockCopy(buffer, 0, numArray, 4, buffer.Length);
+                    this.mWriteEventArgs.SetBuffer(numArray, 0, numArray.Length);
                     next = null;
                     try
                     {
@@ -159,19 +156,19 @@ namespace KartRider.Common.Network
                     }
                     catch (ObjectDisposedException objectDisposedException)
                     {
-                        Console.WriteLine("[SOCKET ERR] {0}", objectDisposedException.ToString());
+                        Console.WriteLine($"[SOCKET ERR] {objectDisposedException.ToString()}");
                         this.Disconnect();
                     }
                 }
                 else
                 {
-                    Console.WriteLine("[SOCKET ERR] Tried to send a packet that has a bufferlength value that is lower than the length: {0} {1}", (int)next.Buffer.Length, next.Length);
+                    Console.WriteLine($"[SOCKET ERR] Tried to send a packet that has a buffer.length value that is lower than the length: {next.Buffer.Length} {next.Length}");
                     this.mSendSegments.Dequeue();
                 }
             }
             catch (Exception exception)
             {
-                Console.WriteLine("[SOCKET ERR] {0}", exception.ToString());
+                Console.WriteLine($"[SOCKET ERR] {exception.ToString()}");
                 this.Disconnect();
             }
         }
@@ -223,7 +220,7 @@ namespace KartRider.Common.Network
                                 {
                                     num1 = this._RIV ^ num1 ^ 4164199944;
                                 }
-                                if ((ulong)this.mCursor >= (ulong)(num1 + 4))
+                                if ((ulong)this.mCursor >= num1 + 4)
                                 {
                                     byte[] numArray = new byte[num1 - 4];
                                     Buffer.BlockCopy(this.mBuffer, 4, numArray, 0, (int)(num1 - 4));
@@ -306,9 +303,9 @@ namespace KartRider.Common.Network
                     {
                         if (pArguments.SocketError != SocketError.Success)
                         {
-                            Console.WriteLine("Send Error: {0}", pArguments.SocketError);
+                            Console.WriteLine($"Send Error: {pArguments.SocketError}");
                         }
-                        Console.WriteLine("Disconnected session 1 {0}", pArguments.SocketError.ToString());
+                        Console.WriteLine($"Disconnected session 1 {pArguments.SocketError}");
                         this.Disconnect();
                     }
                 }
@@ -342,7 +339,7 @@ namespace KartRider.Common.Network
             }
             catch
             {
-                remoteEndPoint = new IPEndPoint((long)0, 0);
+                remoteEndPoint = new IPEndPoint(0, 0);
             }
             return remoteEndPoint;
         }
@@ -372,7 +369,7 @@ namespace KartRider.Common.Network
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Disconnected session 11 {0}", exception.ToString());
+                Console.WriteLine($"Disconnected session 11 {exception}");
                 this.Disconnect();
             }
         }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using KartLibrary.Consts;
 using KartLibrary.Encrypt;
 using KartLibrary.IO;
@@ -68,14 +63,14 @@ namespace KartLibrary.File
                 };
                 Files[i] = file;
             }
-            DataBaseOffset = (int)decryptStream.Position + 0x3FF >> 10 << 10;
+            DataBaseOffset = ((int)decryptStream.Position + 0x3FF) >> 10 << 10;
         }
         private int GetHeaderOffset(string name)
         {
             name = name.ToLower();
             int sum = 0;
             foreach (char c in name) sum += c;
-            long mpl = sum * 0xA41A41A5L >> 32;
+            long mpl = (sum * 0xA41A41A5L) >> 32;
             int result = sum - (int)mpl;
             result >>= 1;
             result += (int)mpl;
@@ -91,7 +86,7 @@ namespace KartLibrary.File
             int sum = 0;
             foreach (char c in name) sum += c;
             sum *= 3;
-            long mpl = sum * 0x3521CFB3L >> 32;
+            long mpl = (sum * 0x3521CFB3L) >> 32;
             int result = sum - (int)mpl;
             result >>= 1;
             result += (int)mpl;

@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Xml.Linq;
 
 namespace XmlFileUpdater
@@ -9,7 +5,7 @@ namespace XmlFileUpdater
     class XmlUpdater
     {
         /// <summary>
-        /// 比较本地XML文件和资源中的XML文件，将资源中独有的内容添加到本地文件
+        /// 比较本地XML文件和资源中的XML文件, 将资源中独有的内容添加到本地文件
         /// </summary>
         /// <param name="localFilePath">本地XML文件路径</param>
         /// <param name="resourceName">资源中XML文件的名称</param>
@@ -34,7 +30,7 @@ namespace XmlFileUpdater
                 // 比较并合并XML内容
                 bool isUpdated = MergeXml(localXml.Root, resourceXml.Root);
 
-                // 如果有更新，保存本地文件
+                // 如果有更新, 保存本地文件
                 if (isUpdated)
                 {
                     localXml.Save(localFilePath);
@@ -42,7 +38,7 @@ namespace XmlFileUpdater
                 }
                 else
                 {
-                    Console.WriteLine("ModelMax.xml 文件已是最新，无需更新!");
+                    Console.WriteLine("ModelMax.xml 文件已是最新, 无需更新!");
                 }
             }
             catch (Exception ex)
@@ -54,7 +50,7 @@ namespace XmlFileUpdater
         /// <summary>
         /// 将资源XML中的内容合并到本地XML中
         /// </summary>
-        /// <returns>如果有内容被添加则返回true，否则返回false</returns>
+        /// <returns>如果有内容被添加则返回true, 否则返回false</returns>
         private bool MergeXml(XElement localRoot, XElement resourceRoot)
         {
             bool isUpdated = false;
@@ -62,7 +58,7 @@ namespace XmlFileUpdater
             // 比较并添加子元素
             foreach (var resourceElement in resourceRoot.Elements())
             {
-                // 这里使用元素名和关键属性作为唯一标识，可根据实际情况修改
+                // 这里使用元素名和关键属性作为唯一标识, 可根据实际情况修改
                 bool exists = CheckElementExists(localRoot, resourceElement);
 
                 if (!exists)
@@ -74,7 +70,7 @@ namespace XmlFileUpdater
                 }
                 else
                 {
-                    // 如果元素存在，递归检查其子元素
+                    // 如果元素存在, 递归检查其子元素
                     var localElement = FindCorrespondingElement(localRoot, resourceElement);
                     if (localElement != null)
                     {
@@ -101,17 +97,17 @@ namespace XmlFileUpdater
         /// </summary>
         private XElement FindCorrespondingElement(XElement parent, XElement elementToFind)
         {
-            // 简单匹配：元素名相同，且具有相同的ID属性（如果存在）
+            // 简单匹配: 元素名相同, 且具有相同的ID属性 (如果存在)
             var candidates = parent.Elements(elementToFind.Name);
 
-            // 如果有ID属性，使用ID进行匹配
+            // 如果有ID属性, 使用ID进行匹配
             if (elementToFind.Attribute("id") != null)
             {
                 string idValue = elementToFind.Attribute("id").Value;
                 return candidates.FirstOrDefault(e => e.Attribute("id")?.Value == idValue);
             }
 
-            // 如果没有ID属性，仅通过元素名匹配（可能不够精确，根据实际情况调整）
+            // 如果没有ID属性, 仅通过元素名匹配 (可能不够精确, 根据实际情况调整)
             return candidates.FirstOrDefault();
         }
     }

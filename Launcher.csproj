@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -25,7 +25,7 @@
 
     <!-- 启用应用程序清单 -->
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-    <!-- 可选：如果需要在调试时也以管理员身份运行 -->
+    <!-- 可选: 如果需要在调试时也以管理员身份运行 -->
     <EnableClickOnceSecuritySettings>true</EnableClickOnceSecuritySettings>
 
     <!-- Versioning & Assembly Information -->
@@ -48,6 +48,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <Platforms>AnyCPU;x64;x86;arm64</Platforms>
+    <UserSecretsId>14b62e2f-0b80-4024-9d73-02b052518861</UserSecretsId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>9999</WarningLevel>

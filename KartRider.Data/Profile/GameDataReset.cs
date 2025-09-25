@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using ExcData;
+﻿using ExcData;
 using Profile;
 
 namespace KartRider

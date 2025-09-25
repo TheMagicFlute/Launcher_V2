@@ -1,5 +1,3 @@
-using System;
-using ExcData;
 using ExcData;
 using KartRider.IO.Packet;
 using Profile;
@@ -26,7 +24,7 @@ namespace KartRider
 
         public static void Start_KartSpac()
         {
-            Console.WriteLine("SpeedType: {0}, Kart_id: {1}, FlyingPet_id: {2}", StartGameData.StartTimeAttack_SpeedType, StartGameData.Kart_id, StartGameData.FlyingPet_id);
+            Console.WriteLine($"SpeedType: {StartGameData.StartTimeAttack_SpeedType}, Kart_id: {StartGameData.Kart_id}, FlyingPet_id: {StartGameData.FlyingPet_id}");
             if (GameType.StartType == 1)
             {
                 Console.WriteLine("故事模式");
@@ -120,7 +118,7 @@ namespace KartRider
             float DriftEscapeForce = FlyingPet.DriftEscapeForce + ExcSpec.Tune_DriftEscapeForce + ExcSpec.Plant45_DriftEscapeForce + ExcSpec.KartLevel_DriftEscapeForce + SpeedPatch.DriftEscapeForce + V2Spec.V2Parts_DriftEscapeForce + V2Spec.V2Level_DriftEscapeForce;
             float NormalBoosterTime = FlyingPet.NormalBoosterTime + ExcSpec.Tune_NormalBoosterTime + ExcSpec.Plant46_NormalBoosterTime + V2Spec.V2Parts_NormalBoosterTime + V2Spec.V2Level_NormalBoosterTime;
             float TransAccelFactor = ExcSpec.Tune_TransAccelFactor + ExcSpec.Plant43_TransAccelFactor + ExcSpec.KartLevel_TransAccelFactor + SpeedPatch.TransAccelFactor + V2Spec.V2Parts_TransAccelFactor + V2Spec.V2Level_TransAccelFactor;
-            //------------------------------------------------------------------------KartSpac Start
+            #region KartSpac Start
             oPacket.WriteEncFloat(Kart.draftMulAccelFactor);
             oPacket.WriteEncInt(Kart.draftTick);
             oPacket.WriteEncFloat(Kart.driftBoostMulAccelFactor);
@@ -261,12 +259,12 @@ namespace KartRider
             oPacket.WriteEncInt(Kart.startItemTableId);
             oPacket.WriteEncInt(Kart.startItemId);
             oPacket.WriteEncInt(0);
-            //------------------------------------------------------------------------KartSpac End
+            #endregion
         }
 
         public static void GetDefaultSpac(OutPacket oPacket)
         {
-            //------------------------------------------------------------------------KartSpac Start
+            #region KartSpac Start
             oPacket.WriteEncFloat(Kart.draftMulAccelFactor);
             oPacket.WriteEncInt(Kart.draftTick);
             oPacket.WriteEncFloat(Kart.driftBoostMulAccelFactor);
@@ -379,12 +377,12 @@ namespace KartRider
             oPacket.WriteEncInt(Kart.startItemTableId);
             oPacket.WriteEncInt(Kart.startItemId);
             oPacket.WriteEncInt(0);
-            //------------------------------------------------------------------------KartSpac End
+            #endregion
         }
 
         public static void GetSchoolSpac(OutPacket oPacket)
         {
-            //------------------------------------------------------------------------KartSpac Start
+            #region KartSpac Start
             oPacket.WriteEncFloat(Kart.draftMulAccelFactor);
             oPacket.WriteEncInt(Kart.draftTick);
             oPacket.WriteEncFloat(Kart.driftBoostMulAccelFactor);
@@ -476,7 +474,7 @@ namespace KartRider
             oPacket.WriteEncInt(Kart.startItemTableId);
             oPacket.WriteEncInt(Kart.startItemId);
             oPacket.WriteEncInt(0);
-            //------------------------------------------------------------------------KartSpac End
+            #endregion
         }
 
         public static void KartSpecLog()
@@ -487,7 +485,7 @@ namespace KartRider
                 GetKartSpac(oPacket);
                 iPacket = new InPacket(oPacket.ToArray());
             }
-            Console.WriteLine($"-------------------------------------------------------------");
+            LauncherSystem.PrintDivLine();
             Console.WriteLine($"draftMulAccelFactor:{iPacket.ReadEncodedFloat()}");
             Console.WriteLine($"draftTick:{iPacket.ReadEncodedInt()}");
             Console.WriteLine($"driftBoostMulAccelFactor:{iPacket.ReadEncodedFloat()}");
@@ -578,7 +576,7 @@ namespace KartRider
             Console.WriteLine($"chargeAntiCollideBalance:{iPacket.ReadEncodedFloat()}");
             Console.WriteLine($"startItemTableId:{iPacket.ReadEncodedFloat()}");
             Console.WriteLine($"startItemId:{iPacket.ReadEncodedFloat()}");
-            Console.WriteLine($"-------------------------------------------------------------");
+            LauncherSystem.PrintDivLine();
         }
     }
 }

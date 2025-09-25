@@ -1,12 +1,12 @@
-using System;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace KartRider
 {
-    public class RouterListener
+    /// <summary>
+    /// 用于监听客户端连接的路由器监听器静态类
+    /// </summary>
+    public static class RouterListener
     {
         public static string sIP;
 
@@ -26,8 +26,8 @@ namespace KartRider
 
         static RouterListener()
         {
-            RouterListener.sIP = "127.0.0.1";
-            RouterListener.port = 39312;
+            sIP = "127.0.0.1";
+            port = 39312;
         }
 
         public static int[] DataTime()
@@ -48,17 +48,17 @@ namespace KartRider
             try
             {
                 Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                Socket clientSocket = RouterListener.Listener.EndAcceptSocket(ar);
-                RouterListener.forceConnect = RouterListener.sIP;
-                if (RouterListener.ForceConnect != "")
+                Socket clientSocket = Listener.EndAcceptSocket(ar);
+                forceConnect = sIP;
+                if (ForceConnect != "")
                 {
-                    RouterListener.forceConnect = RouterListener.ForceConnect;
+                    forceConnect = ForceConnect;
                 }
-                RouterListener.MySession = new SessionGroup(clientSocket, null);
+                MySession = new SessionGroup(clientSocket, null);
                 IPEndPoint clientEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
-                RouterListener.client = clientEndPoint;
-                Console.WriteLine($"Client: {RouterListener.client.Address.ToString()}:{RouterListener.client.Port.ToString()}");
-                if (File.Exists(Launcher.PinFileBak))
+                client = clientEndPoint;
+                Console.WriteLine($"Client IP: {client.Address}:{client.Port}");
+                if (File.Exists(Launcher.PinFileBak)) // restore PinFile
                 {
                     File.Delete(Launcher.PinFile);
                     File.Move(Launcher.PinFileBak, Launcher.PinFile);
@@ -67,31 +67,31 @@ namespace KartRider
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"发生异常：{ex.Message}");
+                Console.WriteLine($"发生异常: {ex.Message}");
             }
             finally
             {
-                RouterListener.Listener.BeginAcceptSocket(new AsyncCallback(RouterListener.OnAcceptSocket), null);
+                Listener.BeginAcceptSocket(new AsyncCallback(OnAcceptSocket), null);
             }
         }
 
         public static void Start()
         {
-            if (RouterListener.Listener == null || RouterListener.CurrentUDPServer == null)
+            if (Listener == null || CurrentUDPServer == null)
             {
-                RouterListener.Listener = new TcpListener(IPAddress.Parse(RouterListener.sIP), RouterListener.port);
-                RouterListener.CurrentUDPServer = new IPEndPoint(IPAddress.Parse(RouterListener.sIP), 39311);
+                Listener = new TcpListener(IPAddress.Parse(sIP), port);
+                CurrentUDPServer = new IPEndPoint(IPAddress.Parse(sIP), 39311);
             }
-            if (!RouterListener.Listener.Server.IsBound)
+            if (!Listener.Server.IsBound)
             {
-                Console.WriteLine("Load server IP: {0}:{1}", RouterListener.sIP, RouterListener.port);
-                RouterListener.ForceConnect = "";
-                RouterListener.Listener.Start();
-                RouterListener.Listener.BeginAcceptSocket(OnAcceptSocket, RouterListener.Listener);
+                Console.WriteLine($"Load Server: {sIP}:{port}");
+                ForceConnect = "";
+                Listener.Start();
+                Listener.BeginAcceptSocket(OnAcceptSocket, Listener);
             }
             else
             {
-                RouterListener.Listener.BeginAcceptSocket(OnAcceptSocket, RouterListener.Listener);
+                Listener.BeginAcceptSocket(OnAcceptSocket, Listener);
             }
         }
     }

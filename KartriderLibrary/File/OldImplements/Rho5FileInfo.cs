@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Ionic.Zlib;
 using KartLibrary.Encrypt;
 
@@ -27,7 +22,7 @@ namespace KartLibrary.File
             byte[] outdata = new byte[DecompressedSize];
             byte[] decryptKey = Rho5Key.GetPackedFileKey(Key, Rho5Key.GetFileKey_U1(BaseRho5.anotherData), FullPath);
             Rho5DecryptStream decryptStream = new Rho5DecryptStream(BaseRho5.BaseStream, decryptKey);
-            decryptStream.Seek(Offset * 0x400 + BaseRho5.DataBaseOffset, SeekOrigin.Begin);
+            decryptStream.Seek((Offset * 0x400) + BaseRho5.DataBaseOffset, SeekOrigin.Begin);
             decryptStream.Read(data, 0, data.Length >= 0x400 ? 0x400 : data.Length);
             if (data.Length >= 0x400)
                 BaseRho5.BaseStream.Read(data, 0x400, data.Length - 0x400);

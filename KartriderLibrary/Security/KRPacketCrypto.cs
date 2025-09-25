@@ -1,5 +1,3 @@
-using System;
-
 namespace KartRider.Common.Security
 {
     public static class KRPacketCrypto
@@ -13,7 +11,7 @@ namespace KartRider.Common.Security
             int num4 = 0;
             uint num5 = 0;
             int i = 0;
-            for (i = 0; (ulong)i < (ulong)(nLength >> 4); i++)
+            for (i = 0; (ulong)i < nLength >> 4; i++)
             {
                 Buffer.BlockCopy(BitConverter.GetBytes(BitConverter.ToUInt32(pData, num4) ^ num), 0, pData, num4, 4);
                 Buffer.BlockCopy(BitConverter.GetBytes(BitConverter.ToUInt32(pData, num4 + 4) ^ num1), 0, pData, num4 + 4, 4);
@@ -33,11 +31,11 @@ namespace KartRider.Common.Security
             Buffer.BlockCopy(numArray, 0, numArray2, 4, 4);
             Buffer.BlockCopy(bytes1, 0, numArray2, 8, 4);
             Buffer.BlockCopy(numArray1, 0, numArray2, 12, 4);
-            while ((ulong)i < (ulong)nLength)
+            while ((ulong)i < nLength)
             {
                 ref byte numPointer = ref pData[i];
                 numPointer = (byte)(numPointer ^ numArray2[num4]);
-                num5 = (uint)(num5 ^ pData[i] << (num4 & 31));
+                num5 = (uint)(num5 ^ (pData[i] << (num4 & 31)));
                 i++;
                 num4++;
             }
@@ -53,7 +51,7 @@ namespace KartRider.Common.Security
             int num4 = 0;
             uint num5 = 0;
             int i = 0;
-            for (i = 0; (ulong)i < (ulong)(nLength >> 4); i++)
+            for (i = 0; (ulong)i < nLength >> 4; i++)
             {
                 num5 = num5 ^ BitConverter.ToUInt32(pData, num4 + 12) ^ BitConverter.ToUInt32(pData, num4 + 8) ^ BitConverter.ToUInt32(pData, num4 + 4) ^ BitConverter.ToUInt32(pData, num4);
                 Buffer.BlockCopy(BitConverter.GetBytes(BitConverter.ToUInt32(pData, num4) ^ num), 0, pData, num4, 4);
@@ -73,9 +71,9 @@ namespace KartRider.Common.Security
             Buffer.BlockCopy(numArray, 0, numArray2, 4, 4);
             Buffer.BlockCopy(bytes1, 0, numArray2, 8, 4);
             Buffer.BlockCopy(numArray1, 0, numArray2, 12, 4);
-            while ((ulong)i < (ulong)nLength)
+            while ((ulong)i < nLength)
             {
-                num5 = (uint)(num5 ^ pData[i] << (num4 & 31));
+                num5 = (uint)(num5 ^ (pData[i] << (num4 & 31)));
                 ref byte numPointer = ref pData[i];
                 numPointer = (byte)(numPointer ^ numArray2[num4]);
                 i++;

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Xml;
 using KartRider;
 using KartRider.IO.Packet;
@@ -329,7 +325,7 @@ namespace RiderData
 
             if (track1Node == null)
             {
-                // Track不存在，添加它
+                // Track不存在, 添加它
                 XmlElement newTrack1 = doc.CreateElement("TrainingMission");
                 newTrack1.SetAttribute("Track", Track.ToString());
                 newTrack1.SetAttribute("Level", "1");
@@ -339,7 +335,7 @@ namespace RiderData
             }
             else
             {
-                // Track存在，增加Level
+                // Track存在, 增加Level
                 if (byte.TryParse(track1Node.Attributes["Level"]?.Value, out byte currentLevel))
                 {
                     byte newLevel = (byte)(currentLevel + 1);

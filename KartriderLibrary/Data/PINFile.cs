@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
+﻿using System.Net;
 using KartRider.Common.Security;
 using KartRider.IO.Packet;
 
@@ -37,15 +34,15 @@ namespace KartRider.Common.Data
 
             public PINHeader()
             {
-                AESKey = (URL = (PatchURL = string.Empty));
+                AESKey = URL = PatchURL = string.Empty;
             }
         }
 
         public class IPEndPoint
         {
-            public string IP { get; set; }
+            public string IP { get; set; } = "";
 
-            public ushort Port { get; set; }
+            public ushort Port { get; set; } = 0;
 
             public void Read(InPacket p)
             {
@@ -69,18 +66,13 @@ namespace KartRider.Common.Data
         {
             public byte Index { get; set; }
 
-            public string Name { get; set; }
+            public string Name { get; set; } = "";
 
             public List<IPEndPoint> LoginServers { get; set; }
 
             public BmlObject AccountConfig { get; set; }
 
             public BmlObject ExtraConfig { get; set; }
-
-            public AuthMethod()
-            {
-                Name = string.Empty;
-            }
         }
 
         private const uint RTTI_PINOBJECT = 284099454u;

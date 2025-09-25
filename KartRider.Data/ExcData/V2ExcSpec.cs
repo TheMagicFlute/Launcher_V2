@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using KartRider;
 using KartRider;
 using Profile;
 
@@ -77,7 +71,7 @@ namespace ExcData
         {
             int fullCycles = (input - 1) / 10;
             int positionInCycle = (input - 1) % 10;
-            int current = 201 + fullCycles * 23; // Each full cycle adds net +23 (from 30 - 7)
+            int current = 201 + (fullCycles * 23); // Each full cycle adds net +23 (from 30 - 7)
             for (int i = 1; i <= positionInCycle; i++)
             {
                 if (i <= 2)
@@ -137,7 +131,7 @@ namespace ExcData
                     }
                 }
 
-                Console.WriteLine("-------------------------------------------------------------");
+                LauncherSystem.PrintDivLine();
 
                 // Helper function to process parts
                 short ProcessPart(Func<short> getDefaultValue, int typeIndex, int valueIndex, ref byte kartType, byte defaultKartType)
@@ -148,40 +142,40 @@ namespace ExcData
                         value = getDefaultValue();
                         if (existingParts != null)
                         {
-                            existingParts[typeIndex] = (short)defaultKartType;
+                            existingParts[typeIndex] = defaultKartType;
                         }
                     }
                     else
                     {
                         kartType = (byte)existingParts[typeIndex - 1];
-                        existingParts[typeIndex] = (short)defaultKartType;
+                        existingParts[typeIndex] = defaultKartType;
                         value = existingParts[valueIndex];
                     }
                     return value;
                 }
 
                 // Process each part
-                var Parts_TransAccelFactor = ProcessPart(() => Get12Parts((short)Kart.defaultEngineType), 3, 4, ref Kart.EngineType, Kart.defaultEngineType);
-                V2Parts_TransAccelFactor = (float)((Parts_TransAccelFactor * 1.0M - 800M) / 25000.0M + 0.4765M);
-                V2Default_TransAccelFactor = (float)((Get12Parts((short)Kart.defaultEngineType) * 1.0M - 800M) / 25000.0M + 0.4765M);
+                var Parts_TransAccelFactor = ProcessPart(() => Get12Parts(Kart.defaultEngineType), 3, 4, ref Kart.EngineType, Kart.defaultEngineType);
+                V2Parts_TransAccelFactor = (float)((((Parts_TransAccelFactor * 1.0M) - 800M) / 25000.0M) + 0.4765M);
+                V2Default_TransAccelFactor = (float)((((Get12Parts(Kart.defaultEngineType) * 1.0M) - 800M) / 25000.0M) + 0.4765M);
                 Console.WriteLine($"V2Parts_TransAccelFactor: {V2Parts_TransAccelFactor}");
 
-                var Parts_SteerConstraint = ProcessPart(() => Get12Parts((short)Kart.defaultHandleType), 6, 7, ref Kart.HandleType, Kart.defaultHandleType);
-                V2Parts_SteerConstraint = (float)((Parts_SteerConstraint * 1.0M - 800M) / 250.0M + 2.7M);
-                V2Default_SteerConstraint = (float)((Get12Parts((short)Kart.defaultHandleType) * 1.0M - 800M) / 250.0M + 2.7M);
+                var Parts_SteerConstraint = ProcessPart(() => Get12Parts(Kart.defaultHandleType), 6, 7, ref Kart.HandleType, Kart.defaultHandleType);
+                V2Parts_SteerConstraint = (float)((((Parts_SteerConstraint * 1.0M) - 800M) / 250.0M) + 2.7M);
+                V2Default_SteerConstraint = (float)((((Get12Parts(Kart.defaultHandleType) * 1.0M) - 800M) / 250.0M) + 2.7M);
                 Console.WriteLine($"V2Parts_SteerConstraint: {V2Parts_SteerConstraint}");
 
-                var Parts_DriftEscapeForce = ProcessPart(() => Get12Parts((short)Kart.defaultWheelType), 9, 10, ref Kart.WheelType, Kart.defaultWheelType);
+                var Parts_DriftEscapeForce = ProcessPart(() => Get12Parts(Kart.defaultWheelType), 9, 10, ref Kart.WheelType, Kart.defaultWheelType);
                 V2Parts_DriftEscapeForce = (float)(Parts_DriftEscapeForce * 2.0M);
-                V2Default_DriftEscapeForce = (float)(Get12Parts((short)Kart.defaultWheelType) * 2.0M);
+                V2Default_DriftEscapeForce = (float)(Get12Parts(Kart.defaultWheelType) * 2.0M);
                 Console.WriteLine($"V2Parts_DriftEscapeForce: {V2Parts_DriftEscapeForce}");
 
-                var Parts_NormalBoosterTime = ProcessPart(() => Get12Parts((short)Kart.defaultBoosterType), 12, 13, ref Kart.BoosterType, Kart.defaultBoosterType);
-                V2Parts_NormalBoosterTime = (float)(Parts_NormalBoosterTime * 1.0M - 260M);
-                V2Default_NormalBoosterTime = (float)(Get12Parts((short)Kart.defaultBoosterType) * 1.0M - 260M);
+                var Parts_NormalBoosterTime = ProcessPart(() => Get12Parts(Kart.defaultBoosterType), 12, 13, ref Kart.BoosterType, Kart.defaultBoosterType);
+                V2Parts_NormalBoosterTime = (float)((Parts_NormalBoosterTime * 1.0M) - 260M);
+                V2Default_NormalBoosterTime = (float)((Get12Parts(Kart.defaultBoosterType) * 1.0M) - 260M);
                 Console.WriteLine($"V2Parts_NormalBoosterTime: {V2Parts_NormalBoosterTime}");
 
-                Console.WriteLine("-------------------------------------------------------------");
+                LauncherSystem.PrintDivLine();
                 KartExcData.SaveParts12List(KartExcData.Parts12List);
 
                 Reset_V2Level_SpecData();
@@ -190,14 +184,14 @@ namespace ExcData
                 {
                     // Create skill pairs (ID, Level) from non-zero entries
                     var skills = Enumerable.Range(0, 3)
-                        .Select(i => new { Index = 3 + i * 2, ID = existingLevel[3 + i * 2], Level = existingLevel[4 + i * 2] })
+                        .Select(i => new { Index = 3 + (i * 2), ID = existingLevel[3 + (i * 2)], Level = existingLevel[4 + (i * 2)] })
                         .Where(s => s.ID != 0)
                         .Select(s => new { s.ID, s.Level })
                         .ToList();
 
                     if (skills.Count > 0)
                     {
-                        Console.WriteLine("-------------------------------------------------------------");
+                        LauncherSystem.PrintDivLine();
 
                         // Define all skill data in a dictionary
                         var skillData = new Dictionary<int, (string Name, float[] Values)>
@@ -226,7 +220,7 @@ namespace ExcData
                             }
                         }
 
-                        Console.WriteLine("-------------------------------------------------------------");
+                        LauncherSystem.PrintDivLine();
                     }
                 }
                 if (Kart.defaultExceedType == 1) // item S
@@ -258,7 +252,7 @@ namespace ExcData
                     int index = random.Next(KartExcData.itemProb_indi.Count);
                     short skill = KartExcData.itemProb_indi[index];
                     skill = GameSupport.GetItemSkill(skill);
-                    Kart.startItemId = (int)(skill);
+                    Kart.startItemId = skill;
                 }
                 else if (Kart.defaultExceedType == 2) // S
                 {

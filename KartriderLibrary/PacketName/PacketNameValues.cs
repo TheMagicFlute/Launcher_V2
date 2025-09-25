@@ -1,5 +1,3 @@
-using System;
-
 namespace KartRider_PacketName
 {
     public enum PacketName : uint

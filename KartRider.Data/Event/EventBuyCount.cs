@@ -1,4 +1,3 @@
-using System;
 using KartRider.IO.Packet;
 
 namespace KartRider

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ionic.Zlib;
+﻿using Ionic.Zlib;
 using KartLibrary.Encrypt;
 
 namespace KartLibrary.File

@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Text;
 
@@ -27,7 +26,7 @@ namespace KartRider.Common.Utilities
             }
             byte[] num = new byte[empty.Length / 2];
             int num1 = 0;
-            for (int j = 0; j < (int)num.Length; j++)
+            for (int j = 0; j < num.Length; j++)
             {
                 num[j] = HexEncoding.HexToByte(new string(new char[] { empty[num1], empty[num1 + 1] }));
                 num1 += 2;
@@ -39,7 +38,7 @@ namespace KartRider.Common.Utilities
         {
             StringBuilder stringBuilder = new StringBuilder();
             byte[] numArray = pArray;
-            for (int i = 0; i < (int)numArray.Length; i++)
+            for (int i = 0; i < numArray.Length; i++)
             {
                 byte num = numArray[i];
                 stringBuilder.Append(num.ToString("X2")).Append(" ");
@@ -49,7 +48,7 @@ namespace KartRider.Common.Utilities
 
         private static byte HexToByte(string pHex)
         {
-            if ((pHex.Length > 2 ? true : pHex.Length <= 0))
+            if (pHex.Length > 2 ? true : pHex.Length <= 0)
             {
                 throw new ArgumentException("hex must be 1 or 2 characters in length");
             }
@@ -63,9 +62,9 @@ namespace KartRider.Common.Utilities
             int num1 = Convert.ToInt32('0');
             pChar = char.ToUpper(pChar);
             int num2 = Convert.ToInt32(pChar);
-            if ((num2 < num ? true : num2 >= num + 6))
+            if (num2 < num ? true : num2 >= num + 6)
             {
-                flag = ((num2 < num1 ? true : num2 >= num1 + 10) ? false : true);
+                flag = (num2 < num1 ? true : num2 >= num1 + 10) ? false : true;
             }
             else
             {
@@ -76,10 +75,10 @@ namespace KartRider.Common.Utilities
 
         public static string ToStringFromAscii(byte[] pBytes)
         {
-            char[] chrArray = new char[(int)pBytes.Length];
-            for (int i = 0; i < (int)pBytes.Length; i++)
+            char[] chrArray = new char[pBytes.Length];
+            for (int i = 0; i < pBytes.Length; i++)
             {
-                if ((pBytes[i] >= 32 ? true : pBytes[i] < 0))
+                if (pBytes[i] >= 32 ? true : pBytes[i] < 0)
                 {
                     chrArray[i] = (char)(pBytes[i] & 255);
                 }

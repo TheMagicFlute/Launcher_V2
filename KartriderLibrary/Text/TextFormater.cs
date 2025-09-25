@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace KartLibrary.Text
 {
@@ -65,8 +60,6 @@ namespace KartLibrary.Text
         public string Text { get; set; }
 
         public TextAlign Align { get; set; }
-
-
     }
 
     public enum TextAlign

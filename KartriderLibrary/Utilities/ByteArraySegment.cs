@@ -1,5 +1,3 @@
-using System;
-
 namespace KartRider.Common.Utilities
 {
     public sealed class ByteArraySegment
@@ -51,7 +49,7 @@ namespace KartRider.Common.Utilities
         public ByteArraySegment(byte[] pBuffer, bool pEncrypted)
         {
             this.mBuffer = pBuffer;
-            this.mLength = (int)this.mBuffer.Length;
+            this.mLength = mBuffer.Length;
             this.mEncrypted = pEncrypted;
         }
 
@@ -66,7 +64,7 @@ namespace KartRider.Common.Utilities
         {
             this.mStart += pLength;
             this.mLength -= pLength;
-            return (this.mLength > 0 ? false : true);
+            return this.mLength > 0 ? false : true;
         }
     }
 }

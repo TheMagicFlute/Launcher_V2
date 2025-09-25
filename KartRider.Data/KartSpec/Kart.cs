@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace KartRider
+﻿namespace KartRider
 {
     public class Kart
     {
-        // --------------------- 物理 ----------------------
+        #region 物理
 
         /// <summary>
         /// 物理: 空气阻力-
@@ -81,7 +79,9 @@ namespace KartRider
         /// </summary>
         public static float SteerLeanFactor;
 
-        // --------------------- 基本 ----------------------
+        #endregion
+
+        #region 基本
 
         /// <summary>
         /// 基本: 倒车加速度+
@@ -104,7 +104,7 @@ namespace KartRider
         public static float draftMulAccelFactor;
 
         /// <summary>
-        /// 基本: 尾流启动时间（ms）
+        /// 基本: 尾流启动时间 (ms)
         /// </summary>
         public static int draftTick;
 
@@ -119,7 +119,7 @@ namespace KartRider
         public static int driftBoostTick;
 
         /// <summary>
-        /// 基本: 碰撞恢复集气量（％）
+        /// 基本: 碰撞恢复集气量 (％)
         /// </summary>
         public static float DriftGaguePreservePercent;
 
@@ -128,7 +128,9 @@ namespace KartRider
         /// </summary>
         public static float SuperBoosterTime;
 
-        // --------------------- 部件 ----------------------
+        #endregion
+
+        #region 部件
 
         /// <summary>
         /// 部件: 默认引擎类型
@@ -206,7 +208,9 @@ namespace KartRider
         /// </summary>
         public static int defaultExceedType;
 
-        // --------------------- 改裝 ----------------------
+        #endregion
+
+        #region 改裝
 
         /// <summary>
         /// 改裝: 弯道加速度
@@ -214,7 +218,7 @@ namespace KartRider
         public static float CornerDrawFactor;
 
         /// <summary>
-        /// 改裝：极限速度-
+        /// 改裝: 极限速度-
         /// </summary>
         public static float DragFactor;
 
@@ -253,7 +257,9 @@ namespace KartRider
         /// </summary>
         public static float DriftMaxGauge;
 
-        // --------------------- 二段 ----------------------
+        #endregion
+
+        #region 二段
 
         /// <summary>
         /// 二段: 启用自动二段加速器
@@ -280,7 +286,9 @@ namespace KartRider
         /// </summary>
         public static float dualTransLowSpeed;
 
-        // --------------------- 三段 ----------------------
+        #endregion
+
+        #region 三段
 
         /// <summary>
         /// 三段: 能量累计比例 - 开启加速器
@@ -308,12 +316,12 @@ namespace KartRider
         public static float instAccelGaugeLength;
 
         /// <summary>
-        /// 三段: 冷却时间（s）
+        /// 三段: 冷却时间 (s)
         /// </summary>
         public static int instAccelGaugeCooldownTime;
 
         /// <summary>
-        /// 三段: 可用最低比例（%）
+        /// 三段: 可用最低比例 (%)
         /// </summary>
         public static float instAccelGaugeMinUsable;
 
@@ -327,7 +335,9 @@ namespace KartRider
         /// </summary>
         public static float instAccelGaugeMinVelLoss;
 
-        // --------------------- 碰撞集气 ----------------------
+        #endregion
+
+        #region 碰撞集气
 
         /// <summary>
         /// 碰撞集气: 冷却时间 (s)
@@ -349,7 +359,9 @@ namespace KartRider
         /// </summary>
         public static float wallCollGaugeMinVelLoss;
 
-        // --------------------- 赋能系统 ----------------------
+        #endregion
+
+        #region 赋能系统
 
         /// <summary>
         /// 赋能系统: 增加超越能量累积 - 碰撞
@@ -367,7 +379,7 @@ namespace KartRider
         public static int chargerSystemboosterUseCount;
 
         /// <summary>
-        /// 赋能系统: 启用时间（ms）
+        /// 赋能系统: 启用时间 (ms)
         /// </summary>
         public static float chargerSystemUseTime;
 
@@ -386,7 +398,9 @@ namespace KartRider
         /// </summary>
         public static float chargeAntiCollideBalance;
 
-        // --------------------- 道具赛参数 ---------------------
+        #endregion
+
+        #region 道具赛参数
 
         /// <summary>
         /// 道具赛: 特殊加速器加速时间
@@ -428,12 +442,14 @@ namespace KartRider
 		/// </summary>
 		public static byte SpecialSlotCapacity;
 
-        // --------------------- 竞速赛参数 ---------------------
+        #endregion
+
+        #region 竞速赛参数
 
         /// <summary>
-		/// 竞速赛: 起步加速力
-		/// </summary>
-		public static float ForwardAccelForce;
+        /// 竞速赛: 起步加速力
+        /// </summary>
+        public static float ForwardAccelForce;
 
         /// <summary>
 		/// 竞速赛: 起步加速度
@@ -445,7 +461,9 @@ namespace KartRider
 		/// </summary>
 		public static byte SpeedSlotCapacity;
 
-        // --------------------- 其他/未知 ----------------------
+        #endregion
+
+        #region 其他/未知
 
         public static int startItemTableId;
 
@@ -458,5 +476,7 @@ namespace KartRider
         public static byte useExtendedAfterBoosterMore;
 
         public static byte BikeRearWheel;
+
+        #endregion
     }
 }

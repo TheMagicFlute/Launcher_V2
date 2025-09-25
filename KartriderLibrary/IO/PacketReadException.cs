@@ -1,5 +1,3 @@
-using System;
-
 namespace KartRider.IO.Packet
 {
     public sealed class PacketReadException : Exception

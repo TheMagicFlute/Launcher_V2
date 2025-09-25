@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using KartLibrary.Consts;
 using KartLibrary.Data;
 using KartLibrary.Xml;
@@ -301,7 +296,7 @@ namespace KartLibrary.File
                         {
                             FileName = part,
                             FileSize = rho5FileInfo.DecompressedSize,
-                            FullName = ((packFolderInfo.FullName == "") ? part : (packFolderInfo.FullName + "/" + part)),
+                            FullName = (packFolderInfo.FullName == "") ? part : (packFolderInfo.FullName + "/" + part),
                             PackFileType = PackFileType.Rho5File,
                             OriginalFile = rho5FileInfo
                         });
@@ -316,7 +311,7 @@ namespace KartLibrary.File
                             {
                                 FolderName = part,
                                 ParentFolder = packFolderInfo,
-                                FullName = ((packFolderInfo.FullName == "") ? part : (packFolderInfo.FullName + "/" + part))
+                                FullName = (packFolderInfo.FullName == "") ? part : (packFolderInfo.FullName + "/" + part)
                             };
                             packFolderInfo2 = obj;
                             folders.Add(obj);

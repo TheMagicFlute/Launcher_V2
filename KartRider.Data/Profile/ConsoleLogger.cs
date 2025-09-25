@@ -1,23 +1,21 @@
-using System;
-using System.IO;
 using System.Text;
 using Profile;
 
 namespace LoggerLibrary
 {
     /// <summary>
-    /// 控制台日志记录器，用于将控制台输出同时保存到日志文件
+    /// 控制台日志记录器, 用于将控制台输出同时保存到日志文件
     /// </summary>
-    // 自定义文本编写器，用于缓存控制台输出
+    // 自定义文本编写器, 用于缓存控制台输出
     public class CachedConsoleWriter : TextWriter
     {
         public static CachedConsoleWriter cachedWriter;
         private readonly TextWriter _originalOut;
         private readonly StringBuilder _cache;
-    
+
         // 提供对缓存的访问
         public string Cache => _cache.ToString();
-    
+
         // 清空缓存
         public void ClearCache() => _cache.Clear();
 

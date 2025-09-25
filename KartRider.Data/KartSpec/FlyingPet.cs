@@ -1,8 +1,5 @@
-﻿using System;
-using System.Xml;
+﻿using System.Xml;
 using ExcData;
-using KartRider;
-using RiderData;
 
 namespace KartRider
 {
@@ -129,7 +126,7 @@ namespace KartRider
                     FlyingPet_Spec_Init();
                 }
             }
-            Console.WriteLine($"-------------------------------------------------------------");
+            LauncherSystem.PrintDivLine();
             Console.WriteLine($"FlyingPet DragFactor:{FlyingPet.DragFactor}");
             Console.WriteLine($"FlyingPet ForwardAccelForce:{FlyingPet.ForwardAccelForce}");
             Console.WriteLine($"FlyingPet DriftEscapeForce:{FlyingPet.DriftEscapeForce}");
@@ -139,7 +136,7 @@ namespace KartRider
             Console.WriteLine($"FlyingPet TeamBoosterTime:{FlyingPet.TeamBoosterTime}");
             Console.WriteLine($"FlyingPet StartForwardAccelForceItem:{FlyingPet.StartForwardAccelForceItem}");
             Console.WriteLine($"FlyingPet StartForwardAccelForceSpeed:{FlyingPet.StartForwardAccelForceSpeed}");
-            Console.WriteLine($"-------------------------------------------------------------");
+            LauncherSystem.PrintDivLine();
             KartSpec.GetKartSpec();
         }
 

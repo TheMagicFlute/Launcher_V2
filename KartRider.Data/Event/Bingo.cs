@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Xml;
 using KartRider.IO.Packet;
 
@@ -20,14 +17,18 @@ namespace KartRider
 
     public static class LotteryManager
     {
-        // 静态存储所有奖励项及其概率
+        /// <summary>
+        /// 静态存储所有奖励项及其概率
+        /// </summary>
         public static List<Reward> RewardList = new List<Reward>();
 
-        // 总概率，用于计算抽取概率
+        /// <summary>
+        /// 总概率, 用于计算抽取概率
+        /// </summary>
         public static int TotalProbability = 0;
 
         /**
-         * 初始化方法，读取XML文件并加载数据
+         * 初始化方法, 读取XML文件并加载数据
          * @param xmlFilePath XML文件路径
          */
         public static void Initialize(XmlNodeList rewardNodes)
@@ -57,7 +58,7 @@ namespace KartRider
                     }
                 }
 
-                Console.WriteLine($"成功加载 {RewardList.Count} 个奖励项，总概率为: {TotalProbability}");
+                Console.WriteLine($"成功加载 {RewardList.Count} 个奖励项, 总概率为: {TotalProbability}");
             }
             catch (Exception ex)
             {
@@ -66,7 +67,7 @@ namespace KartRider
         }
 
         /**
-         * 随机获取指定数量的stockId，考虑概率因素
+         * 随机获取指定数量的stockId, 考虑概率因素
          * @param count 要获取的数量
          * @return 随机选中的stockId列表
          */
@@ -77,7 +78,7 @@ namespace KartRider
             // 检查是否已初始化
             if (RewardList.Count == 0)
             {
-                Console.WriteLine("请先调用Initialize方法加载数据");
+                Console.WriteLine("请先调用 Initialize 方法加载数据");
                 return result;
             }
 
@@ -95,16 +96,16 @@ namespace KartRider
             // 检查请求数量是否超过可用奖励数量
             if (count > uniqueRewardCount)
             {
-                Console.WriteLine($"请求数量超过可用的不重复奖励数量，最多只能返回 {uniqueRewardCount} 个结果");
+                Console.WriteLine($"请求数量超过可用的不重复奖励数量, 最多只能返回 {uniqueRewardCount} 个结果");
                 count = uniqueRewardCount;
             }
 
-            // 创建奖励列表的副本用于操作，避免修改原始数据
+            // 创建奖励列表的副本用于操作, 避免修改原始数据
             List<Reward> availableRewards = new List<Reward>(RewardList);
-            // 使用当前时间作为种子创建Random实例，避免短时间内多次调用产生相同序列
+            // 使用当前时间作为种子创建Random实例, 避免短时间内多次调用产生相同序列
             Random random = new Random(Guid.NewGuid().GetHashCode());
 
-            // 已选中的奖励ID集合，用于双重保证不重复
+            // 已选中的奖励ID集合, 用于双重保证不重复
             HashSet<int> selectedIds = new HashSet<int>();
 
             // 循环获取指定数量的不重复奖励
@@ -134,7 +135,7 @@ namespace KartRider
                 if (selectedReward != null && selectedIds.Add(selectedReward.StockId))
                 {
                     result.Add(selectedReward.StockId);
-                    // 移除所有相同StockId的奖励，确保不会重复选中
+                    // 移除所有相同StockId的奖励, 确保不会重复选中
                     availableRewards.RemoveAll(r => r.StockId == selectedReward.StockId);
                 }
             }
@@ -142,7 +143,7 @@ namespace KartRider
             // 检查最终结果数量是否符合预期
             if (result.Count < count)
             {
-                Console.WriteLine($"警告：实际返回 {result.Count} 个结果，少于请求的 {count} 个");
+                Console.WriteLine($"警告: 实际返回 {result.Count} 个结果, 少于请求的 {count} 个");
             }
             return result;
         }
@@ -227,35 +228,35 @@ namespace KartRider
             if (BingoNums.Count != 25)
                 Console.WriteLine("Bingo宫格必须包含25个数字");
 
-            // 将字典转换为5x5的二维数组，左上角为坐标原点(0,0)
+            // 将字典转换为5x5的二维数组, 左上角为坐标原点(0,0)
             byte[,] grid = new byte[5, 5];
 
-            // 字典的Key是按从左上角开始的行优先顺序排列：0-24
+            // 字典的Key是按从左上角开始的行优先顺序排列: 0-24
             // 0: (0,0)  1: (0,1)  2: (0,2)  3: (0,3)  4: (0,4)  第一行(最上方)
             // 5: (1,0)  6: (1,1)  ...      9: (1,4)  第二行
             // ...
             // 20: (4,0) ...     24: (4,4)  第五行(最下方)
-            // 使用列表填充网格（确保索引顺序正确）
+            // 使用列表填充网格 (确保索引顺序正确)
             for (int index = 0; index < BingoNumsList.Count; index++)
             {
                 // 只处理前 25 个元素
                 if (index >= 25)
                     break;
 
-                int row = index / 5; // 计算行（0-4）
-                int col = index % 5; // 计算列（0-4）
+                int row = index / 5; // 计算行 (0-4)
+                int col = index % 5; // 计算列 (0-4)
 
-                // 二次校验：确保row和col在有效范围内
+                // 二次校验: 确保row和col在有效范围内
                 if (row < 0 || row >= 5 || col < 0 || col >= 5)
                 {
-                    Console.WriteLine($"计算出无效的网格坐标：index={index}, row={row}, col={col}");
+                    Console.WriteLine($"计算出无效的网格坐标: index={index}, row={row}, col={col}");
                 }
 
-                grid[row, col] = BingoNums[BingoNumsList[index]]; // 0 = 未选中，1 = 已选中
+                grid[row, col] = BingoNums[BingoNumsList[index]]; // 0 = 未选中, 1 = 已选中
             }
 
-            // 检查横线(0-4) - 0是最上方，4是最下方
-            // 与grid的行直接对应，无需反转
+            // 检查横线(0-4) - 0是最上方, 4是最下方
+            // 与grid的行直接对应, 无需反转
             for (int row = 0; row < 5; row++)
             {
                 bool isCompleted = true;
@@ -285,7 +286,7 @@ namespace KartRider
             var item5 = BingoItemsList[5];
             BingoItems[item5] = (byte)(antiDiagonalCompleted ? 1 : 0);
 
-            // 检查竖线(6-10) - 6是最左方，10是最右方
+            // 检查竖线(6-10) - 6是最左方, 10是最右方
             for (int col = 0; col < 5; col++)
             {
                 bool isCompleted = true;
@@ -317,4 +318,3 @@ namespace KartRider
         }
     }
 }
-

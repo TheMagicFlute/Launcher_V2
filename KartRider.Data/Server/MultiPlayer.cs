@@ -1,29 +1,17 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
 using ExcData;
-using ExcData;
-using KartLibrary.IO;
-using KartLibrary.IO;
-using KartRider.Common.Utilities;
 using KartRider.Common.Utilities;
 using KartRider.IO.Packet;
-using KartRider.IO.Packet;
-using KartRider_PacketName;
-using KartRider_PacketName;
 using Profile;
 
 namespace KartRider
 {
+    /// <summary>
+    /// 多人游戏相关功能
+    /// </summary>
     public static class MultiPlayer
     {
         static string RoomName;
@@ -46,7 +34,7 @@ namespace KartRider
         public static void MilTime(uint time)
         {
             GameType.min = time / 60000;
-            uint sec = time - GameType.min * 60000;
+            uint sec = time - (GameType.min * 60000);
             GameType.sec = sec / 1000;
             GameType.mil = time % 1000;
         }
@@ -76,14 +64,14 @@ namespace KartRider
             if (TimeData.Count == 0)
                 return new Dictionary<int, int>();
 
-            // 按值降序排序（值越大排名越靠前）
+            // 按值降序排序 (值越大排名越靠前)
             var sortedItems = TimeData
                 .OrderBy(item => item.Value)
                 .ToList();
 
             var ranks = new Dictionary<int, int>();
 
-            // 排名从0开始，逐个分配（相同值也会依次+1）
+            // 排名从0开始, 逐个分配 (相同值也会依次+1)
             for (int i = 0; i < sortedItems.Count; i++)
             {
                 ranks[sortedItems[i].Key] = i; // 直接使用索引作为排名
@@ -119,7 +107,7 @@ namespace KartRider
                 if (StartGameData.StartTimeAttack_RandomTrackGameType == 0)
                 {
                     aiNodes = doc.Root
-                    ?.Element("SpeedAI")                            // 指定父节点（如ItemAI、SpeedAI等）
+                    ?.Element("SpeedAI")                            // 指定父节点 (如ItemAI、SpeedAI等)
                     ?.Elements()                                    // 获取该父节点下的所有直接子元素
                     .Where(e => e.Name.LocalName.StartsWith("Ai")
                     && !e.Name.LocalName.Equals("SpeedSpec"))       // 筛选条件
@@ -128,7 +116,7 @@ namespace KartRider
                 else if (StartGameData.StartTimeAttack_RandomTrackGameType == 1)
                 {
                     aiNodes = doc.Root
-                    ?.Element("ItemAI")                             // 指定父节点（如ItemAI、SpeedAI等）
+                    ?.Element("ItemAI")                             // 指定父节点 (如ItemAI、SpeedAI等)
                     ?.Elements()                                    // 获取该父节点下的所有直接子元素
                     .Where(e => e.Name.LocalName.StartsWith("Ai")
                     && !e.Name.LocalName.Equals("ItemSpec"))        // 筛选条件
@@ -139,11 +127,11 @@ namespace KartRider
                 outPacket.WriteInt();
                 if (AiTimeData.Count < aiNodes.Count())
                 {
-                    // 如果 AiTimeData 中的 AI 数量少于 aiNodes，则填充缺失的 AI 时间数据
+                    // 如果 AiTimeData 中的 AI 数量少于 aiNodes, 则填充缺失的 AI 时间数据
                     foreach (var node in aiNodes)
                     {
                         string nodeName = node.Name.LocalName;
-                        int numberPart = int.Parse(nodeName.Substring(2)); // 从索引2开始截取（跳过"Ai"）
+                        int numberPart = int.Parse(nodeName.Substring(2)); // 从索引2开始截取 (跳过"Ai")
                         if (!AiTimeData.ContainsKey(numberPart))
                         {
                             AiTimeData[numberPart] = 4294967295;
@@ -195,9 +183,9 @@ namespace KartRider
                 int index = 0;
                 foreach (var node in aiNodes)
                 {
-                    // 提取 Ai 后的数值部分（例如："Ai2" -> "2"）
+                    // 提取 Ai 后的数值部分 (例如: "Ai2" -> "2")
                     string nodeName = node.Name.LocalName;
-                    int numberPart = int.Parse(nodeName.Substring(2)); // 从索引 2 开始截取（去除"Ai"）
+                    int numberPart = int.Parse(nodeName.Substring(2)); // 从索引 2 开始截取 (去除"Ai")
                     outPacket.WriteInt(numberPart);
 
                     if (AiTimeData.ContainsKey(numberPart) && AiTimeData[numberPart] > 0)
@@ -229,9 +217,9 @@ namespace KartRider
                 outPacket.WriteByte(0);
                 outPacket.WriteLong(EndTicks + 5000);
                 RouterListener.MySession.Client.Send(outPacket);
-                Console.WriteLine("EndTicks = {0}", EndTicks + 5000);
+                Console.WriteLine($"EndTicks = {EndTicks + 5000}");
             }
-            //Console.WriteLine("GameSlotPacket, Settle. Ticks = {0}", SettleTicks);
+            // Console.WriteLine($"GameSlotPacket, Settle. Ticks = {SettleTicks}");
         }
 
         static short ParseShort(XAttribute attribute)
@@ -294,7 +282,7 @@ namespace KartRider
                             GameSupport.AttackedSkill(type, uni, targetSkill);
                         }
                     }
-                    Console.WriteLine("GameSlotPacket, Attacked. Skill = {0}", skill);
+                    Console.WriteLine($"GameSlotPacket, Attacked. Skill = {skill}");
                 }
                 if (type == 18)
                 {
@@ -314,7 +302,7 @@ namespace KartRider
                             GameSupport.AddItemSkill(targetSkill);
                         }
                     }
-                    Console.WriteLine("GameSlotPacket, Mapping. Skill = {0}", skill);
+                    Console.WriteLine($"GameSlotPacket, Mapping. Skill = {skill}");
                 }
                 // if (item == 0 && type == 12)
                 // {
@@ -326,16 +314,16 @@ namespace KartRider
                 //         iPacket.ReadBytes(nextpacketlenth - 4 - 4);
                 //         ArrivalTicks = iPacket.ReadUInt();
                 //     }
-                //     Console.WriteLine("GameSlotPacket, Arrivaled. Ticks = {0}", ArrivalTicks);
+                //     Console.WriteLine($"GameSlotPacket, Arrivaled. Ticks = {ArrivalTicks}");
                 // }
                 return;
             }
             else if (hash == Adler32Helper.GenerateAdler32_ASCII("GameControlPacket"))
             {
                 byte state = iPacket.ReadByte();
-                Console.WriteLine("----------------------------------------------");
-                Console.WriteLine("GameControlPacket, state = {0}", state);
-                Console.WriteLine("----------------------------------------------");
+                LauncherSystem.PrintDivLine();
+                Console.WriteLine($"GameControlPacket, state = {state}");
+                LauncherSystem.PrintDivLine();
                 // start
                 if (state == 0)
                 {
@@ -357,7 +345,7 @@ namespace KartRider
                     }
                     AiTimeData.Clear();
                     FinishTime = 0;
-                    Console.WriteLine("StartTicks = {0}", StartTicks);
+                    Console.WriteLine($"StartTicks = {StartTicks}");
                 }
                 // finish
                 else if (state == 2)
@@ -377,8 +365,7 @@ namespace KartRider
                         oPacket.WriteByte(0);
                         oPacket.WriteLong(EndTicks);
                     }
-                    //Console.Write("GameControlPacket, Finish. Finish Time = {0}", FinishTime);
-                    //Console.WriteLine(" , End - Start Ticks : {0}", EndTicks - StartTicks - 15000);
+                    // Console.WriteLine($"GameControlPacket, Finish. Finish Time = {FinishTime}, End - Start Ticks : {EndTicks - StartTicks - 15000}");
                     Set_settleTrigger();
                 }
                 return;
@@ -387,7 +374,7 @@ namespace KartRider
             {
                 using (OutPacket oPacket = new OutPacket("ChGetRoomListReplyPacket"))
                 {
-                    //oPacket.WriteHexString("0300000000000000030000009D02070000002759B65B004E778DA9737E002100F603CA34010107000801B80003000000DB02070000002759B65B004E778DA9737E002100050000000001070108030000000000009A02070000002759B65B004E778DA9737E00210005000000000107010202000000000000");
+                    // oPacket.WriteHexString("0300000000000000030000009D02070000002759B65B004E778DA9737E002100F603CA34010107000801B80003000000DB02070000002759B65B004E778DA9737E002100050000000001070108030000000000009A02070000002759B65B004E778DA9737E00210005000000000107010202000000000000");
                     oPacket.WriteInt(0);
                     oPacket.WriteInt(0);
                     oPacket.WriteInt(0);
@@ -397,13 +384,13 @@ namespace KartRider
             }
             else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqChannelSwitch", 0))
             {
-                Console.WriteLine("Channel Switch, avaliable = {0}", iPacket.Available);
+                Console.WriteLine($"Channel Switch, available = {iPacket.Available}");
                 // Console.WriteLine(BitConverter.ToString(iPacket.ReadBytes(iPacket.Available)).Replace("-", " "));
                 // iPacket.ReadInt();
                 // iPacket.ReadBytes(14);
                 byte[] DateTime1 = iPacket.ReadBytes(18);
                 byte channel = iPacket.ReadByte();
-                Console.WriteLine("Channel Switch, channel = {0}", channel);
+                Console.WriteLine($"Channel Switch, channel = {channel}");
                 int channeldata1 = 0;
                 channeldata1 = 1;
                 channeldata2 = 4;
@@ -498,9 +485,8 @@ namespace KartRider
             }
             else if (hash == Adler32Helper.GenerateAdler32_ASCII("ChCreateRoomRequestPacket", 0))
             {
-                Console.Write("Avaiable = {0}", iPacket.Available);
                 RoomName = iPacket.ReadString();    // room name
-                Console.WriteLine(" RoomName = {0}, len = {1}", RoomName, RoomName.Length);
+                Console.WriteLine($"Available = {iPacket.Available} RoomName = {RoomName}, len = {RoomName.Length}");
                 iPacket.ReadInt();
                 var unk1 = iPacket.ReadByte(); // 7c
                 iPacket.ReadInt();
@@ -535,7 +521,7 @@ namespace KartRider
                     // 获取目标父节点
                     XElement targetParent = doc.Root?.Element(targetParentNode);
 
-                    // 清空所有 Ai* 节点（保留 Spec）
+                    // 清空所有 Ai* 节点 (保留 Spec)
                     RemoveAiNodes(targetParent);
 
                     // 新增 AI 节点数量
@@ -558,7 +544,7 @@ namespace KartRider
                 track = iPacket.ReadUInt();
                 iPacket.ReadInt();
                 RoomUnkBytes = iPacket.ReadBytes(32);
-                Console.WriteLine("Gr Track Changed : {0}", RandomTrack.GetTrackName(track));
+                Console.WriteLine($"Gr Track Changed : {RandomTrack.GetTrackName(track)}");
                 return;
             }
             else if (hash == Adler32Helper.GenerateAdler32_ASCII("GrRequestSetSlotStatePacket"))
@@ -616,7 +602,7 @@ namespace KartRider
                         "//SpeedAI/*[starts-with(name(), 'Ai') " +
                         "and contains(translate(name(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'ai') " +
                         "and not(contains(name(), 'spec'))]"
-                        );
+                       );
                     }
                     else if (StartGameData.StartTimeAttack_RandomTrackGameType == 1)
                     {
@@ -624,7 +610,7 @@ namespace KartRider
                         "//ItemAI/*[starts-with(name(), 'Ai') " +
                         "and contains(translate(name(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'ai') " +
                         "and not(contains(name(), 'spec'))]"
-                        );
+                       );
                     }
                     //XmlNodeList lis = doc.SelectNodes("//*[starts-with(name(), 'Ai') and contains(translate(name(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'ai') and not(contains(name(), 'data'))]");
                     if (lis.Count > 0)
@@ -663,7 +649,7 @@ namespace KartRider
                     RouterListener.MySession.Client.Send(oPacket);
                 }
                 // StartGameRacing.KartSpecLog();
-                Console.WriteLine("Track : {0}", RandomTrack.GetTrackName(StartGameData.StartTimeAttack_Track));
+                Console.WriteLine($"Track : {RandomTrack.GetTrackName(StartGameData.StartTimeAttack_Track)}");
                 return;
             }
             else if (hash == Adler32Helper.GenerateAdler32_ASCII("PcReportStateInGame", 0))
@@ -681,8 +667,8 @@ namespace KartRider
             }
             else if (hash == Adler32Helper.GenerateAdler32_ASCII("GrRequestBasicAiPacket"))
             {
-                int pos = iPacket.ReadInt();
-                Console.WriteLine("GrRequestBasicAiPacket, position = {0}", pos);
+                int slot = iPacket.ReadInt();
+                Console.WriteLine($"GrRequestBasicAiPacket, position = {slot}");
                 var selector = new DictionaryRandomSelector();
                 var charDict = KartExcData.aiCharacterDict;
                 var kartDict = KartExcData.aiKartDict;
@@ -701,14 +687,14 @@ namespace KartRider
                 }
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(FileName.AI_LoadFile);
-                XmlNode ai = xmlDoc.SelectSingleNode($"//{AiXml}/Ai{pos.ToString()}");
+                XmlNode ai = xmlDoc.SelectSingleNode($"//{AiXml}/Ai{slot.ToString()}");
                 if (ai != null)
                 {
                     using (OutPacket oPacket = new OutPacket("GrSlotDataBasicAi"))
                     {
                         oPacket.WriteInt(1);
                         oPacket.WriteByte(1);
-                        oPacket.WriteInt(pos);
+                        oPacket.WriteInt(slot);
                         oPacket.WriteHexString("0000000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
                         RouterListener.MySession.Client.Send(oPacket);
                     }
@@ -739,7 +725,7 @@ namespace KartRider
                         {
                             oPacket.WriteInt(0);
                             oPacket.WriteByte(1);
-                            oPacket.WriteInt(pos);
+                            oPacket.WriteInt(slot);
                             oPacket.WriteShort(targetCharId);
                             oPacket.WriteShort(ridIndex ?? 0);
                             oPacket.WriteShort(targetKartId);
@@ -763,7 +749,7 @@ namespace KartRider
                                 if (AiNode != null)
                                 {
                                     // 查找是否已存在Ai1元素
-                                    XmlNode existing = AiNode.SelectSingleNode("Ai" + pos.ToString());
+                                    XmlNode existing = AiNode.SelectSingleNode("Ai" + slot.ToString());
                                     if (existing != null)
                                     {
                                         existing.Attributes["character"].Value = targetCharId.ToString();
@@ -772,11 +758,11 @@ namespace KartRider
                                         existing.Attributes["balloon"].Value = (balloonId ?? 0).ToString();
                                         existing.Attributes["headBand"].Value = (headbandId ?? 0).ToString();
                                         existing.Attributes["goggle"].Value = (goggleId ?? 0).ToString();
-                                        Console.WriteLine("Ai" + pos.ToString() + "元素已成功更新");
+                                        Console.WriteLine($"Ai{slot} 元素已成功更新");
                                     }
                                     else
                                     {
-                                        XmlElement aiElement = xmlDoc.CreateElement("Ai" + pos.ToString());
+                                        XmlElement aiElement = xmlDoc.CreateElement($"Ai{slot}");
                                         aiElement.SetAttribute("character", targetCharId.ToString());
                                         aiElement.SetAttribute("rid", (ridIndex ?? 0).ToString());
                                         aiElement.SetAttribute("kart", targetKartId.ToString());
@@ -784,13 +770,13 @@ namespace KartRider
                                         aiElement.SetAttribute("headBand", (headbandId ?? 0).ToString());
                                         aiElement.SetAttribute("goggle", (goggleId ?? 0).ToString());
                                         AiNode.AppendChild(aiElement);
-                                        Console.WriteLine("Ai" + pos.ToString() + "元素已成功添加");
+                                        Console.WriteLine("Ai{slot} 元素已成功添加");
                                     }
                                     xmlDoc.Save(FileName.AI_LoadFile);
                                 }
                                 else
                                 {
-                                    Console.WriteLine("未找到节点" + AiXml);
+                                    Console.WriteLine($"未找到节点{AiXml}");
                                 }
                             }
                             else
@@ -800,7 +786,7 @@ namespace KartRider
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine("操作出错: " + ex.Message);
+                            Console.WriteLine($"操作出错: {ex.Message}");
                         }
                     }
                 }
@@ -821,7 +807,7 @@ namespace KartRider
                     oPacket.WriteInt(AiNum);
                     oPacket.WriteUInt(AiTime);
                     RouterListener.MySession.Client.Send(oPacket);
-                    Console.WriteLine("AiTime = {0}", AiTime);
+                    Console.WriteLine($"AiTime = {AiTime}");
                 }
                 if (AiTimeData.Count == 0 && FinishTime == 0)
                 {
@@ -833,8 +819,7 @@ namespace KartRider
                         oPacket.WriteLong(EndTicks);
                         RouterListener.MySession.Client.Send(oPacket);
                     }
-                    //Console.Write("GameControlPacket, Finish. Finish Time = {0}", AiTime);
-                    //Console.WriteLine(" , End - Start Ticks : {0}", AiTime - StartTicks);
+                    // Console.Write($"GameControlPacket, Finish. Finish Time = {AiTime} ,End - Start Ticks : {AiTime - StartTicks}");
                     Set_settleTrigger();
                 }
                 if (!AiTimeData.ContainsKey(AiNum))
@@ -870,7 +855,7 @@ namespace KartRider
             for (int i = 0; i < 4; i++) outPacket.WriteInt();
 
             /* ---- One/First player ---- */
-            outPacket.WriteInt(2); // Player Type, 2 = RoomMaster, 3 = AutoReady, 4 = Observer, 5 = Preparing , 7 = AI
+            outPacket.WriteInt(2); // Player Type, 2 = RoomMaster, 3 = AutoReady, 4 = Observer, 5 = Preparing, 7 = AI
             outPacket.WriteUInt(ProfileService.ProfileConfig.Rider.UserNO);
 
             outPacket.WriteEndPoint(IPAddress.Parse(RouterListener.client.Address.ToString()), (ushort)RouterListener.client.Port);
@@ -943,7 +928,7 @@ namespace KartRider
             doc.Load(FileName.AI_LoadFile);
             string parentNodePath = "";
             if (StartGameData.StartTimeAttack_RandomTrackGameType == 0) parentNodePath = "//SpeedAI";
-            else if ((StartGameData.StartTimeAttack_RandomTrackGameType == 1)) parentNodePath = "//ItemAI";
+            else if (StartGameData.StartTimeAttack_RandomTrackGameType == 1) parentNodePath = "//ItemAI";
             XmlNode[] aiData = new XmlNode[8];
             for (int i = 1; i <= 7; i++)
             {
@@ -1035,7 +1020,7 @@ namespace KartRider
             outPacket.WriteByte(0);
         }
 
-        // 移除所有 Ai* 节点（保留 Spec）
+        // 移除所有 Ai* 节点 (保留 Spec)
         static void RemoveAiNodes(XElement targetParent)
         {
             // 查找并删除所有以"Ai"开头的子元素
@@ -1090,7 +1075,7 @@ namespace KartRider
                     new XAttribute("balloon", balloonId?.ToString() ?? "0"),
                     new XAttribute("headBand", headbandId?.ToString() ?? "0"),
                     new XAttribute("goggle", goggleId?.ToString() ?? "0")
-                    ));
+                   ));
                 }
             }
         }

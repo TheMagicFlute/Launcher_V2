@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Newtonsoft.Json;
 
 namespace KartRider;
@@ -11,19 +8,19 @@ namespace KartRider;
 public class SpecialKartConfig
 {
     /// <summary>
-    /// 特殊道具车：将指定道具变更为特殊道具
+    /// 特殊道具车: 将指定道具变更为特殊道具
     /// </summary>
     public string SkillChangeDesc { get; set; }
     public Dictionary<short, Dictionary<short, short>> SkillChange { get; set; }
 
     /// <summary>
-    /// 特殊道具车：使用指定道具后获得特殊道具
+    /// 特殊道具车: 使用指定道具后获得特殊道具
     /// </summary>
     public string SkillMappingsDesc { get; set; }
     public Dictionary<short, Dictionary<short, short>> SkillMappings { get; set; }
 
     /// <summary>
-    /// 特殊道具车：被指定道具攻击后获得特殊道具
+    /// 特殊道具车: 被指定道具攻击后获得特殊道具
     /// </summary>
     public string SkillAttackedDesc { get; set; }
     public Dictionary<short, Dictionary<short, short>> SkillAttacked { get; set; }
@@ -31,13 +28,13 @@ public class SpecialKartConfig
     /// <summary>
     /// 将特殊道具车配置存储到JSON文件
     /// </summary>
-    /// <param name="filePath">文件路径（如：./Config/SpecialKartConfig.json）</param>
+    /// <param name="filePath">文件路径 (如: ./Config/SpecialKartConfig.json)</param>
     public static void SaveConfigToFile(string filePath)
     {
-        // 1. 初始化配置对象，填充原代码中的数据
+        // 1. 初始化配置对象, 填充原代码中的数据
         var config = new SpecialKartConfig
         {
-            SkillChangeDesc = "特殊道具车：将指定道具变更为特殊道具",
+            SkillChangeDesc = "特殊道具车: 将指定道具变更为特殊道具",
             SkillChange = new Dictionary<short, Dictionary<short, short>>
             {
                 { 1571, new Dictionary<short, short> { {7, 32} } },
@@ -71,7 +68,7 @@ public class SpecialKartConfig
                 { 1479, new Dictionary<short, short> { {7, 131} } }
             },
 
-            SkillMappingsDesc = "特殊道具车：使用指定道具后获得特殊道具",
+            SkillMappingsDesc = "特殊道具车: 使用指定道具后获得特殊道具",
             SkillMappings = new Dictionary<short, Dictionary<short, short>>
             {
                 { 1569, new Dictionary<short, short> { {5, 7} } },
@@ -86,7 +83,7 @@ public class SpecialKartConfig
                 { 1479, new Dictionary<short, short> { {131, 5} } }
             },
 
-            SkillAttackedDesc = "特殊道具车：被指定道具攻击后获得特殊道具",
+            SkillAttackedDesc = "特殊道具车: 被指定道具攻击后获得特殊道具",
             SkillAttacked = new Dictionary<short, Dictionary<short, short>>
             {
                 { 1571, new Dictionary<short, short> { {8, 6} } },
@@ -104,20 +101,20 @@ public class SpecialKartConfig
             }
         };
 
-        // 2. 确保目录存在（若不存在则创建）
+        // 2. 确保目录存在 (若不存在则创建)
         var directory = Path.GetDirectoryName(filePath);
         if (!Directory.Exists(directory))
         {
             Directory.CreateDirectory(directory);
         }
 
-        // 3. 若文件不存在，则将配置对象序列化为JSON并写入文件
+        // 3. 若文件不存在, 则将配置对象序列化为JSON并写入文件
         if (!File.Exists(filePath))
         {
-            var json = JsonConvert.SerializeObject(config, Formatting.Indented); // Formatting.Indented：格式化JSON（易读）
+            var json = JsonConvert.SerializeObject(config, Formatting.Indented); // Formatting.Indented: 格式化JSON (易读)
             File.WriteAllText(filePath, json, System.Text.Encoding.UTF8);
 
-            Console.WriteLine($"配置已成功保存到：{filePath}");
+            Console.WriteLine($"配置已成功保存到: {filePath}");
         }
     }
 
@@ -125,7 +122,7 @@ public class SpecialKartConfig
     /// 从JSON文件读取特殊道具车配置
     /// </summary>
     /// <param name="filePath">配置文件路径</param>
-    /// <returns>特殊道具车配置对象（SpecialKartConfig）</returns>
+    /// <returns>特殊道具车配置对象 (SpecialKartConfig)</returns>
     public static SpecialKartConfig LoadConfigFromFile(string filePath)
     {
         // 1. 检查文件是否存在
@@ -141,7 +138,7 @@ public class SpecialKartConfig
         var config = JsonConvert.DeserializeObject<SpecialKartConfig>(json);
         if (config == null)
         {
-            throw new Exception("配置文件解析失败，可能是JSON格式错误");
+            throw new Exception("配置文件解析失败, 可能是JSON格式错误");
         }
 
         Console.WriteLine($"道具车特性配置已成功从 {filePath} 读取");

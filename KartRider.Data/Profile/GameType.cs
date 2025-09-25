@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace KartRider
+﻿namespace KartRider
 {
     public class GameType
     {

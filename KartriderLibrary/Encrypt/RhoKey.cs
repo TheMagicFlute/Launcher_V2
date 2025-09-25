@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using KartLibrary.File;
 using KartLibrary.IO;
 
@@ -187,7 +181,7 @@ namespace KartLibrary.Encrypt
             byte[] strData = Encoding.GetEncoding("UTF-16").GetBytes(fileInfo.Name);
             uint key = Adler.Adler32(0, strData, 0, strData.Length);
             key += (uint)fileInfo.ExtNum;
-            key += (RhoKey - 0x756DE654);
+            key += RhoKey - 0x756DE654;
             return key;
         }
 
@@ -196,7 +190,7 @@ namespace KartLibrary.Encrypt
             byte[] strData = Encoding.GetEncoding("UTF-16").GetBytes(fileName);
             uint key = Adler.Adler32(0, strData, 0, strData.Length);
             key += extNum;
-            key += (RhoKey - 0x756DE654);
+            key += RhoKey - 0x756DE654;
             return key;
         }
 
@@ -205,7 +199,7 @@ namespace KartLibrary.Encrypt
             byte[] strData = Encoding.GetEncoding("UTF-16").GetBytes(fileInfo.Name);
             uint key = Adler.Adler32(0, strData, 0, strData.Length);
             key += (uint)fileInfo.ExtNum;
-            key += (RhoKey - 0x7E2AF33D);
+            key += RhoKey - 0x7E2AF33D;
             return key;
         }
 
