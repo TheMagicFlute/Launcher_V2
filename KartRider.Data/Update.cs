@@ -396,6 +396,25 @@ namespace KartRider
                 return false;
             }
         }
+
+        /// <summary>
+        /// 计算指定文件的SHA256哈希值
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>SHA256哈希值的字符串表示</returns>
+        static string CalculateSHA256(string filePath)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                using (FileStream stream = File.OpenRead(filePath))
+                {
+                    // 计算文件的哈希值
+                    byte[] hashBytes = sha256.ComputeHash(stream);
+
+                    // 将字节数组转换为十六进制字符串
+                    return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                }
+            }
+        }
     }
 }
-
