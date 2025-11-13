@@ -1,4 +1,6 @@
+using KartRider;
 using Launcher.App.ExcData;
+using Launcher.App.Forms;
 using Launcher.App.Profile;
 using Launcher.App.Server;
 using Launcher.App.Utility;
@@ -8,68 +10,68 @@ namespace Launcher.App.Rider
 {
     public static class NewRider
     {
-        private static readonly HashSet<short> excludedKeys = [3, 6, 10, 15, 19, 25, 29, 30, 32, 33, 35, 36, 40, 41, 47, 48, 50, 51, 56, 57, 58, 59, 60, 62, 63, 64, 65, 66, 72, 73, 74, 75];
-        private static readonly HashSet<short> ValidItemCatIds = [1, 2, 4, 8, 11, 12, 13, 14, 16, 18, 20, 21, 26, 27, 28, 31, 52, 61, 70, 71];
+        public static Dictionary<short, Dictionary<short, string>> items = new Dictionary<short, Dictionary<short, string>>();
+        private static readonly HashSet<short> excludedKeys = new HashSet<short> { 3, 6, 10, 15, 19, 24, 25, 29, 33, 34, 35, 40, 41, 47, 48, 50, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 72, 73, 74, 75 };
+        private static readonly HashSet<short> ValidItemCatIds = new HashSet<short> { 1, 2, 4, 8, 11, 12, 13, 14, 16, 18, 20, 21, 26, 27, 28, 31, 52, 61, 70, 71 };
 
-        public static void LoadItemData()
+        public static void LoadItemData(SessionGroup Parent, string Nickname)
         {
-            KartExcData.Tune_ExcData();
-            KartExcData.Plant_ExcData();
-            KartExcData.Level_ExcData();
-            KartExcData.Parts_ExcData();
-            KartExcData.Level12_ExcData();
-            KartExcData.Parts12_ExcData();
-            XUniquePartsData();
-            XLegendPartsData();
-            XRarePartsData();
-            XNormalPartsData();
-            V1UniquePartsData();
-            V1LegendPartsData();
-            V1RarePartsData();
-            V1NormalPartsData();
-            partsEngine12();
-            partsHandle12();
-            partsWheel12();
-            partsBooster12();
-            items();
-            NewKart1();
-            NewKart2();
-            NewRiderData();//라이더 인식
+            KartExcData.Tune_ExcData(Parent, Nickname);
+            KartExcData.Plant_ExcData(Parent, Nickname);
+            KartExcData.Level_ExcData(Parent, Nickname);
+            KartExcData.Parts_ExcData(Parent, Nickname);
+            KartExcData.Level12_ExcData(Parent, Nickname);
+            KartExcData.Parts12_ExcData(Parent, Nickname);
+            NewRider.XUniquePartsData(Parent, Nickname);
+            NewRider.XLegendPartsData(Parent, Nickname);
+            NewRider.XRarePartsData(Parent, Nickname);
+            NewRider.XNormalPartsData(Parent, Nickname);
+            NewRider.V1UniquePartsData(Parent, Nickname);
+            NewRider.V1LegendPartsData(Parent, Nickname);
+            NewRider.V1RarePartsData(Parent, Nickname);
+            NewRider.V1NormalPartsData(Parent, Nickname);
+            NewRider.partsEngine12(Parent, Nickname);
+            NewRider.partsHandle12(Parent, Nickname);
+            NewRider.partsWheel12(Parent, Nickname);
+            NewRider.partsBooster12(Parent, Nickname);
+            NewRider.Items(Parent, Nickname);
+            NewRider.NewKart1(Parent);
+            NewRider.NewKart2(Parent);
+            NewRider.NewRiderData(Parent, Nickname);//라이더 인식
         }
 
-        public static void NewRiderData()
+        public static void NewRiderData(SessionGroup Parent, string Nickname)
         {
             using (OutPacket oPacket = new OutPacket("PrGetRider"))
             {
                 oPacket.WriteByte(1);
                 oPacket.WriteByte(0);
-                oPacket.WriteString(ProfileService.ProfileConfig.Rider.Nickname);
+                oPacket.WriteString(Nickname);
                 oPacket.WriteShort(0);
                 oPacket.WriteShort(0);
-                oPacket.WriteShort(ProfileService.ProfileConfig.Rider.Emblem1);
-                oPacket.WriteShort(ProfileService.ProfileConfig.Rider.Emblem2);
+                oPacket.WriteShort(ProfileService.ProfileConfigs[Nickname].Rider.Emblem1);
+                oPacket.WriteShort(ProfileService.ProfileConfigs[Nickname].Rider.Emblem2);
                 oPacket.WriteShort(0);
-                GameSupport.GetRider(oPacket);
-                oPacket.WriteShort(0);
-                oPacket.WriteString(ProfileService.ProfileConfig.Rider.Card);
-                oPacket.WriteUInt(ProfileService.ProfileConfig.Rider.Lucci);
-                oPacket.WriteUInt(ProfileService.ProfileConfig.Rider.RP);
+                GameSupport.GetRider(Parent, Nickname, oPacket);
+                oPacket.WriteString(ProfileService.ProfileConfigs[Nickname].Rider.Card);
+                oPacket.WriteUInt(ProfileService.ProfileConfigs[Nickname].Rider.Lucci);
+                oPacket.WriteUInt(ProfileService.ProfileConfigs[Nickname].Rider.RP);
                 oPacket.WriteBytes(new byte[94]);
-                RouterListener.MySession.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
-        public static void NewKart1()
+        public static void NewKart1(SessionGroup Parent)
         {
             short sn = 1;
             int range = 100;//分批次数
-            if (KartExcData.items.TryGetValue(3, out Dictionary<short, string> resultDict))
+            if (items.TryGetValue(3, out Dictionary<short, string> resultDict))
             {
                 List<short> kart = new List<short>(resultDict.Keys);
-                int times = (kart.Count / range) + (kart.Count % range > 0 ? 1 : 0);
+                int times = kart.Count / range + (kart.Count % range > 0 ? 1 : 0);
                 for (int i = 0; i < times; i++)
                 {
-                    var tempList = kart.GetRange(i * range, (i + 1) * range > kart.Count ? kart.Count - (i * range) : range);
+                    var tempList = kart.GetRange(i * range, (i + 1) * range > kart.Count ? (kart.Count - i * range) : range);
                     int Count = tempList.Count;
                     using (OutPacket outPacket = new OutPacket("PrRequestKartInfoPacket"))
                     {
@@ -87,19 +89,26 @@ namespace Launcher.App.Rider
                             outPacket.WriteShort(0);
                             outPacket.WriteShort(0);
                         }
-                        RouterListener.MySession.Client.Send(outPacket);
+                        Parent.Client.Send(outPacket);
                     }
                 }
             }
         }
 
-        public static void NewKart2()
+        public static void NewKart2(SessionGroup Parent)
         {
+            var newList = new List<NewKart>();
+
+            if (File.Exists(FileName.NewKart_LoadFile))
+            {
+                newList = JsonHelper.DeserializeNoBom<List<NewKart>>(FileName.NewKart_LoadFile);
+            }
+
             int range = 100;//分批次数
-            int times = (KartExcData.NewKart.Count / range) + (KartExcData.NewKart.Count % range > 0 ? 1 : 0);
+            int times = newList.Count / range + (newList.Count % range > 0 ? 1 : 0);
             for (int i = 0; i < times; i++)
             {
-                var tempList = KartExcData.NewKart.GetRange(i * range, (i + 1) * range > KartExcData.NewKart.Count ? KartExcData.NewKart.Count - (i * range) : range);
+                var tempList = newList.GetRange(i * range, (i + 1) * range > newList.Count ? (newList.Count - i * range) : range);
                 int Count = tempList.Count;
                 using (OutPacket outPacket = new OutPacket("PrRequestKartInfoPacket"))
                 {
@@ -108,8 +117,8 @@ namespace Launcher.App.Rider
                     foreach (var Kart in tempList)
                     {
                         outPacket.WriteShort(3);
-                        outPacket.WriteShort(Kart[0]);
-                        outPacket.WriteShort(Kart[1]);
+                        outPacket.WriteShort(Kart.KartID);
+                        outPacket.WriteShort(Kart.KartSN);
                         outPacket.WriteShort(1);//数量
                         outPacket.WriteShort(0);
                         outPacket.WriteShort(-1);
@@ -117,14 +126,14 @@ namespace Launcher.App.Rider
                         outPacket.WriteShort(0);
                         outPacket.WriteShort(0);
                     }
-                    RouterListener.MySession.Client.Send(outPacket);
+                    Parent.Client.Send(outPacket);
                 }
             }
         }
 
-        public static void items()
+        public static void Items(SessionGroup Parent, string Nickname)
         {
-            foreach (var category in KartExcData.items)
+            foreach (var category in items)
             {
                 short itemCatId = category.Key;
                 if (!excludedKeys.Contains(itemCatId))
@@ -133,7 +142,7 @@ namespace Launcher.App.Rider
                     foreach (var item in category.Value)
                     {
                         short sn = 0;
-                        ushort num = ProfileService.ProfileConfig.Rider.SlotChanger;
+                        ushort num = ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger;
                         short id = item.Key;
                         if (ValidItemCatIds.Contains(itemCatId))
                         {
@@ -187,14 +196,14 @@ namespace Launcher.App.Rider
                             items.Add(add);
                         }
                     }
-                    LoRpGetRiderItemPacket(itemCatId, items);
+                    LoRpGetRiderItemPacket(Parent, itemCatId, items);
                 }
             }
         }
 
-        public static void partsEngine12()
+        public static void partsEngine12(SessionGroup Parent, string Nickname)
         {
-            if (KartExcData.items.TryGetValue(72, out Dictionary<short, string> resultDict))
+            if (items.TryGetValue(72, out Dictionary<short, string> resultDict))
             {
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
                 {
@@ -204,11 +213,11 @@ namespace Launcher.App.Rider
                     oPacket.WriteInt(count);
                     foreach (var kvp in resultDict)
                     {
-                        short id = kvp.Key;
+                        short id = (short)kvp.Key;
                         oPacket.WriteShort(72);
                         oPacket.WriteShort(id);
                         oPacket.WriteShort(0);
-                        oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                        oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                         oPacket.WriteByte(0);
                         oPacket.WriteByte(0);
                         oPacket.WriteShort(-1);
@@ -230,16 +239,16 @@ namespace Launcher.App.Rider
                         {
                             oPacket.WriteByte(1);
                         }
-                        oPacket.WriteShort(V2Spec.Get12Parts(id));
+                        oPacket.WriteShort(V2Specs.Get12Parts(id));
                     }
-                    RouterListener.MySession.Client.Send(oPacket);
+                    Parent.Client.Send(oPacket);
                 }
             }
         }
 
-        public static void partsHandle12()
+        public static void partsHandle12(SessionGroup Parent, string Nickname)
         {
-            if (KartExcData.items.TryGetValue(73, out Dictionary<short, string> resultDict))
+            if (items.TryGetValue(73, out Dictionary<short, string> resultDict))
             {
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
                 {
@@ -249,11 +258,11 @@ namespace Launcher.App.Rider
                     oPacket.WriteInt(count);
                     foreach (var kvp in resultDict)
                     {
-                        short id = kvp.Key;
+                        short id = (short)kvp.Key;
                         oPacket.WriteShort(73);
                         oPacket.WriteShort(id);
                         oPacket.WriteShort(0);
-                        oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                        oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                         oPacket.WriteByte(0);
                         oPacket.WriteByte(0);
                         oPacket.WriteShort(-1);
@@ -275,16 +284,16 @@ namespace Launcher.App.Rider
                         {
                             oPacket.WriteByte(1);
                         }
-                        oPacket.WriteShort(V2Spec.Get12Parts(id));
+                        oPacket.WriteShort(V2Specs.Get12Parts(id));
                     }
-                    RouterListener.MySession.Client.Send(oPacket);
+                    Parent.Client.Send(oPacket);
                 }
             }
         }
 
-        public static void partsWheel12()
+        public static void partsWheel12(SessionGroup Parent, string Nickname)
         {
-            if (KartExcData.items.TryGetValue(74, out Dictionary<short, string> resultDict))
+            if (items.TryGetValue(74, out Dictionary<short, string> resultDict))
             {
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
                 {
@@ -294,11 +303,11 @@ namespace Launcher.App.Rider
                     oPacket.WriteInt(count);
                     foreach (var kvp in resultDict)
                     {
-                        short id = kvp.Key;
+                        short id = (short)kvp.Key;
                         oPacket.WriteShort(74);
                         oPacket.WriteShort(id);
                         oPacket.WriteShort(0);
-                        oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                        oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                         oPacket.WriteByte(0);
                         oPacket.WriteByte(0);
                         oPacket.WriteShort(-1);
@@ -320,16 +329,16 @@ namespace Launcher.App.Rider
                         {
                             oPacket.WriteByte(1);
                         }
-                        oPacket.WriteShort(V2Spec.Get12Parts(id));
+                        oPacket.WriteShort(V2Specs.Get12Parts(id));
                     }
-                    RouterListener.MySession.Client.Send(oPacket);
+                    Parent.Client.Send(oPacket);
                 }
             }
         }
 
-        public static void partsBooster12()
+        public static void partsBooster12(SessionGroup Parent, string Nickname)
         {
-            if (KartExcData.items.TryGetValue(75, out Dictionary<short, string> resultDict))
+            if (items.TryGetValue(75, out Dictionary<short, string> resultDict))
             {
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
                 {
@@ -339,11 +348,11 @@ namespace Launcher.App.Rider
                     oPacket.WriteInt(count);
                     foreach (var kvp in resultDict)
                     {
-                        short id = kvp.Key;
+                        short id = (short)kvp.Key;
                         oPacket.WriteShort(75);
                         oPacket.WriteShort(id);
                         oPacket.WriteShort(0);
-                        oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                        oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                         oPacket.WriteByte(0);
                         oPacket.WriteByte(0);
                         oPacket.WriteShort(-1);
@@ -365,14 +374,14 @@ namespace Launcher.App.Rider
                         {
                             oPacket.WriteByte(1);
                         }
-                        oPacket.WriteShort(V2Spec.Get12Parts(id));
+                        oPacket.WriteShort(V2Specs.Get12Parts(id));
                     }
-                    RouterListener.MySession.Client.Send(oPacket);
+                    Parent.Client.Send(oPacket);
                 }
             }
         }
 
-        public static void XUniquePartsData()
+        public static void XUniquePartsData(SessionGroup Parent, string Nickname)
         {
             using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
             {
@@ -386,7 +395,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(63);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -400,7 +409,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(64);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -414,7 +423,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(65);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -428,7 +437,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(66);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -437,11 +446,11 @@ namespace Launcher.App.Rider
                     oPacket.WriteByte(Grade);
                     oPacket.WriteShort(i);
                 }
-                RouterListener.MySession.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
-        public static void XLegendPartsData()
+        public static void XLegendPartsData(SessionGroup Parent, string Nickname)
         {
             using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
             {
@@ -455,7 +464,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(63);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -469,7 +478,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(64);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -483,7 +492,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(65);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -497,7 +506,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(66);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -506,11 +515,11 @@ namespace Launcher.App.Rider
                     oPacket.WriteByte(Grade);
                     oPacket.WriteShort(i);
                 }
-                RouterListener.MySession.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
-        public static void XRarePartsData()
+        public static void XRarePartsData(SessionGroup Parent, string Nickname)
         {
             using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
             {
@@ -524,7 +533,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(63);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -538,7 +547,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(64);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -552,7 +561,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(65);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -566,7 +575,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(66);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -575,11 +584,11 @@ namespace Launcher.App.Rider
                     oPacket.WriteByte(Grade);
                     oPacket.WriteShort(i);
                 }
-                RouterListener.MySession.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
-        public static void XNormalPartsData()
+        public static void XNormalPartsData(SessionGroup Parent, string Nickname)
         {
             using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
             {
@@ -593,7 +602,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(63);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -607,7 +616,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(64);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -621,7 +630,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(65);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -635,7 +644,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(66);
                     oPacket.WriteShort(1);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -644,12 +653,12 @@ namespace Launcher.App.Rider
                     oPacket.WriteByte(Grade);
                     oPacket.WriteShort(i);
                 }
-                RouterListener.MySession.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
         //-----------------------------------------------------------------------------------------------V1 파츠 관련
-        public static void V1UniquePartsData()
+        public static void V1UniquePartsData(SessionGroup Parent, string Nickname)
         {
             using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
             {
@@ -663,7 +672,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(63);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -677,7 +686,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(64);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -691,7 +700,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(65);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -705,7 +714,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(66);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -714,11 +723,11 @@ namespace Launcher.App.Rider
                     oPacket.WriteByte(Grade);
                     oPacket.WriteShort(i);
                 }
-                RouterListener.MySession.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
-        public static void V1LegendPartsData()
+        public static void V1LegendPartsData(SessionGroup Parent, string Nickname)
         {
             using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
             {
@@ -732,7 +741,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(63);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -746,7 +755,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(64);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -760,7 +769,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(65);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -774,7 +783,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(66);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -783,11 +792,11 @@ namespace Launcher.App.Rider
                     oPacket.WriteByte(Grade);
                     oPacket.WriteShort(i);
                 }
-                RouterListener.MySession.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
-        public static void V1RarePartsData()
+        public static void V1RarePartsData(SessionGroup Parent, string Nickname)
         {
             using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
             {
@@ -801,7 +810,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(63);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -815,7 +824,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(64);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -829,7 +838,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(65);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -843,7 +852,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(66);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -852,11 +861,11 @@ namespace Launcher.App.Rider
                     oPacket.WriteByte(Grade);
                     oPacket.WriteShort(i);
                 }
-                RouterListener.MySession.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
-        public static void V1NormalPartsData()
+        public static void V1NormalPartsData(SessionGroup Parent, string Nickname)
         {
             using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
             {
@@ -870,7 +879,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(63);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -884,7 +893,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(64);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -898,7 +907,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(65);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -912,7 +921,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteShort(66);
                     oPacket.WriteShort(2);
                     oPacket.WriteShort(0);
-                    oPacket.WriteUShort(ProfileService.ProfileConfig.Rider.SlotChanger);
+                    oPacket.WriteUShort(ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger);
                     oPacket.WriteByte(0);
                     oPacket.WriteByte(0);
                     oPacket.WriteShort(-1);
@@ -921,17 +930,17 @@ namespace Launcher.App.Rider
                     oPacket.WriteByte(Grade);
                     oPacket.WriteShort(i);
                 }
-                RouterListener.MySession.Client.Send(oPacket);
+                Parent.Client.Send(oPacket);
             }
         }
 
-        public static void LoRpGetRiderItemPacket(short itemCat, List<List<ushort>> item)
+        public static void LoRpGetRiderItemPacket(SessionGroup Parent, short itemCat, List<List<ushort>> item)
         {
             int range = 100;//分批次数
-            int times = (item.Count / range) + (item.Count % range > 0 ? 1 : 0);
+            int times = item.Count / range + (item.Count % range > 0 ? 1 : 0);
             for (int i = 0; i < times; i++)
             {
-                var tempList = item.GetRange(i * range, (i + 1) * range > item.Count ? item.Count - (i * range) : range);
+                var tempList = item.GetRange(i * range, (i + 1) * range > item.Count ? (item.Count - i * range) : range);
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
                 {
                     oPacket.WriteInt(1);
@@ -943,7 +952,7 @@ namespace Launcher.App.Rider
                         oPacket.WriteUShort(tempList[f][0]);
                         oPacket.WriteUShort(tempList[f][1]);
                         oPacket.WriteUShort(tempList[f][2]);
-                        oPacket.WriteByte(ProfileService.ProfileConfig.ServerSetting.PreventItem_Use);
+                        oPacket.WriteByte(ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.PreventItem_Use);
                         oPacket.WriteByte(0);
                         oPacket.WriteShort(-1);
                         oPacket.WriteShort(0);
@@ -951,7 +960,7 @@ namespace Launcher.App.Rider
                         oPacket.WriteByte(0);
                         oPacket.WriteShort(0);
                     }
-                    RouterListener.MySession.Client.Send(oPacket);
+                    Parent.Client.Send(oPacket);
                 }
             }
         }

@@ -27,7 +27,7 @@ namespace Launcher.App.Server
 
         public SessionGroup(Socket clientSocket, Socket serverSocket)
         {
-            Client = new ClientSession(this, clientSocket);
+            this.Client = new ClientSession(this, clientSocket);
         }
     }
 }

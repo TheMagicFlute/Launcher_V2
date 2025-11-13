@@ -129,7 +129,7 @@ namespace Launcher.App.Forms
         {
             try
             {
-                string country = ProfileService.ProfileConfig.ServerSetting.CC.ToString();
+                string country = ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.CC.ToString();
                 // 中国大陆需要使用代理下载, 处理 url
                 if (country != "" && country == "CN")
                 {

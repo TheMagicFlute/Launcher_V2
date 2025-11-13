@@ -1,75 +1,62 @@
-using Launcher.App.Server;
-using Newtonsoft.Json;
+using Launcher.App.Utility;
 
 namespace Launcher.App.Profile
 {
     public class ProfileService
     {
-        public static ProfileConfig ProfileConfig { get; set; } = new();
+        public static Dictionary<string, ProfileConfig> ProfileConfigs { get; set; } = new();
+        public static Setting SettingConfig { get; set; } = new Setting();
 
-        /// <summary>
-        /// Clamp values to valid ranges before saving and after loading.
-        /// </summary>
-        public static void ClampValue()
+        public static void SaveSettings()
         {
-            ProfileConfig.Rider.Lucci = Math.Clamp(ProfileConfig.Rider.Lucci, 0, SessionGroup.LucciMax);
-            ProfileConfig.GameOption.Set_BGM = Math.Clamp(ProfileConfig.GameOption.Set_BGM, 0f, 1f);
-            ProfileConfig.GameOption.Set_Sound = Math.Clamp(ProfileConfig.GameOption.Set_Sound, 0f, 1f);
+            File.WriteAllText(FileName.Load_Settings, JsonHelper.Serialize(SettingConfig));
         }
 
-        /// <summary>
-        /// Save the current config to the config file.
-        /// </summary>
-        public static void Save()
+        public static bool LoadSettings()
         {
-            ClampValue();
-            try
+            if (File.Exists(FileName.Load_Settings))
             {
-                var jsonSettings = new JsonSerializerSettings
-                {
-                    Formatting = Formatting.Indented,
-                };
-
-                using (StreamWriter streamWriter = new(FileName.ConfigFile, false))
-                {
-                    streamWriter.Write(JsonConvert.SerializeObject(ProfileConfig, jsonSettings));
-                }
+                SettingConfig = JsonHelper.DeserializeNoBom<Setting>(FileName.Load_Settings);
+                return true;
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine($"Error saving config: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Load the config from the config file.
-        /// </summary>
-        /// <returns>False if fail to load the config</returns>
-        public static bool Load()
-        {
-            bool result = File.Exists(FileName.ConfigFile);
-            if (!result)
-            {
-                ProfileConfig = new ProfileConfig();
-                Save();
+                SettingConfig = new Setting();
+                SaveSettings();
                 return false;
             }
-            try
+        }
+
+        public static void Save(string Nickname)
+        {
+            if (!FileName.FileNames.ContainsKey(Nickname))
             {
-                ProfileConfig = JsonConvert.DeserializeObject<ProfileConfig>(File.ReadAllText(FileName.ConfigFile)) ?? new ProfileConfig();
+                FileName.Load(Nickname);
             }
-            catch (Exception ex)
+            var filename = FileName.FileNames[Nickname];
+            if (ProfileConfigs.ContainsKey(Nickname))
             {
-                Console.WriteLine($"Error loading config: {ex.Message}");
-                ProfileConfig = new ProfileConfig();
-                result = false;
+                File.WriteAllText(filename.config_path, JsonHelper.Serialize(ProfileConfigs[Nickname]));
             }
-            finally
+        }
+
+        public static void Load(string Nickname)
+        {
+            if (!FileName.FileNames.ContainsKey(Nickname))
             {
-                ClampValue();
-                Save();
+                FileName.Load(Nickname);
             }
-            return result;
+            var filename = FileName.FileNames[Nickname];
+
+            if (File.Exists(filename.config_path))
+            {
+                ProfileConfigs.TryAdd(Nickname, JsonHelper.DeserializeNoBom<ProfileConfig>(filename.config_path));
+            }
+            else
+            {
+                ProfileConfigs.TryAdd(Nickname, new ProfileConfig());
+                Save(Nickname);
+            }
         }
     }
 }

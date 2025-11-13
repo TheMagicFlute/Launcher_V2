@@ -1,4 +1,4 @@
-﻿namespace KartRider
+﻿namespace Launcher.App.Forms
 {
     partial class Options
     {

@@ -684,7 +684,6 @@ namespace Launcher.Library.Encrypt
                 else
                 {
                     xmm0 = Sse2.LoadLow(xmm0, &temp_1);
-
                 }
             }
             return new Vector128<double>();

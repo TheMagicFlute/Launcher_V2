@@ -1,5 +1,4 @@
-using KartRider;
-using Launcher.App.Utility;
+using Launcher.App.Profile;
 using System.Net;
 using System.Net.Sockets;
 
@@ -7,27 +6,13 @@ namespace Launcher.App.Server
 {
     public class RouterListener
     {
-        public static string sIP;
+        public static IPAddress sIP { get; set; }
 
-        public static int port;
-
-        public static string forceConnect;
-
-        public static IPEndPoint client;
-
-        public static IPEndPoint CurrentUDPServer { get; set; }
-
-        public static string ForceConnect { get; set; }
+        public static System.Net.IPEndPoint CurrentUDPServer { get; set; }
 
         public static TcpListener Listener { get; private set; }
 
         public static SessionGroup MySession { get; set; }
-
-        static RouterListener()
-        {
-            sIP = "0.0.0.0";
-            port = 39312;
-        }
 
         public static int[] DataTime()
         {
@@ -35,18 +20,8 @@ namespace Launcher.App.Server
             DateTime time = new DateTime(1900, 1, 1, 0, 0, 0);
             TimeSpan t = dt.Subtract(time);
             double totalSeconds = dt.TimeOfDay.TotalSeconds / 4;
-            int Month = (dt.Year - 1900) * 12;
-            int MonthCount = Month + dt.Month;
-            double tempResult = (double)MonthCount / 2;
-            int oddMonthCount;
-            if (tempResult % 1 != 0)
-            {
-                oddMonthCount = (int)tempResult + 1;
-            }
-            else
-            {
-                oddMonthCount = (int)tempResult;
-            }
+            int MonthCount = (dt.Year - 1900) * 12 + dt.Month;
+            int oddMonthCount = (MonthCount + 1) / 2;
             return new int[] { t.Days, (int)totalSeconds, oddMonthCount };
         }
 
@@ -55,22 +30,13 @@ namespace Launcher.App.Server
             try
             {
                 Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                Socket clientSocket = Listener.EndAcceptSocket(ar);
-                forceConnect = sIP;
-                if (ForceConnect != "")
-                {
-                    forceConnect = ForceConnect;
-                }
-                MySession = new SessionGroup(clientSocket, null);
-                IPEndPoint clientEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
-                client = clientEndPoint;
-                Console.WriteLine("Client: " + client.Address.ToString() + ":" + client.Port.ToString());
-                if (File.Exists(MainForm.PinFileBak))
-                {
-                    File.Delete(MainForm.PinFile);
-                    File.Move(MainForm.PinFileBak, MainForm.PinFile);
-                }
-                GameSupport.PcFirstMessage();
+                Socket clientSocket = RouterListener.Listener.EndAcceptSocket(ar);
+
+                // 创建客户端会话（自动开始接收消息）
+                RouterListener.MySession = new SessionGroup(clientSocket, null);
+
+                // 将会话添加到管理类
+                ClientManager.AddClient(RouterListener.MySession);
             }
             catch (Exception ex)
             {
@@ -78,27 +44,30 @@ namespace Launcher.App.Server
             }
             finally
             {
-                Listener.BeginAcceptSocket(new AsyncCallback(OnAcceptSocket), null);
+                RouterListener.Listener.BeginAcceptSocket(new AsyncCallback(RouterListener.OnAcceptSocket), null);
             }
         }
 
         public static void Start()
         {
-            if (Listener == null || CurrentUDPServer == null)
+            if (RouterListener.Listener == null || RouterListener.CurrentUDPServer == null)
             {
-                Listener = new TcpListener(IPAddress.Parse(sIP), port);
-                CurrentUDPServer = new IPEndPoint(IPAddress.Parse(sIP), 39311);
+                RouterListener.Listener = new TcpListener(IPAddress.Any, ProfileService.SettingConfig.ServerPort);
+                RouterListener.CurrentUDPServer = new System.Net.IPEndPoint(IPAddress.Any, 39311);
             }
-            if (!Listener.Server.IsBound)
+            if (!RouterListener.Listener.Server.IsBound)
             {
-                Console.WriteLine($"[Server] Load server IP: {sIP}:{port}");
-                ForceConnect = "";
-                Listener.Start();
-                Listener.BeginAcceptSocket(OnAcceptSocket, Listener);
+                var RouterIPList = LanIpGetter.GetAllLocalLanIps();
+                foreach (var ip in RouterIPList)
+                {
+                    Console.WriteLine("Load server IP: {0}:{1}", ip, ProfileService.SettingConfig.ServerPort);
+                }
+                RouterListener.Listener.Start();
+                RouterListener.Listener.BeginAcceptSocket(OnAcceptSocket, RouterListener.Listener);
             }
             else
             {
-                Listener.BeginAcceptSocket(OnAcceptSocket, Listener);
+                RouterListener.Listener.BeginAcceptSocket(OnAcceptSocket, RouterListener.Listener);
             }
         }
     }

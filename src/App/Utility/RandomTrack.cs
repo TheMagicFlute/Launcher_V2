@@ -1,6 +1,4 @@
-﻿using Launcher.App.ExcData;
-using Launcher.App.KartSpec;
-using Launcher.App.Rider;
+﻿using Launcher.App.Rider;
 using Launcher.Library.Utilities;
 using System.Xml.Linq;
 
@@ -8,15 +6,16 @@ namespace Launcher.App.Utility
 {
     public class RandomTrack
     {
-        public static string GameType = "item";
-        public static string SetRandomTrack = "all";
+        public static Dictionary<uint, string> track = new Dictionary<uint, string>();
+        public static XDocument randomTrack = new XDocument();
+
         public static string GameTrack = "village_R01";
 
         public static string GetTrackName(uint trackId)
         {
-            if (KartExcData.track.ContainsKey(trackId))
+            if (track.ContainsKey(trackId))
             {
-                return KartExcData.track[trackId];
+                return track[trackId];
             }
             else
             {
@@ -24,123 +23,123 @@ namespace Launcher.App.Utility
             }
         }
 
-        public static void SetGameType()
+        public static uint GetRandomTrack(string Nickname, byte GameType, uint Track)
         {
-            if (StartGameData.StartTimeAttack_RandomTrackGameType == 0)
-            {
-                GameType = "speed";
-            }
-            else if (StartGameData.StartTimeAttack_RandomTrackGameType == 1)
-            {
-                GameType = "item";
-            }
-            SetRandomType();
-        }
+            string RandomTrackGameType = "speed";
+            string RandomTrackSetRandomTrack = "all";
+            string RandomTrackGameTrack = "village_R01";
 
-        public static void SetRandomType()
-        {
-            if (StartGameData.StartTimeAttack_Track == 0)
+            if (GameType == 0)
             {
-                SetRandomTrack = "all";
+                RandomTrackGameType = "speed";
             }
-            else if (StartGameData.StartTimeAttack_Track == 1)
+            else if (GameType == 1)
             {
-                SetRandomTrack = "clubSpeed";
+                RandomTrackGameType = "item";
             }
-            else if (StartGameData.StartTimeAttack_Track == 3)
+
+            if (Track == 0)
             {
-                SetRandomTrack = "hot1";
+                RandomTrackSetRandomTrack = "all";
             }
-            else if (StartGameData.StartTimeAttack_Track == 4)
+            else if (Track == 1)
             {
-                SetRandomTrack = "hot2";
+                RandomTrackSetRandomTrack = "clubSpeed";
             }
-            else if (StartGameData.StartTimeAttack_Track == 5)
+            else if (Track == 3)
             {
-                SetRandomTrack = "hot3";
+                RandomTrackSetRandomTrack = "hot1";
             }
-            else if (StartGameData.StartTimeAttack_Track == 6)
+            else if (Track == 4)
             {
-                SetRandomTrack = "hot4";
+                RandomTrackSetRandomTrack = "hot2";
             }
-            else if (StartGameData.StartTimeAttack_Track == 7)
+            else if (Track == 5)
             {
-                SetRandomTrack = "hot5";
+                RandomTrackSetRandomTrack = "hot3";
             }
-            else if (StartGameData.StartTimeAttack_Track == 8)
+            else if (Track == 6)
             {
-                SetRandomTrack = "new";
+                RandomTrackSetRandomTrack = "hot4";
             }
-            else if (StartGameData.StartTimeAttack_Track == 23)
+            else if (Track == 7)
             {
-                SetRandomTrack = "crazy";
+                RandomTrackSetRandomTrack = "hot5";
             }
-            else if (StartGameData.StartTimeAttack_Track == 30)
+            else if (Track == 8)
             {
-                SetRandomTrack = "reverse";
+                RandomTrackSetRandomTrack = "new";
             }
-            else if (StartGameData.StartTimeAttack_Track == 40)
+            else if (Track == 23)
             {
-                SetRandomTrack = "speedAll";
+                RandomTrackSetRandomTrack = "crazy";
+            }
+            else if (Track == 30)
+            {
+                RandomTrackSetRandomTrack = "reverse";
+            }
+            else if (Track == 40)
+            {
+                RandomTrackSetRandomTrack = "speedAll";
             }
             else
             {
-                SetRandomTrack = "Unknown";
+                RandomTrackSetRandomTrack = "Unknown";
             }
-            RandomTrackSetList();
-        }
 
-        public static void RandomTrackSetList()
-        {
-            if (SetRandomTrack == "all" || SetRandomTrack == "speedAll")
+            if (RandomTrackSetRandomTrack == "all" || RandomTrackSetRandomTrack == "speedAll")
             {
                 Random random = new Random();
-                if (FavoriteItem.FavoriteTrackList.Count > 0)
+                List<uint> availableTracks;
+                if (FavoriteItem.FavoriteTrackLists.TryGetValue(Nickname, out var favoriteTracks)
+                    && favoriteTracks.GetAllTracks().Count > 0)
                 {
-                    int randomIndex = random.Next(FavoriteItem.FavoriteTrackList.Count);
-                    StartGameData.StartTimeAttack_Track = uint.Parse(FavoriteItem.FavoriteTrackList[randomIndex][1]);
+                    availableTracks = favoriteTracks.GetAllTracks();
+                    return availableTracks[random.Next(availableTracks.Count)];
                 }
                 else
                 {
-                    int randomIndex = random.Next(KartExcData.track.Count);
-                    GameTrack = KartExcData.track.ElementAt(randomIndex).Value;
-                    StartGameData.StartTimeAttack_Track = Adler32Helper.GenerateAdler32_UNICODE(GameTrack, 0);
+                    int randomIndex = random.Next(track.Count);
+                    var selectedTrack = track.ElementAt(randomIndex).Value;
+                    return Adler32Helper.GenerateAdler32_UNICODE(selectedTrack, 0);
                 }
             }
-            else if (SetRandomTrack == "Unknown")
+            else if (RandomTrackSetRandomTrack == "Unknown")
             {
-                if (!KartExcData.track.ContainsKey(StartGameData.StartTimeAttack_Track))
+                Console.WriteLine("RandomTrack: {0} / {1} / {2}", RandomTrackGameType, RandomTrackSetRandomTrack, RandomTrack.GameTrack);
+                if (track.ContainsKey(Track))
                 {
-                    StartGameData.StartTimeAttack_Track = Adler32Helper.GenerateAdler32_UNICODE(GameTrack, 0);
+                    return Track;
                 }
-                Console.WriteLine("RandomTrack: {0} / {1} / {2}", GameType, SetRandomTrack, GameTrack);
+                else
+                {
+                    return Adler32Helper.GenerateAdler32_UNICODE(RandomTrack.GameTrack, 0);
+                }
             }
             else
             {
-                XDocument doc = KartExcData.randomTrack;
+                XDocument doc = randomTrack;
                 var TrackSet = doc.Descendants("RandomTrackSet")
-                    .FirstOrDefault(rts => (string)rts.Attribute("gameType") == GameType && (string)rts.Attribute("randomType") == SetRandomTrack);
+                    .FirstOrDefault(rts => (string)rts.Attribute("gameType") == RandomTrackGameType && (string)rts.Attribute("randomType") == RandomTrackSetRandomTrack);
                 if (TrackSet != null)
                 {
                     Random random = new Random();
                     var randomTrack = TrackSet.Descendants("track").ElementAt(random.Next(TrackSet.Descendants("track").Count()));
-                    GameTrack = (string)randomTrack.Attribute("id");
-                    StartGameData.StartTimeAttack_Track = Adler32Helper.GenerateAdler32_UNICODE(GameTrack, 0);
+                    RandomTrackGameTrack = (string)randomTrack.Attribute("id");
                 }
                 else
                 {
                     var TrackList = doc.Descendants("RandomTrackList")
-                        .FirstOrDefault(rts => (string)rts.Attribute("randomType") == SetRandomTrack);
+                        .FirstOrDefault(rts => (string)rts.Attribute("randomType") == RandomTrackSetRandomTrack);
                     if (TrackList != null)
                     {
                         Random random = new Random();
                         var randomTrack = TrackList.Descendants("track").ElementAt(random.Next(TrackList.Descendants("track").Count()));
-                        GameTrack = (string)randomTrack.Attribute("id");
-                        StartGameData.StartTimeAttack_Track = Adler32Helper.GenerateAdler32_UNICODE(GameTrack, 0);
+                        RandomTrackGameTrack = (string)randomTrack.Attribute("id");
                     }
                 }
+                return Adler32Helper.GenerateAdler32_UNICODE(RandomTrackGameTrack, 0);
             }
-            SpeedType.SpeedTypeData();
         }
     }
 }
