@@ -48,13 +48,13 @@ jobs:
       run: cd src
 
     - name: Publish x64
-      run: dotnet publish Launcher.csproj --runtime win-x64 -p:PublishSingleFile=true -p:AssemblyName=Launcher_x64 -o PublishedWinExe -c Release --no-self-contained
+      run: dotnet publish Launcher.sln --runtime win-x64 -p:PublishSingleFile=true -p:AssemblyName=Launcher_x64 -o PublishedWinExe -c Release --no-self-contained
 
     - name: Publish x86
-      run: dotnet publish Launcher.csproj --runtime win-x86 -p:PublishSingleFile=true -p:AssemblyName=Launcher_x86 -o PublishedWinExe -c Release --no-self-contained
+      run: dotnet publish Launcher.sln --runtime win-x86 -p:PublishSingleFile=true -p:AssemblyName=Launcher_x86 -o PublishedWinExe -c Release --no-self-contained
 
     - name: Publish arm64
-      run: dotnet publish Launcher.csproj --runtime win-arm64 -p:PublishSingleFile=true -p:AssemblyName=Launcher_arm64 -o PublishedWinExe -c Release --no-self-contained
+      run: dotnet publish Launcher.sln --runtime win-arm64 -p:PublishSingleFile=true -p:AssemblyName=Launcher_arm64 -o PublishedWinExe -c Release --no-self-contained
 
     - name: Archive build artifacts
       uses: actions/upload-artifact@v4
