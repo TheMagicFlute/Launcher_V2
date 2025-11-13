@@ -1,4 +1,8 @@
-﻿using Launcher.App.Utility;
+﻿using Launcher.App.Profile;
+using Launcher.App.Server;
+using Launcher.App.Utility;
+using Launcher.Properties;
+using System.Diagnostics;
 
 namespace Launcher.App.Forms
 {
@@ -20,26 +24,17 @@ namespace Launcher.App.Forms
         {
             StartAnimation();
 
-            // load Data files (放到后台线程执行，避免阻塞 UI)
             Task.Run(() =>
             {
                 try
                 {
-                    Console.WriteLine("读取Data文件...");
-                    var packFolderManager = KartRhoFile.Dump(Path.GetFullPath(Path.Combine(Program.RootDirectory, @"Data\aaa.pk")));
-                    if (packFolderManager == null)
-                    {
-                        // MsgErrorReadData 可能会弹窗，必须回到 UI 线程调用
-                        this.Invoke(() => Utils.MsgErrorReadData());
-                        return;
-                    }
-                    packFolderManager.Reset();
-                    Console.WriteLine("Data文件读取完成!");
+                    Load_Main();
+                    PromptMsg.Text = "读取Data文件...";
+                    Load_Data();
+                    PromptMsg.Text = "加载特殊赛车配置...";
+                    Load_Kart_Data();
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"读取Data文件时出错: {ex.Message}");
-                }
+                catch { }
                 finally
                 {
                     // 操作完成后停止动画并进行 UI 收尾并关闭窗体
@@ -51,32 +46,86 @@ namespace Launcher.App.Forms
                             {
                                 animationTimer.Stop();
                                 animationTimer.Dispose();
-                            }
-                            catch { }
-
-                            try
-                            {
                                 ProgressBar.Value = ProgressBar.Minimum;
                             }
                             catch { }
 
                             Utils.PrintDivLine();
-
-                            try
-                            {
-                                // 先 Close，然后 Dispose（双重保险，Close 之后窗体会被释放，Dispose 可能抛异常，故包裹 try）
-                                this.Close();
-                                this.Dispose();
-                            }
-                            catch { }
+                            Dispose();
                         });
                     }
-                    catch
-                    {
-                        // 如果窗体已关闭或 Invoke 失败，吞掉异常以避免崩溃
-                    }
+                    catch { }
                 }
             });
+        }
+
+        private void Load_Main()
+        {
+            if (Process.GetProcessesByName("KartRider").Length != 0)
+            {
+                Utils.MsgKartIsRunning();
+                return;
+            }
+
+            // find game directory
+            if (Utils.CheckGameAvailability(FileName.AppDir))
+            {
+                // working directory
+                Program.RootDirectory = FileName.AppDir;
+                Console.WriteLine("使用当前目录下的游戏.");
+            }
+            else if (Utils.CheckGameAvailability(FileName.TCGKartGamePath))
+            {
+                // TCGame registered directory
+                Program.RootDirectory = FileName.TCGKartGamePath;
+                Console.WriteLine("使用TCGame注册的游戏目录下的游戏.");
+            }
+            else
+            {
+                // game not found
+                Utils.MsgFileNotFound();
+            }
+            Console.WriteLine($"游戏目录: {Program.RootDirectory}");
+            Utils.PrintDivLine();
+        }
+
+        private void Load_Data()
+        {
+            Console.WriteLine("读取Data文件...");
+            try
+            {
+                var packFolderManager = KartRhoFile.Dump(Path.GetFullPath(Path.Combine(Program.RootDirectory, @"Data\aaa.pk")));
+                if (packFolderManager == null)
+                {
+                    // MsgErrorReadData 可能会弹窗，必须回到 UI 线程调用
+                    this.Invoke(() => Utils.MsgErrorReadData());
+                    return;
+                }
+                packFolderManager.Reset();
+                Console.WriteLine("Data文件读取完成!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"读取Data文件时出错: {ex.Message}");
+            }
+        }
+
+        private void Load_Kart_Data()
+        {
+            Console.WriteLine("加载特殊赛车配置...");
+            string ModelMax = Resources.ModelMax;
+            if (!File.Exists(FileName.ModelMax_LoadFile))
+            {
+                using (StreamWriter streamWriter = new StreamWriter(FileName.ModelMax_LoadFile, false))
+                {
+                    streamWriter.Write(ModelMax);
+                }
+            }
+            XmlUpdater updater = new();
+            updater.UpdateLocalXmlWithResource(FileName.ModelMax_LoadFile, ModelMax);
+
+            SpecialKartConfig.SaveConfigToFile(FileName.SpecialKartConfig);
+            MultiPlayer.kartConfig = SpecialKartConfig.LoadConfigFromFile(FileName.SpecialKartConfig);
         }
 
         private void StartAnimation()

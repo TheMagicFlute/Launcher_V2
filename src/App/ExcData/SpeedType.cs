@@ -1,7 +1,3 @@
-using Launcher.App.KartSpec;
-using Launcher.App.Profile;
-using Launcher.App.Utility;
-
 namespace Launcher.App.ExcData
 {
     public class SpeedType
@@ -20,28 +16,29 @@ namespace Launcher.App.ExcData
             { "复古Pro", 14 }
         };
 
-        public static float AddSpec_TransAccelFactor = 0f;
-        public static float AddSpec_SteerConstraint = 0f;
-        public static float AddSpec_DriftEscapeForce = 0f;
+        public float AddSpec_TransAccelFactor { get; set; } = 0f;
+        public float AddSpec_SteerConstraint { get; set; } = 0f;
+        public float AddSpec_DriftEscapeForce { get; set; } = 0f;
 
-        public static float DragFactor = 0f;
-        public static float ForwardAccelForce = 0f;
-        public static float BackwardAccelForce = 0f;
-        public static float GripBrakeForce = 0f;
-        public static float SlipBrakeForce = 0f;
-        public static float SteerConstraint = 0f;
-        public static float DriftEscapeForce = 0f;
-        public static float CornerDrawFactor = 0f;
-        public static float DriftMaxGauge = 0f;
-        public static float TransAccelFactor = 0f;
-        public static float BoostAccelFactor = 0f;
-        public static float StartForwardAccelForceItem = 0f;
-        public static float StartForwardAccelForceSpeed = 0f;
+        public float DragFactor { get; set; } = 0f;
+        public float ForwardAccelForce { get; set; } = 0f;
+        public float BackwardAccelForce { get; set; } = 0f;
+        public float GripBrakeForce { get; set; } = 0f;
+        public float SlipBrakeForce { get; set; } = 0f;
+        public float SteerConstraint { get; set; } = 0f;
+        public float DriftEscapeForce { get; set; } = 0f;
+        public float CornerDrawFactor { get; set; } = 0f;
+        public float DriftMaxGauge { get; set; } = 0f;
+        public float TransAccelFactor { get; set; } = 0f;
+        public float BoostAccelFactor { get; set; } = 0f;
+        public float StartForwardAccelForceItem { get; set; } = 0f;
+        public float StartForwardAccelForceSpeed { get; set; } = 0f;
 
-        public static void SpeedTypeData()
+        public void SpeedTypeData(byte SpeedType)
         {
-            if (ProfileService.ProfileConfig.GameOption.SpeedType == 3)//S0 보통
+            if (SpeedType == 3)//S0 보통
             {
+                Console.WriteLine("SpeedType:S0");
                 AddSpec_SteerConstraint = -0.3f;
                 AddSpec_DriftEscapeForce = -350f;
                 AddSpec_TransAccelFactor = -0.015f;
@@ -58,10 +55,10 @@ namespace Launcher.App.ExcData
                 BoostAccelFactor = 0.006f;
                 StartForwardAccelForceItem = -530f;
                 StartForwardAccelForceSpeed = -950f;
-                Console.WriteLine("SpeedType:S0");
             }
-            else if (ProfileService.ProfileConfig.GameOption.SpeedType == 0)//S1 빠름
+            else if (SpeedType == 0)//S1 빠름
             {
+                Console.WriteLine("SpeedType:S1");
                 AddSpec_SteerConstraint = 1.7f;
                 AddSpec_DriftEscapeForce = 150f;
                 AddSpec_TransAccelFactor = 0.199f;
@@ -78,10 +75,10 @@ namespace Launcher.App.ExcData
                 BoostAccelFactor = 0.006f;
                 StartForwardAccelForceItem = -200f;
                 StartForwardAccelForceSpeed = -360f;
-                Console.WriteLine("SpeedType:S1");
             }
-            else if (ProfileService.ProfileConfig.GameOption.SpeedType == 1)//S2 매우빠름
+            else if (SpeedType == 1)//S2 매우빠름
             {
+                Console.WriteLine("SpeedType:S2");
                 AddSpec_SteerConstraint = 2.2f;
                 AddSpec_DriftEscapeForce = 1100f;
                 AddSpec_TransAccelFactor = 0.202f;
@@ -98,10 +95,10 @@ namespace Launcher.App.ExcData
                 BoostAccelFactor = 0.006f;
                 StartForwardAccelForceItem = 200f;
                 StartForwardAccelForceSpeed = 360f;
-                Console.WriteLine("SpeedType:S2");
             }
-            else if (ProfileService.ProfileConfig.GameOption.SpeedType == 2)//S3 가장빠름
+            else if (SpeedType == 2)//S3 가장빠름
             {
+                Console.WriteLine("SpeedType:S3");
                 AddSpec_SteerConstraint = 2.7f;
                 AddSpec_DriftEscapeForce = 1500f;
                 AddSpec_TransAccelFactor = 0.2f;
@@ -118,10 +115,10 @@ namespace Launcher.App.ExcData
                 BoostAccelFactor = 0.006f;
                 StartForwardAccelForceItem = 750f;
                 StartForwardAccelForceSpeed = 1350f;
-                Console.WriteLine("SpeedType:S3");
             }
-            else if (ProfileService.ProfileConfig.GameOption.SpeedType == 4 || ProfileService.ProfileConfig.GameOption.SpeedType == 6 || ProfileService.ProfileConfig.GameOption.SpeedType == 7)//무부, 통합
+            else if (SpeedType == 4 || SpeedType == 6 || SpeedType == 7)//무부, 통합
             {
+                Console.WriteLine("SpeedType:Integration");
                 AddSpec_SteerConstraint = 1.95f;
                 AddSpec_DriftEscapeForce = 400f;
                 AddSpec_TransAccelFactor = 0.2005f;
@@ -138,10 +135,10 @@ namespace Launcher.App.ExcData
                 BoostAccelFactor = 0f;
                 StartForwardAccelForceItem = 0f;
                 StartForwardAccelForceSpeed = 0f;
-                Console.WriteLine("SpeedType:Integration");
             }
-            else if (ProfileService.ProfileConfig.GameOption.SpeedType == 10)//Rookie, S1
+            else if (SpeedType == 10)//Rookie, S1
             {
+                Console.WriteLine("SpeedType:Rookie");
                 AddSpec_SteerConstraint = 0f;
                 AddSpec_DriftEscapeForce = 0f;
                 AddSpec_TransAccelFactor = 0f;
@@ -159,8 +156,9 @@ namespace Launcher.App.ExcData
                 StartForwardAccelForceItem = -270f;
                 StartForwardAccelForceSpeed = -270f;
             }
-            else if (ProfileService.ProfileConfig.GameOption.SpeedType == 11)//L3, S2
+            else if (SpeedType == 11)//L3, S2
             {
+                Console.WriteLine("SpeedType:L3");
                 AddSpec_SteerConstraint = 0f;
                 AddSpec_DriftEscapeForce = 0f;
                 AddSpec_TransAccelFactor = 0f;
@@ -178,8 +176,9 @@ namespace Launcher.App.ExcData
                 StartForwardAccelForceItem = 450f;
                 StartForwardAccelForceSpeed = 450f;
             }
-            else if (ProfileService.ProfileConfig.GameOption.SpeedType == 12)//L2
+            else if (SpeedType == 12)//L2
             {
+                Console.WriteLine("SpeedType:L2");
                 AddSpec_SteerConstraint = 0f;
                 AddSpec_DriftEscapeForce = 0f;
                 AddSpec_TransAccelFactor = 0f;
@@ -197,8 +196,9 @@ namespace Launcher.App.ExcData
                 StartForwardAccelForceItem = 400f;
                 StartForwardAccelForceSpeed = 400f;
             }
-            else if (ProfileService.ProfileConfig.GameOption.SpeedType == 13)//L1, S3
+            else if (SpeedType == 13)//L1, S3
             {
+                Console.WriteLine("SpeedType:L1");
                 AddSpec_SteerConstraint = 0f;
                 AddSpec_DriftEscapeForce = 0f;
                 AddSpec_TransAccelFactor = 0f;
@@ -216,8 +216,9 @@ namespace Launcher.App.ExcData
                 StartForwardAccelForceItem = 1350f;
                 StartForwardAccelForceSpeed = 1350f;
             }
-            else if (ProfileService.ProfileConfig.GameOption.SpeedType == 14)//Pro
+            else if (SpeedType == 14)//Pro
             {
+                Console.WriteLine("SpeedType:Pro");
                 AddSpec_SteerConstraint = 0f;
                 AddSpec_DriftEscapeForce = 0f;
                 AddSpec_TransAccelFactor = 0f;
@@ -237,10 +238,24 @@ namespace Launcher.App.ExcData
             }
             else
             {
-                GameSupport.OnDisconnect();
-                Console.WriteLine("SpeedType:null");
+                Console.WriteLine("SpeedType:Integration");
+                AddSpec_SteerConstraint = 1.95f;
+                AddSpec_DriftEscapeForce = 400f;
+                AddSpec_TransAccelFactor = 0.2005f;
+                DragFactor = 0f;
+                ForwardAccelForce = 0f;
+                BackwardAccelForce = 0f;
+                GripBrakeForce = 0f;
+                SlipBrakeForce = 0f;
+                SteerConstraint = 0f;
+                DriftEscapeForce = 0f;
+                CornerDrawFactor = 0f;
+                DriftMaxGauge = 0f;
+                TransAccelFactor = 0f;
+                BoostAccelFactor = 0f;
+                StartForwardAccelForceItem = 0f;
+                StartForwardAccelForceSpeed = 0f;
             }
-            FlyingPet.FlyingPet_Spec();
         }
     }
 }

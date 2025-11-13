@@ -47,9 +47,9 @@
             PromptMsg.AutoSize = true;
             PromptMsg.Location = new Point(12, 18);
             PromptMsg.Name = "PromptMsg";
-            PromptMsg.Size = new Size(180, 17);
+            PromptMsg.Size = new Size(136, 17);
             PromptMsg.TabIndex = 1;
-            PromptMsg.Text = "正在读取游戏资源文件, 请稍候...";
+            PromptMsg.Text = "Loading, please wait...";
             // 
             // Loader
             // 

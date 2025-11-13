@@ -177,11 +177,11 @@ namespace Launcher.App.Event
             foreach (byte num in uniqueNumbers)
             {
                 BingoNumsList.Add(num);
-                BingoNums.Add(num, 0);
+                BingoNums.TryAdd(num, 0);
             }
         }
 
-        public static void SpRpLotteryPacket()
+        public static void SpRpLotteryPacket(SessionGroup Parent)
         {
             int stock1 = LotteryManager.GetRandomStockIds(1)[0];
             Random random = new Random();
@@ -195,7 +195,7 @@ namespace Launcher.App.Event
                     foreach (int stock in srocks)
                     {
                         BingoItemsList.Add(stock);
-                        BingoItems.Add(stock, 0);
+                        BingoItems.TryAdd(stock, 0);
                     }
                 }
             }
@@ -207,14 +207,14 @@ namespace Launcher.App.Event
                 outPacket.WriteByte(0);
                 outPacket.WriteByte(BingoNum);
                 outPacket.WriteBytes(new byte[11]);
-                RouterListener.MySession.Client.Send(outPacket);
+                Parent.Client.Send(outPacket);
             }
             if (BingoNums.ContainsKey(BingoNum) && BingoNumsList.Contains(BingoNum))
             {
                 BingoNums[BingoNum] = 1;
                 CheckLinesAsArray();
             }
-            BingoCount++;
+            Bingo.BingoCount++;
         }
 
         public static void CheckLinesAsArray()

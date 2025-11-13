@@ -8,26 +8,26 @@ namespace Launcher.App.Server
         public static short ItemID = 0;
         public static short Amount = 0;
 
-        public static void TestServerAddItem()
+        public static void TestServerAddItem(SessionGroup Parent)
         {
             using (OutPacket outPacket = new OutPacket("PrRequestKartInfoPacket"))
             {
                 outPacket.WriteByte(1);
                 outPacket.WriteInt(1);
-                outPacket.WriteShort(Type);
-                outPacket.WriteShort(ItemID);
+                outPacket.WriteShort(TestServer.Type);
+                outPacket.WriteShort(TestServer.ItemID);
                 outPacket.WriteShort(0);
-                outPacket.WriteShort(Amount);
+                outPacket.WriteShort(TestServer.Amount);
                 outPacket.WriteShort(0);
                 outPacket.WriteShort(-1);
                 outPacket.WriteShort(0);
                 outPacket.WriteShort(0);
                 outPacket.WriteShort(0);
-                RouterListener.MySession.Client.Send(outPacket);
+                Parent.Client.Send(outPacket);
             }
-            Type = 0;
-            ItemID = 0;
-            Amount = 0;
+            TestServer.Type = 0;
+            TestServer.ItemID = 0;
+            TestServer.Amount = 0;
         }
     }
 }

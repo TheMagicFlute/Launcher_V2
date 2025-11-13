@@ -1,4 +1,3 @@
-using KartRider;
 using Launcher.App.Constant;
 using Launcher.App.Forms;
 using Launcher.App.Logger;
@@ -57,9 +56,10 @@ namespace Launcher.App
         public static string architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
 
         // ----- Form Dialogs -----
-        public static MainForm LauncherDlg;
-        public static GetKart GetKartDlg;
-        public static Options OptionsDlg;
+        public static Forms.MainForm LauncherDlg;
+        public static Forms.GetKart GetKartDlg;
+        public static Forms.Options OptionsDlg;
+        public static Forms.Setting SettingDlg;
 
         [STAThread]
         private static async Task Main(string[] args)
@@ -91,17 +91,19 @@ namespace Launcher.App
                 return;
             }
 
-            // auto hide console window if not in debug mode
-            if (!ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility)
-                ShowWindow(consoleHandle, SW_HIDE);
-
             // check & create app directory
             if (!Directory.Exists(FileName.ProfileDir))
                 Directory.CreateDirectory(FileName.ProfileDir);
             if (!Directory.Exists(FileName.LogDir))
                 Directory.CreateDirectory(FileName.LogDir);
 
-            if (!ProfileService.Load()) // New User
+            ProfileService.Load(ProfileService.SettingConfig.Name);
+
+            // auto hide console window if not in debug mode
+            if (!ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ConsoleVisibility)
+                ShowWindow(consoleHandle, SW_HIDE);
+
+            if (!ProfileService.LoadSettings())
                 Utils.MsgWelcome();
 
             if (Constants.DBG)
@@ -117,46 +119,17 @@ namespace Launcher.App
             if (countryCode != "") // available country code
             {
                 // change country code & write to file
-                ProfileService.ProfileConfig.ServerSetting.CC = (CountryCode)Enum.Parse(typeof(CountryCode), countryCode);
-                ProfileService.Save();
+                ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.CC = (CountryCode)Enum.Parse(typeof(CountryCode), countryCode);
+                ProfileService.Save(ProfileService.SettingConfig.Name);
             }
-            Console.WriteLine($"最后一次联网打开地区为: {ProfileService.ProfileConfig.ServerSetting.CC}");
-
-            Utils.PrintDivLine();
+            Console.WriteLine($"最后一次联网打开地区为: {ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.CC}");
 
             // auto check update
-            if (ProfileService.ProfileConfig.ServerSetting.AutoUpdate)
+            if (ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.AutoUpdate)
             {
                 new Updater().ShowDialog();
                 Utils.PrintDivLine();
             }
-
-            if (Process.GetProcessesByName("KartRider").Length != 0)
-            {
-                Utils.MsgKartIsRunning();
-                return;
-            }
-
-            // find game directory
-            if (Utils.CheckGameAvailability(FileName.AppDir))
-            {
-                // working directory
-                RootDirectory = FileName.AppDir;
-                Console.WriteLine("使用当前目录下的游戏.");
-            }
-            else if (Utils.CheckGameAvailability(FileName.TCGKartGamePath))
-            {
-                // TCGame registered directory
-                RootDirectory = FileName.TCGKartGamePath;
-                Console.WriteLine("使用TCGame注册的游戏目录下的游戏.");
-            }
-            else
-            {
-                // game not found
-                Utils.MsgFileNotFound();
-            }
-            Console.WriteLine($"游戏目录: {RootDirectory}");
-            Utils.PrintDivLine();
 
             // Open Main Form
             LauncherDlg = new();

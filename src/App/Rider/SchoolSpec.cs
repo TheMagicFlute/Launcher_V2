@@ -1,4 +1,4 @@
-﻿using Launcher.App.KartSpec;
+﻿using Launcher.App.Spec;
 
 namespace Launcher.App.Rider
 {

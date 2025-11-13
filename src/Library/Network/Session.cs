@@ -1,3 +1,5 @@
+using Launcher.App.Server;
+using Launcher.Library.Constant;
 using Launcher.Library.IO;
 using Launcher.Library.Security;
 using Launcher.Library.Utilities;
@@ -8,11 +10,7 @@ namespace Launcher.Library.Network
 {
     public abstract class Session
     {
-        private readonly Socket _socket;
-
-        public uint _RIV;
-
-        public uint _SIV;
+        private readonly System.Net.Sockets.Socket _socket;
 
         private const int DEFAULT_SIZE = 65536;
 
@@ -34,7 +32,7 @@ namespace Launcher.Library.Network
         {
             get
             {
-                return _label;
+                return this._label;
             }
         }
 
@@ -50,45 +48,45 @@ namespace Launcher.Library.Network
             set;
         }
 
-        public Socket Socket
+        public System.Net.Sockets.Socket Socket
         {
             get
             {
-                return _socket;
+                return this._socket;
             }
         }
 
-        public Session(Socket socket)
+        public Session(System.Net.Sockets.Socket socket)
         {
-            _socket = socket;
-            mWriteEventArgs = new SocketAsyncEventArgs()
+            this._socket = socket;
+            this.mWriteEventArgs = new SocketAsyncEventArgs()
             {
                 DisconnectReuseSocket = false
             };
-            mWriteEventArgs.Completed += new EventHandler<SocketAsyncEventArgs>((s, a) => EndSend(a));
-            WaitForData();
+            this.mWriteEventArgs.Completed += new EventHandler<SocketAsyncEventArgs>((object s, SocketAsyncEventArgs a) => this.EndSend(a));
+            this.WaitForData();
         }
 
         public void Append(byte[] pBuffer)
         {
-            Append(pBuffer, 0, pBuffer.Length);
+            this.Append(pBuffer, 0, (int)pBuffer.Length);
         }
 
         public void Append(byte[] pBuffer, int pStart, int pLength)
         {
             try
             {
-                if (mBuffer.Length - mCursor < pLength)
+                if ((int)this.mBuffer.Length - this.mCursor < pLength)
                 {
-                    int length = mBuffer.Length * 2;
-                    while (length < mCursor + pLength)
+                    int length = (int)this.mBuffer.Length * 2;
+                    while (length < this.mCursor + pLength)
                     {
                         length *= 2;
                     }
-                    Array.Resize(ref mBuffer, length);
+                    Array.Resize<byte>(ref this.mBuffer, length);
                 }
-                Buffer.BlockCopy(pBuffer, pStart, mBuffer, mCursor, pLength);
-                mCursor += pLength;
+                Buffer.BlockCopy(pBuffer, pStart, this.mBuffer, this.mCursor, pLength);
+                this.mCursor += pLength;
             }
             catch
             {
@@ -97,153 +95,170 @@ namespace Launcher.Library.Network
 
         public void BeginReceive()
         {
-            if (mDisconnected != 0 ? false : _socket.Connected)
+            if ((this.mDisconnected != 0 ? false : this._socket.Connected))
             {
                 try
                 {
-                    _socket.BeginReceive(mSharedBuffer, 0, 65536, SocketFlags.None, new AsyncCallback(EndReceive), _socket);
+                    this._socket.BeginReceive(this.mSharedBuffer, 0, 65536, SocketFlags.None, new AsyncCallback(this.EndReceive), this._socket);
                 }
                 catch
                 {
-                    Disconnect();
+                    this.Disconnect();
                 }
             }
             else
             {
-                Disconnect();
+                this.Disconnect();
             }
         }
 
         private void BeginSend()
         {
-            ByteArraySegment next = mSendSegments.Next;
+            ByteArraySegment next = this.mSendSegments.Next;
             try
             {
                 if (next == null)
                 {
-                    mSendSegments.Dequeue();
+                    this.mSendSegments.Dequeue();
                 }
-                else if (next.Buffer.Length >= next.Length)
+                else if ((int)next.Buffer.Length >= next.Length)
                 {
+                    IPEndPoint clientEndPoint = this._socket.RemoteEndPoint as IPEndPoint;
+                    if (clientEndPoint == null) return;
+                    string clientId = ClientManager.GetClientId(clientEndPoint);
+                    var clientGroup = ClientManager.ClientGroups[clientId];
                     byte[] buffer = next.Buffer;
-                    byte[] numArray = new byte[buffer.Length + (_SIV != 0 ? 8 : 4)];
-                    if (_SIV != 0)
+                    byte[] numArray = new byte[(int)buffer.Length + (clientGroup.SIV != 0 ? 8 : 4)];
+                    if (clientGroup.SIV != 0)
                     {
-                        uint num = KRPacketCrypto.HashEncrypt(buffer, (uint)buffer.Length, _SIV);
-                        Buffer.BlockCopy(BitConverter.GetBytes((int)(_SIV ^ (ulong)(buffer.Length + 4) ^ 4164199944)), 0, numArray, 0, 4);
-                        Buffer.BlockCopy(BitConverter.GetBytes(_SIV ^ num ^ 3388492432), 0, numArray, numArray.Length - 4, 4);
-                        _SIV += 21446425;
-                        if (_SIV == 0)
+                        uint num = KRPacketCrypto.HashEncrypt(buffer, (uint)buffer.Length, clientGroup.SIV);
+                        Buffer.BlockCopy(BitConverter.GetBytes((int)((ulong)clientGroup.SIV ^ (ulong)((int)buffer.Length + 4) ^ (ulong)4164199944)), 0, numArray, 0, 4);
+                        Buffer.BlockCopy(BitConverter.GetBytes(clientGroup.SIV ^ num ^ 3388492432), 0, numArray, (int)numArray.Length - 4, 4);
+                        clientGroup.SIV += 21446425;
+                        if (clientGroup.SIV == 0)
                         {
-                            _SIV = 1;
+                            clientGroup.SIV = 1;
                         }
                     }
                     else
                     {
-                        Buffer.BlockCopy(BitConverter.GetBytes(buffer.Length), 0, numArray, 0, 4);
+                        Buffer.BlockCopy(BitConverter.GetBytes((int)buffer.Length), 0, numArray, 0, 4);
                     }
-                    Buffer.BlockCopy(buffer, 0, numArray, 4, buffer.Length);
-                    mWriteEventArgs.SetBuffer(numArray, 0, numArray.Length);
+                    Buffer.BlockCopy(buffer, 0, numArray, 4, (int)buffer.Length);
+                    this.mWriteEventArgs.SetBuffer(numArray, 0, (int)numArray.Length);
                     next = null;
                     try
                     {
-                        if (!Socket.SendAsync(mWriteEventArgs))
+                        if (!this.Socket.SendAsync(this.mWriteEventArgs))
                         {
-                            EndSend(mWriteEventArgs);
+                            this.EndSend(this.mWriteEventArgs);
                         }
                     }
                     catch (ObjectDisposedException objectDisposedException)
                     {
                         Console.WriteLine("[SOCKET ERR] {0}", objectDisposedException.ToString());
-                        Disconnect();
+                        this.Disconnect();
                     }
                 }
                 else
                 {
-                    Console.WriteLine("[SOCKET ERR] Tried to send a packet that has a bufferlength value that is lower than the length: {0} {1}", next.Buffer.Length, next.Length);
-                    mSendSegments.Dequeue();
+                    Console.WriteLine("[SOCKET ERR] Tried to send a packet that has a bufferlength value that is lower than the length: {0} {1}", (int)next.Buffer.Length, next.Length);
+                    this.mSendSegments.Dequeue();
                 }
             }
             catch (Exception exception)
             {
                 Console.WriteLine("[SOCKET ERR] {0}", exception.ToString());
-                Disconnect();
+                this.Disconnect();
             }
         }
 
         public void Disconnect()
         {
-            if (Interlocked.CompareExchange(ref mDisconnected, 1, 0) == 0)
+            if (Interlocked.CompareExchange(ref this.mDisconnected, 1, 0) == 0)
             {
-                OnDisconnect();
+                this.OnDisconnect();
                 try
                 {
-                    Socket.Shutdown(SocketShutdown.Both);
-                    Socket.Close();
+                    this.Socket.Shutdown(SocketShutdown.Both);
+                    this.Socket.Close();
+                    ClientManager.RemoveClient(this.Socket);
                 }
                 catch
                 {
                 }
-                mWriteEventArgs.Completed -= new EventHandler<SocketAsyncEventArgs>((s, a) => EndSend(a));
-                mWriteEventArgs.Dispose();
-                mWriteEventArgs = null;
+                this.mWriteEventArgs.Completed -= new EventHandler<SocketAsyncEventArgs>((object s, SocketAsyncEventArgs a) => this.EndSend(a));
+                this.mWriteEventArgs.Dispose();
+                this.mWriteEventArgs = null;
             }
         }
 
         private void EndReceive(IAsyncResult ar)
         {
-            if (mDisconnected == 0)
+            if (this.mDisconnected == 0)
             {
                 try
                 {
                     int num = 0;
                     try
                     {
-                        num = _socket.EndReceive(ar);
+                        num = this._socket.EndReceive(ar);
+                        if (num == 0)
+                        {
+                            // 读取到0字节，说明客户端主动断开
+                            Console.WriteLine("客户端主动断开连接");
+                            ClientManager.RemoveClient(this._socket);
+                            this.Disconnect();
+                            return;
+                        }
                     }
                     catch
                     {
-                        Disconnect();
+                        this.Disconnect();
                         return;
                     }
                     if (num > 0)
                     {
-                        Append(mSharedBuffer, 0, num);
+                        this.Append(this.mSharedBuffer, 0, num);
                         while (true)
                         {
-                            if (mCursor >= 4)
+                            if (this.mCursor >= 4)
                             {
-                                uint num1 = BitConverter.ToUInt32(mBuffer, 0);
-                                if (_RIV != 0)
+                                IPEndPoint clientEndPoint = this._socket.RemoteEndPoint as IPEndPoint;
+                                if (clientEndPoint == null) return;
+                                string clientId = ClientManager.GetClientId(clientEndPoint);
+                                var clientGroup = ClientManager.ClientGroups[clientId];
+                                uint num1 = BitConverter.ToUInt32(this.mBuffer, 0);
+                                if (clientGroup.RIV != 0)
                                 {
-                                    num1 = _RIV ^ num1 ^ 4164199944;
+                                    num1 = clientGroup.RIV ^ num1 ^ 4164199944;
                                 }
-                                if ((ulong)mCursor >= num1 + 4)
+                                if ((ulong)this.mCursor >= (ulong)(num1 + 4))
                                 {
                                     byte[] numArray = new byte[num1 - 4];
-                                    Buffer.BlockCopy(mBuffer, 4, numArray, 0, (int)(num1 - 4));
-                                    if (_RIV != 0)
+                                    Buffer.BlockCopy(this.mBuffer, 4, numArray, 0, (int)(num1 - 4));
+                                    if (clientGroup.RIV != 0)
                                     {
-                                        if ((_RIV ^ BitConverter.ToUInt32(mBuffer, (int)num1) ^ 3388492432) != KRPacketCrypto.HashDecrypt(numArray, num1 - 4, _RIV))
+                                        if ((clientGroup.RIV ^ BitConverter.ToUInt32(this.mBuffer, (int)num1) ^ 3388492432) != KRPacketCrypto.HashDecrypt(numArray, num1 - 4, clientGroup.RIV))
                                         {
                                             Console.WriteLine("Different checksum while decrypting");
                                         }
-                                        _RIV += 21446425;
-                                        if (_RIV == 0)
+                                        clientGroup.RIV += 21446425;
+                                        if (clientGroup.RIV == 0)
                                         {
-                                            _RIV = 1;
+                                            clientGroup.RIV = 1;
                                         }
                                     }
-                                    mCursor = (int)(mCursor - (num1 + 4));
-                                    if (mCursor > 0)
+                                    this.mCursor = (int)(this.mCursor - (num1 + 4));
+                                    if (this.mCursor > 0)
                                     {
-                                        Buffer.BlockCopy(mBuffer, (int)(num1 + 4), mBuffer, 0, mCursor);
+                                        Buffer.BlockCopy(this.mBuffer, (int)(num1 + 4), this.mBuffer, 0, this.mCursor);
                                     }
-                                    if (mDisconnected == 0)
+                                    if (this.mDisconnected == 0)
                                     {
                                         using (InPacket inPacket = new InPacket(numArray))
                                         {
-                                            OnPacket(inPacket);
+                                            this.OnPacket(inPacket);
                                         }
                                     }
                                     else
@@ -261,40 +276,40 @@ namespace Launcher.Library.Network
                                 break;
                             }
                         }
-                        BeginReceive();
+                        this.BeginReceive();
                     }
                     else
                     {
-                        Disconnect();
+                        this.Disconnect();
                     }
                 }
                 catch (Exception exception)
                 {
                     Console.WriteLine(exception.ToString());
-                    Disconnect();
+                    this.Disconnect();
                 }
             }
         }
 
         private void EndSend(SocketAsyncEventArgs pArguments)
         {
-            if (mDisconnected == 0)
+            if (this.mDisconnected == 0)
             {
                 try
                 {
                     if (pArguments.BytesTransferred > 0)
                     {
-                        if (mSendSegments.Next.Advance(pArguments.BytesTransferred))
+                        if (this.mSendSegments.Next.Advance(pArguments.BytesTransferred))
                         {
-                            mSendSegments.Dequeue();
+                            this.mSendSegments.Dequeue();
                         }
-                        if (mSendSegments.Next == null)
+                        if (this.mSendSegments.Next == null)
                         {
-                            mSending = 0;
+                            this.mSending = 0;
                         }
                         else
                         {
-                            BeginSend();
+                            this.BeginSend();
                         }
                     }
                     else
@@ -304,12 +319,12 @@ namespace Launcher.Library.Network
                             Console.WriteLine("Send Error: {0}", pArguments.SocketError);
                         }
                         Console.WriteLine("Disconnected session 1 {0}", pArguments.SocketError.ToString());
-                        Disconnect();
+                        this.Disconnect();
                     }
                 }
                 catch
                 {
-                    Disconnect();
+                    this.Disconnect();
                 }
             }
         }
@@ -319,7 +334,7 @@ namespace Launcher.Library.Network
             string str;
             try
             {
-                str = ((IPEndPoint)_socket.RemoteEndPoint).Address.ToString();
+                str = ((IPEndPoint)this._socket.RemoteEndPoint).Address.ToString();
             }
             catch
             {
@@ -333,11 +348,11 @@ namespace Launcher.Library.Network
             IPEndPoint remoteEndPoint;
             try
             {
-                remoteEndPoint = (IPEndPoint)_socket.RemoteEndPoint;
+                remoteEndPoint = (IPEndPoint)this._socket.RemoteEndPoint;
             }
             catch
             {
-                remoteEndPoint = new IPEndPoint(0, 0);
+                remoteEndPoint = new IPEndPoint((long)0, 0);
             }
             return remoteEndPoint;
         }
@@ -348,40 +363,43 @@ namespace Launcher.Library.Network
 
         public void Send(OutPacket pPacket)
         {
-            Console.WriteLine((Constant.PacketName)BitConverter.ToUInt32(pPacket.ToArray(), 0) + "：" + BitConverter.ToString(pPacket.ToArray()).Replace("-", ""));
+            IPEndPoint clientEndPoint = this._socket.RemoteEndPoint as IPEndPoint;
+            if (clientEndPoint == null) return;
+            string clientId = ClientManager.GetClientId(clientEndPoint);
+            var clientGroup = ClientManager.ClientGroups[clientId];
+            var nickname = clientGroup.Nickname;
+            string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            Console.WriteLine($"[{currentTime}][{nickname}] " + (PacketName)BitConverter.ToUInt32(pPacket.ToArray(), 0) + ": " + BitConverter.ToString(pPacket.ToArray()).Replace("-", " "));
             try
             {
-                if (mDisconnected == 0)
+                if (this.mDisconnected == 0)
                 {
-                    mSendSegments.Enqueue(new ByteArraySegment(pPacket.ToArray(), true));
-                    if (Interlocked.CompareExchange(ref mSending, 1, 0) == 0)
+                    this.mSendSegments.Enqueue(new ByteArraySegment(pPacket.ToArray(), true));
+                    if (Interlocked.CompareExchange(ref this.mSending, 1, 0) == 0)
                     {
-                        BeginSend();
+                        this.BeginSend();
                     }
                 }
             }
             catch (Exception exception)
             {
                 Console.WriteLine("Disconnected session 11 {0}", exception.ToString());
-                Disconnect();
+                this.Disconnect();
             }
         }
 
         public void SendRaw(byte[] pBuffer)
         {
-            if (mDisconnected == 0)
+            this.mSendSegments.Enqueue(new ByteArraySegment(pBuffer, false));
+            if (Interlocked.CompareExchange(ref this.mSending, 1, 0) == 0)
             {
-                mSendSegments.Enqueue(new ByteArraySegment(pBuffer, false));
-                if (Interlocked.CompareExchange(ref mSending, 1, 0) == 0)
-                {
-                    BeginSend();
-                }
+                this.BeginSend();
             }
         }
 
         public void WaitForData()
         {
-            BeginReceive();
+            this.BeginReceive();
         }
     }
 }

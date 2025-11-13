@@ -8,17 +8,17 @@ namespace Launcher.App.Event
         public static int BuyCount = 0;
         public static int[] ShopItem = new int[0];
 
-        public static void PrEventBuyCount()
+        public static void PrEventBuyCount(SessionGroup Parent)
         {
             using (OutPacket outPacket = new OutPacket("PrEventBuyCount"))
             {
-                outPacket.WriteInt(BuyCount);
-                for (int i = 0; i < ShopItem.Length; i++)
+                outPacket.WriteInt(EventBuyCount.BuyCount);
+                for (int i = 0; i < EventBuyCount.ShopItem.Length; i++)
                 {
-                    outPacket.WriteInt(ShopItem[i]);
+                    outPacket.WriteInt(EventBuyCount.ShopItem[i]);
                     outPacket.WriteInt(0);
                 }
-                RouterListener.MySession.Client.Send(outPacket);
+                Parent.Client.Send(outPacket);
             }
         }
     }

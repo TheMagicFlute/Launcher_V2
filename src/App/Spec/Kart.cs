@@ -1,4 +1,4 @@
-﻿namespace Launcher.App.KartSpec
+﻿namespace Launcher.App.Spec
 {
     public class Kart
     {

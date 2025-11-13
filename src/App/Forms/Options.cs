@@ -1,27 +1,26 @@
-﻿using Launcher.App.Forms;
-using Launcher.App.Profile;
+﻿using Launcher.App.Profile;
 using Launcher.App.Server;
 using Launcher.Library.IO;
 using static Launcher.App.Program;
 using static Launcher.App.Utility.Utils;
 
-namespace KartRider
+namespace Launcher.App.Forms
 {
     public partial class Options : Form
     {
         public Options()
         {
             InitializeComponent();
-            checkBox_AutoUpdate.Checked = ProfileService.ProfileConfig.ServerSetting.AutoUpdate;
+            checkBox_AutoUpdate.Checked = ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.AutoUpdate;
         }
 
         #region Launcher Options
 
         private void button_ToggleConsole_Click(object sender, EventArgs e)
         {
-            ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility = !IsWindowVisible(consoleHandle);
-            ShowWindow(consoleHandle, ProfileService.ProfileConfig.ServerSetting.ConsoleVisibility ? SW_SHOW : SW_HIDE);
-            ProfileService.Save();
+            ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ConsoleVisibility = !IsWindowVisible(consoleHandle);
+            ShowWindow(consoleHandle, ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ConsoleVisibility ? SW_SHOW : SW_HIDE);
+            ProfileService.Save(ProfileService.SettingConfig.Name);
         }
 
         private void button_ToggleConsole_MouseEnter(object sender, EventArgs e)
@@ -31,9 +30,9 @@ namespace KartRider
 
         private void button_ToggleShowPacketDetail_Click(object sender, EventArgs e)
         {
-            ProfileService.ProfileConfig.ServerSetting.ShowPacketDetail = !ProfileService.ProfileConfig.ServerSetting.ShowPacketDetail;
-            Console.WriteLine($"输出数据包细节: {(ProfileService.ProfileConfig.ServerSetting.ShowPacketDetail ? "开" : "关")}");
-            ProfileService.Save();
+            ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ShowPacketDetail = !ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ShowPacketDetail;
+            Console.WriteLine($"输出数据包细节: {(ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ShowPacketDetail ? "开" : "关")}");
+            ProfileService.Save(ProfileService.SettingConfig.Name);
         }
 
         private void button_ToggleShowPacketDetail_MouseEnter(object sender, EventArgs e)
@@ -48,8 +47,8 @@ namespace KartRider
 
         private void checkBox_AutoUpdate_CheckedChanged(object sender, EventArgs e)
         {
-            ProfileService.ProfileConfig.ServerSetting.AutoUpdate = checkBox_AutoUpdate.Checked;
-            ProfileService.Save();
+            ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.AutoUpdate = checkBox_AutoUpdate.Checked;
+            ProfileService.Save(ProfileService.SettingConfig.Name);
         }
 
         private void checkBox_AutoUpdate_MouseEnter(object sender, EventArgs e)

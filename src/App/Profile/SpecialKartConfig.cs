@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using Launcher.App.Utility;
 
 namespace Launcher.App.Profile;
 
@@ -46,8 +46,7 @@ public class SpecialKartConfig
         if (File.Exists(filePath))
         {
             // 3.1 读取现有配置
-            var existingJson = File.ReadAllText(filePath, System.Text.Encoding.UTF8);
-            var existingConfig = JsonConvert.DeserializeObject<SpecialKartConfig>(existingJson) ?? new SpecialKartConfig();
+            var existingConfig = JsonHelper.DeserializeNoBom<SpecialKartConfig>(filePath);
 
             // 3.2 初始化现有配置的字典（避免null引用）
             existingConfig.SkillChange ??= new Dictionary<short, Dictionary<short, short>>();
@@ -127,8 +126,7 @@ public class SpecialKartConfig
         }
 
         // 5. 写入最终配置
-        var json = JsonConvert.SerializeObject(finalConfig, Formatting.Indented);
-        File.WriteAllText(filePath, json, System.Text.Encoding.UTF8);
+        File.WriteAllText(filePath, JsonHelper.Serialize(finalConfig));
     }
 
     /// <summary>
@@ -143,8 +141,7 @@ public class SpecialKartConfig
             throw new FileNotFoundException("特殊道具车配置文件不存在", filePath);
         }
 
-        string json = File.ReadAllText(filePath, System.Text.Encoding.UTF8);
-        var config = JsonConvert.DeserializeObject<SpecialKartConfig>(json);
+        var config = JsonHelper.DeserializeNoBom<SpecialKartConfig>(filePath);
         if (config == null)
         {
             throw new Exception("配置文件解析失败，可能是JSON格式错误");
@@ -169,6 +166,8 @@ public class SpecialKartConfig
             SkillChangeDesc = "特殊道具车：将指定道具变更为特殊道具",
             SkillChange = new Dictionary<short, Dictionary<short, short>>
             {
+                { 1585, new Dictionary<short, short> { {4, 118} } },
+                { 1579, new Dictionary<short, short> { {5, 103}, {6, 31} } },
                 { 1575, new Dictionary<short, short> { {4, 119}, {9, 27} } },
                 { 1571, new Dictionary<short, short> { {7, 32} } },
                 { 1569, new Dictionary<short, short> { {4, 7} } },
@@ -219,6 +218,7 @@ public class SpecialKartConfig
             SkillAttackedDesc = "特殊道具车：被指定道具攻击后获得特殊道具",
             SkillAttacked = new Dictionary<short, Dictionary<short, short>>
             {
+                { 1581, new Dictionary<short, short> { {5, 31}, {7, 31} } },
                 { 1571, new Dictionary<short, short> { {8, 6} } },
                 { 1561, new Dictionary<short, short> { {7, 111} } },
                 { 1557, new Dictionary<short, short> { {7, 32}, {5, 103} } },
@@ -235,3 +235,4 @@ public class SpecialKartConfig
         };
     }
 }
+

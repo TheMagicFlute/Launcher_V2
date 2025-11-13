@@ -7,9 +7,9 @@ using Launcher.Library.File.Rho;
 using Launcher.Library.File.Rho5;
 using Launcher.Library.IO;
 using Launcher.Library.Xml;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -57,6 +57,8 @@ namespace Launcher.App.Utility
             welcomeMessage.AppendLine("如果觉得喜欢，或者本软件对你的练习有帮助，请考虑在 GitHub 上给本项目一个Star⭐");
             welcomeMessage.AppendLine("祝你游戏愉快！<(￣︶￣)↗[GO!]");
             MessageBox.Show(welcomeMessage.ToString(), "欢迎", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            ProfileService.SaveSettings();
+            ProfileService.Save(ProfileService.SettingConfig.Name);
         }
 
         public static void TryKillKart()
@@ -144,27 +146,21 @@ namespace Launcher.App.Utility
                     if (response.IsSuccessStatusCode)
                     {
                         string json = await response.Content.ReadAsStringAsync();
-                        JObject data = JObject.Parse(json);
-                        if (data.TryGetValue("country", out JToken? countryToken))
-                        {
-                            return countryToken.ToString();
-                        }
-                        else
-                        {
-                            Console.WriteLine("响应中未找到 'country' 字段.");
-                            return "";
-                        }
+                        IpInfo data = JsonSerializer.Deserialize<IpInfo>(json,
+                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        string country = data.Country;
+                        return country;
                     }
                     else
                     {
-                        Console.WriteLine($"请求 IP 地址失败, 状态码: {response.StatusCode}");
+                        Console.WriteLine($"请求失败，状态码: {response.StatusCode}");
                         return "";
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"请求 IP 地址时发生异常: {ex.Message}");
+                Console.WriteLine($"发生异常: {ex.Message}");
                 return "";
             }
         }
@@ -250,7 +246,6 @@ namespace Launcher.App.Utility
                                 return;
                             }
                             files = Directory.GetFiles(parent, "*.rho");
-                            AAAC(parent, files);
                         }
                     }
                 }
@@ -325,7 +320,7 @@ namespace Launcher.App.Utility
                 input = input.Replace("\\", "/");
                 if (!input.EndsWith("/"))
                     input += "/";
-                rho5Archive.SaveFolder(input, dataPackName, fullName, ProfileService.ProfileConfig.ServerSetting.CC, dataPackID);
+                rho5Archive.SaveFolder(input, dataPackName, fullName, ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.CC, dataPackID);
             }
             else
             {
@@ -340,7 +335,7 @@ namespace Launcher.App.Utility
             else if (output.EndsWith(".rho5"))
                 output = output.Replace(".rho5", "");
             var packFolderManager = new PackFolderManager();
-            packFolderManager.OpenSingleFile(input, ProfileService.ProfileConfig.ServerSetting.CC);
+            packFolderManager.OpenSingleFile(input, ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.CC);
             var packFolderInfoQueue = new Queue<PackFolderInfo>();
             packFolderInfoQueue.Enqueue(packFolderManager.GetRootFolder());
             packFolderManager.GetRootFolder();
@@ -566,5 +561,31 @@ namespace Launcher.App.Utility
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// IP interface
+    /// </summary>
+    class IpInfo
+    {
+        /// <summary>
+        /// IP地址
+        /// </summary>
+        public string Ip { get; set; }
+
+        /// <summary>
+        /// 城市
+        /// </summary>
+        public string City { get; set; }
+
+        /// <summary>
+        /// 地区
+        /// </summary>
+        public string Region { get; set; }
+
+        /// <summary>
+        /// 国家
+        /// </summary>
+        public string Country { get; set; }
     }
 }

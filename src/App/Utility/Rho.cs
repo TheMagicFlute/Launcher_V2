@@ -1,7 +1,7 @@
 using Launcher.App.Event;
-using Launcher.App.ExcData;
 using Launcher.App.Rider;
 using Launcher.App.Server;
+using Launcher.App.Spec;
 using Launcher.Library.File.OldImplements;
 using Launcher.Library.Utilities;
 using Launcher.Library.Xml;
@@ -20,48 +20,40 @@ namespace Launcher.App.Utility
                 PackFolderManager packFolderManager = new PackFolderManager();
                 packFolderManager.OpenDataFolder(input);
                 string regionCode = packFolderManager.regionCode.ToString().ToLower();
+
                 Queue<PackFolderInfo> packFolderInfoQueue = new Queue<PackFolderInfo>();
                 packFolderInfoQueue.Enqueue(packFolderManager.GetRootFolder());
-                packFolderManager.GetRootFolder();
                 while (packFolderInfoQueue.Count > 0)
                 {
                     PackFolderInfo packFolderInfo1 = packFolderInfoQueue.Dequeue();
                     foreach (PackFileInfo packFileInfo in packFolderInfo1.GetFilesInfo())
                     {
                         string fullName = ReplacePath(packFileInfo.FullName);
-                        if (fullName.Contains("flyingPet") && fullName.Contains("param@" + regionCode + ".bml"))
+                        if (fullName.Contains("flyingPet") && fullName.Contains($"param@{regionCode}.bml"))
                         {
                             Console.WriteLine(fullName);
                             string name = fullName.Substring(10, fullName.Length - 23);
-                            if (!KartExcData.flyingSpec.ContainsKey(name))
+                            if (!FlyingPet.flyingSpec.ContainsKey(name))
                             {
                                 byte[] data = packFileInfo.GetData();
-                                BinaryXmlDocument bxd = new BinaryXmlDocument();
-                                bxd.Read(Encoding.GetEncoding("UTF-16"), data);
-                                string output_bml = bxd.RootTag.ToString();
-                                byte[] output_data = Encoding.GetEncoding("UTF-16").GetBytes(output_bml);
-                                using (MemoryStream stream = new MemoryStream(output_data))
+                                using (MemoryStream stream = new MemoryStream(BmlToXml(fullName, data)))
                                 {
                                     XmlDocument flying = new XmlDocument();
                                     flying.Load(stream);
-                                    KartExcData.flyingSpec.Add(name, flying);
+                                    FlyingPet.flyingSpec.Add(name, flying);
                                 }
                             }
                         }
-                        if (fullName == "track/common/randomTrack@" + regionCode + ".bml")
+                        if (fullName == $"track/common/randomTrack@{regionCode}.bml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
-                            BinaryXmlDocument bxd = new BinaryXmlDocument();
-                            bxd.Read(Encoding.GetEncoding("UTF-16"), data);
-                            string output_bml = bxd.RootTag.ToString();
-                            byte[] output_data = Encoding.GetEncoding("UTF-16").GetBytes(output_bml);
-                            using (MemoryStream stream = new MemoryStream(output_data))
+                            using (MemoryStream stream = new MemoryStream(BmlToXml(fullName, data)))
                             {
-                                KartExcData.randomTrack = XDocument.Load(stream);
+                                RandomTrack.randomTrack = XDocument.Load(stream);
                             }
                         }
-                        if (fullName == "track/common/trackLocale@" + regionCode + ".xml")
+                        if (fullName == $"track/common/trackLocale@{regionCode}.xml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
@@ -69,104 +61,22 @@ namespace Launcher.App.Utility
                             {
                                 XmlDocument trackLocale = new XmlDocument();
                                 trackLocale.Load(stream);
-                                XmlNodeList trackParams = trackLocale.GetElementsByTagName("track");
-                                if (trackParams.Count > 0)
-                                {
-                                    foreach (XmlNode xn in trackParams)
-                                    {
-                                        XmlElement xe = (XmlElement)xn;
-                                        string track = xe.GetAttribute("id");
-                                        uint id = Adler32Helper.GenerateAdler32_UNICODE(track, 0);
-                                        if (!KartExcData.track.ContainsKey(id))
-                                        {
-                                            KartExcData.track.Add(id, track);
-                                        }
-                                    }
-                                }
-                                XmlNodeList track_crzParams = trackLocale.GetElementsByTagName("track_crz");
-                                if (track_crzParams.Count > 0)
-                                {
-                                    foreach (XmlNode xn in track_crzParams)
-                                    {
-                                        XmlElement xe = (XmlElement)xn;
-                                        string track = xe.GetAttribute("refId") + "_crz";
-                                        uint id = Adler32Helper.GenerateAdler32_UNICODE(track, 0);
-                                        if (!KartExcData.track.ContainsKey(id))
-                                        {
-                                            KartExcData.track.Add(id, track);
-                                        }
-                                    }
-                                }
-                                XmlNodeList track_rvsParams = trackLocale.GetElementsByTagName("track_rvs");
-                                if (track_rvsParams.Count > 0)
-                                {
-                                    foreach (XmlNode xn in track_rvsParams)
-                                    {
-                                        XmlElement xe = (XmlElement)xn;
-                                        string track = xe.GetAttribute("refId") + "_rvs";
-                                        uint id = Adler32Helper.GenerateAdler32_UNICODE(track, 0);
-                                        if (!KartExcData.track.ContainsKey(id))
-                                        {
-                                            KartExcData.track.Add(id, track);
-                                        }
-                                    }
-                                }
+                                ProcessNodes(trackLocale.GetElementsByTagName("track"), "id");
+                                ProcessNodes(trackLocale.GetElementsByTagName("track_crz"), "refId", "crz");
+                                ProcessNodes(trackLocale.GetElementsByTagName("track_rvs"), "refId", "rvs");
                             }
                         }
-                        if (fullName == "track/common/trackLocale@" + regionCode + ".bml")
+                        if (fullName == $"track/common/trackLocale@{regionCode}.bml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
-                            BinaryXmlDocument bxd = new BinaryXmlDocument();
-                            bxd.Read(Encoding.GetEncoding("UTF-16"), data);
-                            string output_bml = bxd.RootTag.ToString();
-                            byte[] output_data = Encoding.GetEncoding("UTF-16").GetBytes(output_bml);
-                            using (MemoryStream stream = new MemoryStream(output_data))
+                            using (MemoryStream stream = new MemoryStream(BmlToXml(fullName, data)))
                             {
                                 XmlDocument trackLocale = new XmlDocument();
                                 trackLocale.Load(stream);
-                                XmlNodeList trackParams = trackLocale.GetElementsByTagName("track");
-                                if (trackParams.Count > 0)
-                                {
-                                    foreach (XmlNode xn in trackParams)
-                                    {
-                                        XmlElement xe = (XmlElement)xn;
-                                        string track = xe.GetAttribute("id");
-                                        uint id = Adler32Helper.GenerateAdler32_UNICODE(track, 0);
-                                        if (!KartExcData.track.ContainsKey(id))
-                                        {
-                                            KartExcData.track.Add(id, track);
-                                        }
-                                    }
-                                }
-                                XmlNodeList track_crzParams = trackLocale.GetElementsByTagName("track_crz");
-                                if (track_crzParams.Count > 0)
-                                {
-                                    foreach (XmlNode xn in track_crzParams)
-                                    {
-                                        XmlElement xe = (XmlElement)xn;
-                                        string track = xe.GetAttribute("refId") + "_crz";
-                                        uint id = Adler32Helper.GenerateAdler32_UNICODE(track, 0);
-                                        if (!KartExcData.track.ContainsKey(id))
-                                        {
-                                            KartExcData.track.Add(id, track);
-                                        }
-                                    }
-                                }
-                                XmlNodeList track_rvsParams = trackLocale.GetElementsByTagName("track_rvs");
-                                if (track_rvsParams.Count > 0)
-                                {
-                                    foreach (XmlNode xn in track_rvsParams)
-                                    {
-                                        XmlElement xe = (XmlElement)xn;
-                                        string track = xe.GetAttribute("refId") + "_rvs";
-                                        uint id = Adler32Helper.GenerateAdler32_UNICODE(track, 0);
-                                        if (!KartExcData.track.ContainsKey(id))
-                                        {
-                                            KartExcData.track.Add(id, track);
-                                        }
-                                    }
-                                }
+                                ProcessNodes(trackLocale.GetElementsByTagName("track"), "id");
+                                ProcessNodes(trackLocale.GetElementsByTagName("track_crz"), "refId", "crz");
+                                ProcessNodes(trackLocale.GetElementsByTagName("track_rvs"), "refId", "rvs");
                             }
                         }
                         if (fullName == "etc_/itemTable.kml")
@@ -184,9 +94,9 @@ namespace Launcher.App.Utility
                                     {
                                         int id = int.Parse(kart.Attribute("id").Value);
                                         string name = kart.Attribute("name").Value;
-                                        if (!KartExcData.KartName.ContainsKey(id))
+                                        if (!KartItem.kartName.ContainsKey(id))
                                         {
-                                            KartExcData.KartName.Add(id, name);
+                                            KartItem.kartName.Add(id, name);
                                         }
                                     }
                                 }
@@ -198,15 +108,15 @@ namespace Launcher.App.Utility
                                     {
                                         int id = int.Parse(flyingPet.Attribute("id").Value);
                                         string name = flyingPet.Attribute("name").Value;
-                                        if (!KartExcData.flyingName.ContainsKey(id))
+                                        if (!FlyingPet.flyingName.ContainsKey(id))
                                         {
-                                            KartExcData.flyingName.Add(id, name);
+                                            FlyingPet.flyingName.Add(id, name);
                                         }
                                     }
                                 }
                             }
                         }
-                        if (fullName == "etc_/itemTable@" + regionCode + ".xml")
+                        if (fullName == $"etc_/itemTable@{regionCode}.xml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
@@ -220,13 +130,13 @@ namespace Launcher.App.Utility
                                     {
                                         int id = int.Parse(kart.Attribute("id").Value);
                                         string name = kart.Attribute("name").Value;
-                                        if (KartExcData.KartName.ContainsKey(id))
+                                        if (KartItem.kartName.ContainsKey(id))
                                         {
-                                            KartExcData.KartName[id] = name;
+                                            KartItem.kartName[id] = name;
                                         }
                                         else
                                         {
-                                            KartExcData.KartName.Add(id, name);
+                                            KartItem.kartName.Add(id, name);
                                         }
                                     }
                                 }
@@ -237,19 +147,19 @@ namespace Launcher.App.Utility
                                     {
                                         int id = int.Parse(flyingPet.Attribute("id").Value);
                                         string name = flyingPet.Attribute("name").Value;
-                                        if (KartExcData.flyingName.ContainsKey(id))
+                                        if (FlyingPet.flyingName.ContainsKey(id))
                                         {
-                                            KartExcData.flyingName[id] = name;
+                                            FlyingPet.flyingName[id] = name;
                                         }
                                         else
                                         {
-                                            KartExcData.flyingName.Add(id, name);
+                                            FlyingPet.flyingName.Add(id, name);
                                         }
                                     }
                                 }
                             }
                         }
-                        if (fullName == "etc_/emblem/emblem@" + regionCode + ".xml")
+                        if (fullName == $"etc_/emblem/emblem@{regionCode}.xml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
@@ -266,22 +176,83 @@ namespace Launcher.App.Utility
                                         short id;
                                         if (short.TryParse(xe.GetAttribute("id"), out id))
                                         {
-                                            if (!KartExcData.emblem.Contains(id))
+                                            if (!Emblem.emblem.Contains(id))
                                             {
-                                                KartExcData.emblem.Add(id);
+                                                Emblem.emblem.Add(id);
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                        if (fullName.Contains("kart_") && fullName.Contains("/param@" + regionCode + ".xml"))
+                        if (fullName == $"etc_/riderSchool/riderSchoolLocale@{regionCode}.xml")
                         {
                             Console.WriteLine(fullName);
-                            byte[] data = ReplaceBytes(packFileInfo.GetData());
-                            string name = fullName.Substring(6, fullName.Length - 19);
-                            if (!KartExcData.KartSpec.ContainsKey(name))
+                            byte[] data = packFileInfo.GetData();
+                            using (MemoryStream stream = new MemoryStream(data))
                             {
+                                XDocument xdoc = XDocument.Load(stream);
+
+                                var validCatLevels = xdoc.Descendants("category")
+                                    // 获取 catLevel 属性值，过滤掉 null 或空值
+                                    .Select(c => c.Attribute("catLevel")?.Value)
+                                    .Where(levelStr => !string.IsNullOrEmpty(levelStr))
+                                    // 尝试转换为整数，过滤掉转换失败的（如非数字格式）
+                                    .Select(levelStr =>
+                                    {
+                                        byte.TryParse(levelStr, out byte level);
+                                        return level;
+                                    })
+                                    // 过滤掉转换后为 0 的无效值（默认转换失败返回 0）
+                                    .Where(level => level > 0);
+
+                                if (validCatLevels.Any())
+                                {
+                                    RiderSchool.catLevel = validCatLevels.Max();
+                                }
+
+                                // 筛选 catLevel='6' 的 category 节点
+                                var targetCategory = xdoc.Descendants("category")
+                                    .FirstOrDefault(c => c.Attribute("catLevel")?.Value == RiderSchool.catLevel.ToString());
+
+                                if (targetCategory != null)
+                                {
+                                    List<byte> validSteps = targetCategory.Descendants("item")
+                                       .Select(item => item.Attribute("step")?.Value)
+                                       .Where(stepStr => !string.IsNullOrEmpty(stepStr))
+                                       .Select(stepStr =>
+                                       {
+                                           byte.TryParse(stepStr, out byte step);
+                                           return step;
+                                       })
+                                       .Where(step => step != 0) // 过滤转换失败的无效值
+                                       .OrderBy(step => step)   // 升序排序
+                                       .ToList();
+
+                                    if (validSteps.Any())
+                                    {
+                                        RiderSchool.maxStep = validSteps.Max();
+
+                                        // 按索引拆分：偶数列（索引 0、2、4...）
+                                        RiderSchool.evenProStep = validSteps
+                                            .Where((step, index) => index % 2 == 0) // 索引%2==0 → 偶索引
+                                            .ToList();
+
+                                        // 按索引拆分：奇数列（索引 1、3、5...）
+                                        RiderSchool.oddProStep = validSteps
+                                            .Where((step, index) => index % 2 != 0) // 索引%2!=0 → 奇索引
+                                            .ToList();
+                                    }
+                                }
+                            }
+                        }
+                        if (fullName.Contains("kart_") && fullName.Contains($"/param@{regionCode}.xml"))
+                        {
+                            Console.WriteLine(fullName);
+                            string name = fullName.Substring(6, fullName.Length - 19);
+                            if (!KartItem.kartSpec.ContainsKey(name))
+                            {
+                                byte[] data = ReplaceBytes(packFileInfo.GetData());
                                 if (data[2] == 13 && data[3] == 0 && data[4] == 10 && data[5] == 0)
                                 {
                                     byte[] newBytes = new byte[data.Length - 4];
@@ -292,7 +263,7 @@ namespace Launcher.App.Utility
                                     {
                                         XmlDocument kart1 = new XmlDocument();
                                         kart1.Load(stream);
-                                        KartExcData.KartSpec.Add(name, kart1);
+                                        KartItem.kartSpec.Add(name, kart1);
                                     }
                                 }
                                 else
@@ -301,21 +272,21 @@ namespace Launcher.App.Utility
                                     {
                                         XmlDocument kart2 = new XmlDocument();
                                         kart2.Load(stream);
-                                        KartExcData.KartSpec.Add(name, kart2);
+                                        KartItem.kartSpec.Add(name, kart2);
                                     }
                                 }
                             }
                         }
-                        if (fullName.Contains("kart_") && fullName.Contains("/param.xml"))
+                        if (fullName.Contains("kart_") && fullName.Contains($"/param@{regionCode}.kml"))
                         {
-                            string name = fullName.Substring(6, fullName.Length - 16);
-                            byte[] data = ReplaceBytes(packFileInfo.GetData());
-                            bool containsTarget = packFolderInfo1.GetFilesInfo().Any(PackFileInfo => ReplacePath(PackFileInfo.FullName) == "kart_/" + name + "/param@" + regionCode + ".xml");
+                            string name = fullName.Substring(6, fullName.Length - 19);
+                            bool containsTarget = packFolderInfo1.GetFilesInfo().Any(PackFileInfo => ReplacePath(PackFileInfo.FullName) == $"kart_/{name}/param@{regionCode}.xml");
                             if (!containsTarget)
                             {
-                                if (!KartExcData.KartSpec.ContainsKey(name))
+                                Console.WriteLine(fullName);
+                                if (!(KartItem.kartSpec.ContainsKey(name)))
                                 {
-                                    Console.WriteLine(fullName);
+                                    byte[] data = ReplaceBytes(packFileInfo.GetData());
                                     if (data[2] == 13 && data[3] == 0 && data[4] == 10 && data[5] == 0)
                                     {
                                         byte[] newBytes = new byte[data.Length - 4];
@@ -326,7 +297,7 @@ namespace Launcher.App.Utility
                                         {
                                             XmlDocument kart1 = new XmlDocument();
                                             kart1.Load(stream);
-                                            KartExcData.KartSpec.Add(name, kart1);
+                                            KartItem.kartSpec.Add(name, kart1);
                                         }
                                     }
                                     else
@@ -335,21 +306,52 @@ namespace Launcher.App.Utility
                                         {
                                             XmlDocument kart2 = new XmlDocument();
                                             kart2.Load(stream);
-                                            KartExcData.KartSpec.Add(name, kart2);
+                                            KartItem.kartSpec.Add(name, kart2);
                                         }
                                     }
                                 }
                             }
                         }
-                        if (fullName == "zeta/" + regionCode + "/quest/QuestAutomation.bml")
+                        if (fullName.Contains("kart_") && fullName.Contains("/param.xml"))
+                        {
+                            string name = fullName.Substring(6, fullName.Length - 16);
+                            bool containsTarget = packFolderInfo1.GetFilesInfo().Any(PackFileInfo => ReplacePath(PackFileInfo.FullName) == $"kart_/{name}/param@{regionCode}.xml" || ReplacePath(PackFileInfo.FullName) == $"kart_/{name}/param@{regionCode}.kml");
+                            if (!containsTarget)
+                            {
+                                Console.WriteLine(fullName);
+                                if (!KartItem.kartSpec.ContainsKey(name))
+                                {
+                                    byte[] data = ReplaceBytes(packFileInfo.GetData());
+                                    if (data[2] == 13 && data[3] == 0 && data[4] == 10 && data[5] == 0)
+                                    {
+                                        byte[] newBytes = new byte[data.Length - 4];
+                                        newBytes[0] = 255;
+                                        newBytes[1] = 254;
+                                        Array.Copy(data, 6, newBytes, 2, data.Length - 6);
+                                        using (MemoryStream stream = new MemoryStream(newBytes))
+                                        {
+                                            XmlDocument kart1 = new XmlDocument();
+                                            kart1.Load(stream);
+                                            KartItem.kartSpec.Add(name, kart1);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        using (MemoryStream stream = new MemoryStream(data))
+                                        {
+                                            XmlDocument kart2 = new XmlDocument();
+                                            kart2.Load(stream);
+                                            KartItem.kartSpec.Add(name, kart2);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (fullName == $"zeta/{regionCode}/quest/QuestAutomation.bml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
-                            BinaryXmlDocument bxd = new BinaryXmlDocument();
-                            bxd.Read(Encoding.GetEncoding("UTF-16"), data);
-                            string output_bml = bxd.RootTag.ToString();
-                            byte[] output_data = Encoding.GetEncoding("UTF-16").GetBytes(output_bml);
-                            using (MemoryStream stream = new MemoryStream(output_data))
+                            using (MemoryStream stream = new MemoryStream(BmlToXml(fullName, data)))
                             {
                                 XmlDocument Quest = new XmlDocument();
                                 Quest.Load(stream);
@@ -360,38 +362,30 @@ namespace Launcher.App.Utility
                                     {
                                         XmlElement xe = (XmlElement)xn;
                                         int id = int.Parse(xe.GetAttribute("id"));
-                                        if (!KartExcData.quest.Contains(id))
+                                        if (!GameSupport.quest.Contains(id))
                                         {
-                                            KartExcData.quest.Add(id);
+                                            GameSupport.quest.Add(id);
                                         }
                                     }
                                 }
                             }
                         }
-                        if (fullName == "zeta/" + regionCode + "/quest/kartPassQuestAutomation.bml")
+                        if (fullName == $"zeta/{regionCode}/quest/kartPassQuestAutomation.bml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
-                            BinaryXmlDocument bxd = new BinaryXmlDocument();
-                            bxd.Read(Encoding.GetEncoding("UTF-16"), data);
-                            string output_bml = bxd.RootTag.ToString();
-                            byte[] output_data = Encoding.GetEncoding("UTF-16").GetBytes(output_bml);
-                            using (MemoryStream stream = new MemoryStream(output_data))
+                            using (MemoryStream stream = new MemoryStream(BmlToXml(fullName, data)))
                             {
                                 XDocument doc = XDocument.Load(stream);
                                 XElement questInfo = doc.Descendants("kartPassQuestInfo").First();
-                                KartExcData.seasonId = int.Parse(questInfo.Attribute("seasonId").Value);
+                                GameSupport.seasonId = int.Parse(questInfo.Attribute("seasonId").Value);
                             }
                         }
-                        if (fullName == "zeta/" + regionCode + "/scenario/scenario.bml")
+                        if (fullName == $"zeta/{regionCode}/scenario/scenario.bml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
-                            BinaryXmlDocument bxd = new BinaryXmlDocument();
-                            bxd.Read(Encoding.GetEncoding("UTF-16"), data);
-                            string output_bml = bxd.RootTag.ToString();
-                            byte[] output_data = Encoding.GetEncoding("UTF-16").GetBytes(output_bml);
-                            using (MemoryStream stream = new MemoryStream(output_data))
+                            using (MemoryStream stream = new MemoryStream(BmlToXml(fullName, data)))
                             {
                                 XmlDocument Scenario = new XmlDocument();
                                 Scenario.Load(stream);
@@ -402,9 +396,9 @@ namespace Launcher.App.Utility
                                     {
                                         XmlElement xe = (XmlElement)xn;
                                         int id = int.Parse(xe.GetAttribute("id"));
-                                        if (!KartExcData.scenario.Contains(id))
+                                        if (!GameSupport.scenario.Contains(id))
                                         {
-                                            KartExcData.scenario.Add(id);
+                                            GameSupport.scenario.Add(id);
                                         }
                                     }
                                 }
@@ -414,11 +408,7 @@ namespace Launcher.App.Utility
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
-                            BinaryXmlDocument bxd = new BinaryXmlDocument();
-                            bxd.Read(Encoding.GetEncoding("UTF-16"), data);
-                            string output_bml = bxd.RootTag.ToString();
-                            byte[] output_data = Encoding.GetEncoding("UTF-16").GetBytes(output_bml);
-                            using (MemoryStream stream = new MemoryStream(output_data))
+                            using (MemoryStream stream = new MemoryStream(BmlToXml(fullName, data)))
                             {
                                 XDocument doc = XDocument.Load(stream);
                                 foreach (var item in doc.Descendants("item"))
@@ -429,7 +419,7 @@ namespace Launcher.App.Utility
                                     // 验证并转换为 short 类型
                                     if (short.TryParse(idxValue, out short idx))
                                     {
-                                        KartExcData.itemProb_indi.Add(idx);
+                                        MultiPlayer.itemProb_indi.Add(idx);
                                     }
                                     else
                                     {
@@ -442,11 +432,7 @@ namespace Launcher.App.Utility
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
-                            BinaryXmlDocument bxd = new BinaryXmlDocument();
-                            bxd.Read(Encoding.GetEncoding("UTF-16"), data);
-                            string output_bml = bxd.RootTag.ToString();
-                            byte[] output_data = Encoding.GetEncoding("UTF-16").GetBytes(output_bml);
-                            using (MemoryStream stream = new MemoryStream(output_data))
+                            using (MemoryStream stream = new MemoryStream(BmlToXml(fullName, data)))
                             {
                                 XDocument doc = XDocument.Load(stream);
                                 foreach (var item in doc.Descendants("item"))
@@ -457,7 +443,7 @@ namespace Launcher.App.Utility
                                     // 验证并转换为 short 类型
                                     if (short.TryParse(idxValue, out short idx))
                                     {
-                                        KartExcData.itemProb_team.Add(idx);
+                                        MultiPlayer.itemProb_team.Add(idx);
                                     }
                                     else
                                     {
@@ -466,7 +452,7 @@ namespace Launcher.App.Utility
                                 }
                             }
                         }
-                        if (fullName == "zeta_/" + regionCode + "/content/basicAI.xml")
+                        if (fullName == $"zeta_/{regionCode}/content/basicAI.xml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
@@ -503,7 +489,7 @@ namespace Launcher.App.Utility
                                             }).ToList()
                                         }
                                     );
-                                KartExcData.aiCharacterDict = aiCharacterDict;
+                                MultiPlayer.aiCharacterDict = aiCharacterDict;
 
                                 // 卡丁车Dictionary：键为short类型的卡丁车ID
                                 var aiKartDict = aiItem.Elements("kart")
@@ -516,10 +502,10 @@ namespace Launcher.App.Utility
                                             Item = int.Parse(k.Attribute("item").Value),
                                         }
                                     );
-                                KartExcData.aiKartDict = aiKartDict;
+                                MultiPlayer.aiKartDict = aiKartDict;
                             }
                         }
-                        if (fullName == "zeta_/" + regionCode + "/content/itemDictionary.xml")
+                        if (fullName == $"zeta_/{regionCode}/content/itemDictionary.xml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
@@ -535,12 +521,12 @@ namespace Launcher.App.Utility
                                     for (int i = 0; i < valuesArray.Count(); i++)
                                     {
                                         List<short> Add = new List<short> { catId, short.Parse(valuesArray[i]) };
-                                        KartExcData.Dictionary.Add(Add);
+                                        GameSupport.Dictionary.Add(Add);
                                     }
                                 }
                             }
                         }
-                        if (fullName == "zeta_/" + regionCode + "/content/timeAttack/timeAttackMission.xml")
+                        if (fullName == $"zeta_/{regionCode}/content/timeAttack/timeAttackMission.xml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
@@ -569,17 +555,17 @@ namespace Launcher.App.Utility
                                     .Where(trackId => !string.IsNullOrEmpty(trackId))
                                     .ToList();
 
-                                if (FavoriteItem.MissionList.Count == 0)
+                                if (TimeAttack.MissionList.Count == 0)
                                 {
-                                    FavoriteItem.MissionList = currentMissionList;
+                                    TimeAttack.MissionList = currentMissionList;
                                 }
-                                if (FavoriteItem.MissionList.Count > 0)
+                                if (TimeAttack.MissionList.Count > 0)
                                 {
-                                    Console.WriteLine(string.Join(", ", FavoriteItem.MissionList));
+                                    Console.WriteLine(string.Join(", ", TimeAttack.MissionList));
                                 }
                             }
                         }
-                        if (fullName == "zeta_/" + regionCode + "/content/timeAttack/timeAttackCompetitive.xml")
+                        if (fullName == $"zeta_/{regionCode}/content/timeAttack/timeAttackCompetitive.xml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
@@ -588,10 +574,10 @@ namespace Launcher.App.Utility
                                 // 加载文档并解析任务
                                 XDocument doc = XDocument.Load(stream);
                                 var extractor = new TrackIdExtractor();
-                                FavoriteItem.Competitive = extractor.GetCurrentWeekTrackIds(doc);
+                                TimeAttack.Competitive = extractor.GetCurrentWeekTrackIds(doc);
                             }
                         }
-                        if (fullName == "zeta_/" + regionCode + "/content/timeAttack/timeAttackCompetitiveData.xml")
+                        if (fullName == $"zeta_/{regionCode}/content/timeAttack/timeAttackCompetitiveData.xml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
@@ -600,10 +586,10 @@ namespace Launcher.App.Utility
                                 // 加载文档并解析任务
                                 XDocument doc = XDocument.Load(stream);
                                 CompleteTrackScoreCalculator calculator = new CompleteTrackScoreCalculator();
-                                FavoriteItem.TrackDictionary = calculator.LoadFromXml(doc);
+                                TimeAttack.TrackDictionary = calculator.LoadFromXml(doc);
                             }
                         }
-                        if (fullName == "zeta_/" + regionCode + "/lottery/lottery.xml")
+                        if (fullName == $"zeta_/{regionCode}/lottery/lottery.xml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
@@ -642,7 +628,7 @@ namespace Launcher.App.Utility
                                 }
                             }
                         }
-                        if (fullName == "zeta_/" + regionCode + "/shop/data/item.kml")
+                        if (fullName == $"zeta_/{regionCode}/shop/data/item.kml")
                         {
                             Console.WriteLine(fullName);
                             byte[] data = packFileInfo.GetData();
@@ -659,11 +645,11 @@ namespace Launcher.App.Utility
                                         short itemCatId = short.Parse(xe.GetAttribute("itemCatId"));
                                         short itemId = short.Parse(xe.GetAttribute("itemId"));
                                         string itemName = xe.GetAttribute("itemName");
-                                        if (!KartExcData.items.ContainsKey(itemCatId))
+                                        if (!NewRider.items.ContainsKey(itemCatId))
                                         {
-                                            KartExcData.items[itemCatId] = new Dictionary<short, string>();
+                                            NewRider.items[itemCatId] = new Dictionary<short, string>();
                                         }
-                                        KartExcData.items[itemCatId][itemId] = itemName;
+                                        NewRider.items[itemCatId][itemId] = itemName;
                                     }
                                 }
                             }
@@ -681,7 +667,7 @@ namespace Launcher.App.Utility
             }
         }
 
-        static byte[] ReplaceBytes(byte[] data)
+        private static byte[] ReplaceBytes(byte[] data)
         {
             byte[] oldBytes = new byte[] {
             0x3C, 0x00, 0x3F, 0x00, 0x78, 0x00, 0x6D, 0x00, 0x6C, 0x00, 0x20, 0x00,
@@ -747,6 +733,44 @@ namespace Launcher.App.Utility
         private static string ReplacePath(string file)
         {
             return file.IndexOf(".rho") > -1 ? file.Substring(0, file.IndexOf(".rho")).Replace("_", "/") + file.Substring(file.IndexOf(".rho") + 4) : file;
+        }
+
+        private static void ProcessNodes(XmlNodeList nodes, string attributeName, string suffix = "")
+        {
+            if (nodes == null) return;
+            foreach (XmlNode xn in nodes)
+            {
+                XmlElement xe = xn as XmlElement;
+                if (xe == null) continue;
+                string attributeValue = xe.GetAttribute(attributeName);
+                if (string.IsNullOrWhiteSpace(attributeValue))
+                {
+                    Console.WriteLine($"警告：节点 {xn.Name} 缺少有效的 {attributeName} 属性");
+                    continue;
+                }
+                string trackIdentifier = string.IsNullOrEmpty(suffix) ? attributeValue : $"{attributeValue}_{suffix}";
+                uint adler32Id = Adler32Helper.GenerateAdler32_UNICODE(trackIdentifier, 0);
+                if (!RandomTrack.track.ContainsKey(adler32Id))
+                {
+                    RandomTrack.track.Add(adler32Id, trackIdentifier);
+                }
+            }
+        }
+
+        private static byte[] BmlToXml(string path, byte[] bmlData)
+        {
+            if (Path.GetExtension(path).ToLower() == ".bml")
+            {
+                BinaryXmlDocument bxd = new BinaryXmlDocument();
+                bxd.Read(Encoding.GetEncoding("UTF-16"), bmlData);
+                string output_bml = bxd.RootTag.ToString();
+                byte[] output_data = Encoding.GetEncoding("UTF-16").GetBytes(output_bml);
+                return output_data;
+            }
+            else
+            {
+                return bmlData;
+            }
         }
     }
 }

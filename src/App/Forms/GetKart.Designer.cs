@@ -1,6 +1,6 @@
 ﻿using Launcher.Properties;
 
-namespace KartRider
+namespace Launcher.App.Forms
 {
     partial class GetKart
     {
@@ -39,9 +39,9 @@ namespace KartRider
             // 
             // button_Add
             // 
-            button_Add.Location = new Point(189, 12);
+            button_Add.Location = new Point(162, 9);
             button_Add.Name = "button_Add";
-            button_Add.Size = new Size(72, 59);
+            button_Add.Size = new Size(60, 60);
             button_Add.TabIndex = 0;
             button_Add.Text = "添加";
             button_Add.UseVisualStyleBackColor = true;
@@ -50,7 +50,7 @@ namespace KartRider
             // label_Type
             // 
             label_Type.AutoSize = true;
-            label_Type.Location = new Point(10, 16);
+            label_Type.Location = new Point(5, 17);
             label_Type.Name = "label_Type";
             label_Type.Size = new Size(35, 12);
             label_Type.TabIndex = 362;
@@ -59,7 +59,7 @@ namespace KartRider
             // label_Item
             // 
             label_Item.AutoSize = true;
-            label_Item.Location = new Point(10, 55);
+            label_Item.Location = new Point(5, 49);
             label_Item.Name = "label_Item";
             label_Item.Size = new Size(35, 12);
             label_Item.TabIndex = 363;
@@ -68,9 +68,9 @@ namespace KartRider
             // ItemType
             // 
             ItemType.FormattingEnabled = true;
-            ItemType.Location = new Point(46, 12);
+            ItemType.Location = new Point(46, 14);
             ItemType.Name = "ItemType";
-            ItemType.Size = new Size(137, 20);
+            ItemType.Size = new Size(110, 20);
             ItemType.TabIndex = 364;
             ItemType.SelectedIndexChanged += ItemType_SelectedIndexChanged;
             ItemType.MouseEnter += ItemType_MouseEnter;
@@ -78,9 +78,9 @@ namespace KartRider
             // ItemID
             // 
             ItemID.FormattingEnabled = true;
-            ItemID.Location = new Point(46, 51);
+            ItemID.Location = new Point(46, 46);
             ItemID.Name = "ItemID";
-            ItemID.Size = new Size(137, 20);
+            ItemID.Size = new Size(110, 20);
             ItemID.TabIndex = 365;
             ItemID.SelectedIndexChanged += ItemID_SelectedIndexChanged;
             ItemID.MouseEnter += ItemID_MouseEnter;
@@ -89,7 +89,7 @@ namespace KartRider
             // 
             AutoScaleDimensions = new SizeF(6F, 12F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(273, 100);
+            ClientSize = new Size(234, 81);
             Controls.Add(ItemID);
             Controls.Add(ItemType);
             Controls.Add(label_Item);

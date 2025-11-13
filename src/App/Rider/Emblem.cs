@@ -1,4 +1,3 @@
-using Launcher.App.ExcData;
 using Launcher.App.Server;
 using Launcher.Library.IO;
 
@@ -6,19 +5,21 @@ namespace Launcher.App.Rider
 {
     public static class Emblem
     {
-        public static void RmOwnerEmblemPacket()
+        public static List<short> emblem = new List<short>();
+
+        public static void RmOwnerEmblemPacket(SessionGroup Parent)
         {
-            int All_Emblem = KartExcData.emblem.Count;
-            using (OutPacket outPacket = new OutPacket("RmConstants.OwnerEmblemPacket"))
+            int All_Emblem = emblem.Count;
+            using (OutPacket outPacket = new OutPacket("RmOwnerEmblemPacket"))
             {
                 outPacket.WriteInt(1);
                 outPacket.WriteInt(1);
                 outPacket.WriteInt(All_Emblem);
-                for (int i = 0; i < KartExcData.emblem.Count; i++)
+                foreach (var item in emblem)
                 {
-                    outPacket.WriteShort(KartExcData.emblem[i]);
+                    outPacket.WriteShort(item);
                 }
-                RouterListener.MySession.Client.Send(outPacket);
+                Parent.Client.Send(outPacket);
             }
         }
     }
