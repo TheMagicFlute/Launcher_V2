@@ -5,6 +5,8 @@ namespace Launcher.App.Forms
 {
     public partial class Setting : Form
     {
+        public string[] AiSpeed = ["ç®€å•", "å›°éš¾", "åœ°ç‹±"];
+
         public Setting()
         {
             InitializeComponent();
@@ -23,7 +25,7 @@ namespace Launcher.App.Forms
             {
                 return;
             }
-            var result = MessageBox.Show("È·¶¨ÒªÉáÆúÎ´±£´æµÄ¸ü¸ÄÂğ?", "È·ÈÏ¹Ø±Õ", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            var result = MessageBox.Show("ç¡®å®šè¦èˆå¼ƒæ›´æ”¹å—ï¼Ÿ", "è­¦å‘Š", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result == DialogResult.No)
             {
                 e.Cancel = true;
@@ -41,9 +43,14 @@ namespace Launcher.App.Forms
             {
                 Speed_comboBox.Items.Add(key);
             }
+            foreach (string key in AiSpeed)
+            {
+                AiSpeed_comboBox.Items.Add(key);
+            }
             Speed_comboBox.Text = (SpeedType.speedNames.FirstOrDefault(x => x.Value == ProfileService.SettingConfig.SpeedType).Key);
+            AiSpeed_comboBox.Text = ProfileService.SettingConfig.AiSpeedType;
             changed = false;
-            Text = "ÉèÖÃ";
+            Text = "è®¾ç½®";
         }
 
         private void Speed_comboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -56,11 +63,30 @@ namespace Launcher.App.Forms
                 {
                     ProfileService.SettingConfig.SpeedType = SpeedType.speedNames[selectedSpeed];
                     ProfileService.SaveSettings();
-                    Console.WriteLine($"ËÙ¶È¸ü¸ÄÎª: {selectedSpeed}");
+                    Console.WriteLine($"é€Ÿåº¦æ›´æ”¹ä¸º: {selectedSpeed}");
                 }
                 else
                 {
-                    Console.WriteLine("Î´ÖªµÄ/²»¿ÉÓÃµÄËÙ¶ÈÀàĞÍ");
+                    Console.WriteLine("æœªçŸ¥çš„/æ— æ•ˆçš„é€Ÿåº¦ç±»å‹");
+                }
+            }
+        }
+
+        private void AiSpeed_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            changed = true;
+            if (AiSpeed_comboBox.SelectedItem != null)
+            {
+                string selectedAiSpeed = AiSpeed_comboBox.SelectedItem.ToString();
+                if (AiSpeed.Contains(selectedAiSpeed))
+                {
+                    ProfileService.SettingConfig.AiSpeedType = selectedAiSpeed;
+                    ProfileService.SaveSettings();
+                    Console.WriteLine($"AIé€Ÿåº¦æ›´æ”¹ä¸º: {selectedAiSpeed}");
+                }
+                else
+                {
+                    Console.WriteLine("æœªçŸ¥çš„/æ— æ•ˆçš„AIé€Ÿåº¦ç±»å‹");
                 }
             }
         }
@@ -72,9 +98,10 @@ namespace Launcher.App.Forms
             ProfileService.SettingConfig.ServerPort = ushort.Parse(ServerPort.Text);
             ProfileService.SettingConfig.NgsOn = NgsOn.Checked;
             ProfileService.SettingConfig.SpeedType = SpeedType.speedNames[Speed_comboBox.Text];
+            ProfileService.SettingConfig.AiSpeedType = AiSpeed_comboBox.Text;
             ProfileService.SaveSettings();
-            Console.WriteLine("ÒÑ±£´æÁª»úÉèÖÃ!");
-            MessageBox.Show("ÒÑ±£´æÁª»úÉèÖÃ!", "±£´æ³É¹¦", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            Console.WriteLine("å·²ä¿å­˜è®¾ç½®");
+            MessageBox.Show("è®¾ç½®æˆåŠŸä¿å­˜", "æç¤º", MessageBoxButtons.OK, MessageBoxIcon.Information);
             changed = false;
             Dispose();
         }
@@ -82,7 +109,7 @@ namespace Launcher.App.Forms
         private void Changed(object sender, EventArgs e)
         {
             changed = true;
-            Text = "ÉèÖÃ*";
+            Text = "è®¾ç½®*";
         }
     }
 }

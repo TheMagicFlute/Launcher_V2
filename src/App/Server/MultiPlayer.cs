@@ -691,7 +691,7 @@ public static class MultiPlayer
             Room.RoomName = RoomName;
             if (Password != "")
             {
-                room.Lock = 1;
+                Room.Lock = 1;
             }
             Room.LockPwd = Password;
             Room.RoomUnkBytes = RoomUnkBytes;
@@ -1036,6 +1036,10 @@ public static class MultiPlayer
                     Parent.Client.Send(outPacket);
                 }
             }
+            return;
+        }
+        else
+        {
             return;
         }
     }

@@ -6,16 +6,12 @@ on:
     paths:
       - 'src/**'
       - '.github/workflows/check.yml'
-    paths-ignore:
-      - 'src/*.md'
   pull_request:
     branches-ignore:
       - gh-pages
     paths:
       - 'src/**'
       - '.github/workflows/check.yml'
-    paths-ignore:
-      - 'src/*.md'
   workflow_dispatch:
 
 jobs:

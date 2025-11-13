@@ -69,6 +69,8 @@ namespace Launcher.App.Forms
 
             ProfileService.SettingConfig.ClientVersion = PinFileData.Header.MinorVersion;
             ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].GameOption.Version = PinFileData.Header.MinorVersion;
+            ProfileService.SettingConfig.LocaleID = PinFileData.Header.LocaleID;
+            ProfileService.SettingConfig.nClientLoc = PinFileData.Header.Unk2;
             ProfileService.Save(ProfileService.SettingConfig.Name);
 
             ClientVersion.Text = $"P{ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].GameOption.Version}";
