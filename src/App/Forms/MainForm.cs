@@ -1,7 +1,4 @@
-using Launcher.App;
 using Launcher.App.Constant;
-using Launcher.App.ExcData;
-using Launcher.App.Forms;
 using Launcher.App.Logger;
 using Launcher.App.Profile;
 using Launcher.App.Server;
@@ -9,7 +6,6 @@ using Launcher.App.Utility;
 using Launcher.Library.Data;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using System.IO.Compression;
 using static Launcher.App.Program;
 using static Launcher.App.Utility.Utils;
 

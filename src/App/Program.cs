@@ -1,4 +1,3 @@
-using KartRider;
 using Launcher.App.Constant;
 using Launcher.App.Forms;
 using Launcher.App.Logger;

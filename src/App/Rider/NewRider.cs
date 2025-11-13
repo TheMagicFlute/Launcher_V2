@@ -1,4 +1,3 @@
-using KartRider;
 using Launcher.App.ExcData;
 using Launcher.App.Forms;
 using Launcher.App.Profile;

@@ -1,5 +1,4 @@
-﻿using Launcher.App.Forms;
-using Launcher.App.Profile;
+﻿using Launcher.App.Profile;
 using Launcher.App.Server;
 using Launcher.Library.IO;
 using static Launcher.App.Program;

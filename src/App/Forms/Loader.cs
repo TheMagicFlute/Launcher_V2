@@ -1,11 +1,8 @@
 ﻿using Launcher.App.Profile;
 using Launcher.App.Server;
 using Launcher.App.Utility;
-using Launcher.Library.Constant;
-using Launcher.Library.File.OldImplements;
 using Launcher.Properties;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace Launcher.App.Forms
 {
