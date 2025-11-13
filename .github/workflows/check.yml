@@ -27,8 +27,8 @@ jobs:
         run: cd src
 
       - name: Build win-x64
-        run: dotnet build Launcher.sln --configuration Debug --runtime win-x64
+        run: dotnet build src/Launcher.csproj --configuration Debug --runtime win-x64
       - name: Build win-x86
-        run: dotnet build Launcher.sln --configuration Debug --runtime win-x86
+        run: dotnet build src/Launcher.csproj --configuration Debug --runtime win-x86
       - name: Build win-arm64
-        run: dotnet build Launcher.sln --configuration Debug --runtime win-arm64
+        run: dotnet build src/Launcher.csproj --configuration Debug --runtime win-arm64
