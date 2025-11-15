@@ -162,32 +162,6 @@ public static class RoomManager
         return detail;
     }
 
-    public static object GetPlayerID(int roomId, int id)
-    {
-        lock (_rooms)
-        {
-            // 1. 先检查房间是否存在
-            if (!_rooms.TryGetValue(roomId, out var room))
-                return null;
-
-            // 2. 遍历房间的8个格子，查找昵称匹配的玩家
-            for (byte slotId = 0; slotId < 8; slotId++)
-            {
-                var member = room.GetSlotMember(slotId);
-                // 严格匹配昵称（含大小写）
-                if (member is Player player && player.ID == id)
-                {
-                    return player;
-                }
-                else if (member is Ai ai && ai.ID == id)
-                {
-                    return ai;
-                }
-            }
-        }
-        return null; // 未找到玩家
-    }
-
     public static Player GetPlayer(int roomId, string nickname)
     {
         if (string.IsNullOrEmpty(nickname))
@@ -222,8 +196,7 @@ public static class RoomManager
         {
             for (int i = 0; i < 4; i++)
             {
-                var status = TryGetSlotStatus(roomId, (byte)i);
-                if (status == SlotStatus.Empty)
+                if (room.ChangeSlotId(slotId, (byte)i))
                 {
                     var Object = TryGetSlotDetail(roomId, (byte)i);
                     if (Object is Player player)
@@ -232,16 +205,12 @@ public static class RoomManager
                         player.Team = team;
                         return true;
                     }
-                    if (Object is Ai ai)
+                    else if (Object is Ai ai)
                     {
                         ai.SlotId = (byte)i;
                         ai.Team = team;
                         return true;
                     }
-                }
-                else
-                {
-                    return false;
                 }
             }
         }
@@ -249,8 +218,7 @@ public static class RoomManager
         {
             for (int i = 4; i < 8; i++)
             {
-                var status = TryGetSlotStatus(roomId, (byte)i);
-                if (status == SlotStatus.Empty)
+                if (room.ChangeSlotId(slotId, (byte)i))
                 {
                     var Object = TryGetSlotDetail(roomId, (byte)i);
                     if (Object is Player player)
@@ -259,16 +227,12 @@ public static class RoomManager
                         player.Team = team;
                         return true;
                     }
-                    if (Object is Ai ai)
+                    else if (Object is Ai ai)
                     {
                         ai.SlotId = (byte)i;
                         ai.Team = team;
                         return true;
                     }
-                }
-                else
-                {
-                    return false;
                 }
             }
         }

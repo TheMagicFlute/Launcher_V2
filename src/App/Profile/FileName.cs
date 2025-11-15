@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 
 namespace Launcher.App.Profile
 {
@@ -46,6 +46,7 @@ namespace Launcher.App.Profile
         public static readonly string ConfigFile = Path.GetFullPath(Path.Combine(ProfileDir, @"Config.json"));
         public static string Load_Settings = Path.GetFullPath(Path.Combine(ProfileDir, @"Settings.json"));
         public static string NewKart_LoadFile = Path.GetFullPath(Path.Combine(ProfileDir, @"NewKart.json"));
+        public static string NewItem_LoadFile = Path.GetFullPath(Path.Combine(ProfileDir, @"NewItem.json"));
         public static string ModelMax_LoadFile = Path.GetFullPath(Path.Combine(ProfileDir, @"ModelMax.xml"));
         public static string SpecialKartConfig = Path.GetFullPath(Path.Combine(ProfileDir, @"SpecialKartConfig.json"));
 

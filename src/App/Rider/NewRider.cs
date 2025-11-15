@@ -9,9 +9,9 @@ namespace Launcher.App.Rider
 {
     public static class NewRider
     {
-        public static Dictionary<short, Dictionary<short, string>> items = new Dictionary<short, Dictionary<short, string>>();
-        private static readonly HashSet<short> excludedKeys = new HashSet<short> { 3, 6, 10, 15, 19, 24, 25, 29, 33, 34, 35, 40, 41, 47, 48, 50, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 72, 73, 74, 75 };
-        private static readonly HashSet<short> ValidItemCatIds = new HashSet<short> { 1, 2, 4, 8, 11, 12, 13, 14, 16, 18, 20, 21, 26, 27, 28, 31, 52, 61, 70, 71 };
+        public static Dictionary<ushort, Dictionary<ushort, string>> items = new Dictionary<ushort, Dictionary<ushort, string>>();
+        private static readonly HashSet<ushort> excludedKeys = new HashSet<ushort> { 3, 6, 10, 15, 19, 24, 25, 29, 33, 34, 35, 40, 41, 47, 48, 50, 51, 56, 57, 58, 60, 62, 63, 64, 65, 66, 72, 73, 74, 75 };
+        private static readonly HashSet<ushort> ValidItemCatIds = new HashSet<ushort> { 1, 2, 4, 8, 11, 12, 13, 14, 16, 18, 20, 21, 26, 27, 28, 31, 52, 61, 70, 71 };
 
         public static void LoadItemData(SessionGroup Parent, string Nickname)
         {
@@ -36,6 +36,7 @@ namespace Launcher.App.Rider
             NewRider.Items(Parent, Nickname);
             NewRider.NewKart1(Parent);
             NewRider.NewKart2(Parent);
+            NewRider.NewItem(Parent);
             NewRider.NewRiderData(Parent, Nickname);//라이더 인식
         }
 
@@ -62,11 +63,11 @@ namespace Launcher.App.Rider
 
         public static void NewKart1(SessionGroup Parent)
         {
-            short sn = 1;
+            ushort sn = 1;
             int range = 100;//分批次数
-            if (items.TryGetValue(3, out Dictionary<short, string> resultDict))
+            if (items.TryGetValue(3, out Dictionary<ushort, string> resultDict))
             {
-                List<short> kart = new List<short>(resultDict.Keys);
+                List<ushort> kart = new List<ushort>(resultDict.Keys);
                 int times = kart.Count / range + (kart.Count % range > 0 ? 1 : 0);
                 for (int i = 0; i < times; i++)
                 {
@@ -79,9 +80,9 @@ namespace Launcher.App.Rider
                         foreach (var Kart in tempList)
                         {
                             outPacket.WriteShort(3);
-                            outPacket.WriteShort(Kart);
-                            outPacket.WriteShort(sn);
-                            outPacket.WriteShort(1);//数量
+                            outPacket.WriteUShort(Kart);
+                            outPacket.WriteUShort(sn);
+                            outPacket.WriteUShort(1);//数量
                             outPacket.WriteShort(0);
                             outPacket.WriteShort(-1);
                             outPacket.WriteShort(0);
@@ -116,9 +117,9 @@ namespace Launcher.App.Rider
                     foreach (var Kart in tempList)
                     {
                         outPacket.WriteShort(3);
-                        outPacket.WriteShort(Kart.KartID);
-                        outPacket.WriteShort(Kart.KartSN);
-                        outPacket.WriteShort(1);//数量
+                        outPacket.WriteUShort(Kart.KartID);
+                        outPacket.WriteUShort(Kart.KartSN);
+                        outPacket.WriteUShort(1);//数量
                         outPacket.WriteShort(0);
                         outPacket.WriteShort(-1);
                         outPacket.WriteShort(0);
@@ -130,19 +131,44 @@ namespace Launcher.App.Rider
             }
         }
 
+        public static void NewItem(SessionGroup Parent)
+        {
+            var newList = new List<NewItem>();
+
+            if (File.Exists(FileName.NewItem_LoadFile))
+            {
+                newList = JsonHelper.DeserializeNoBom<List<NewItem>>(FileName.NewItem_LoadFile);
+            }
+
+            // 按 ItemType 分组（返回 IEnumerable<IGrouping<short, NewItem>>）
+            var groupedByType = newList.GroupBy(item => item.ItemType);
+
+            // 遍历分组结果
+            foreach (var group in groupedByType)
+            {
+                List<List<ushort>> items = new List<List<ushort>>();
+                foreach (var item in group)
+                {
+                    List<ushort> add = new List<ushort> { (ushort)item.ItemID, 0, item.Count };
+                    items.Add(add);
+                }
+                LoRpGetRiderItemPacket(Parent, group.Key, items);
+            }
+        }
+
         public static void Items(SessionGroup Parent, string Nickname)
         {
             foreach (var category in items)
             {
-                short itemCatId = category.Key;
+                ushort itemCatId = category.Key;
                 if (!excludedKeys.Contains(itemCatId))
                 {
                     List<List<ushort>> items = new List<List<ushort>>();
                     foreach (var item in category.Value)
                     {
-                        short sn = 0;
+                        ushort sn = 0;
                         ushort num = ProfileService.ProfileConfigs[Nickname].Rider.SlotChanger;
-                        short id = item.Key;
+                        ushort id = item.Key;
                         if (ValidItemCatIds.Contains(itemCatId))
                         {
                             num = 1;
@@ -202,7 +228,7 @@ namespace Launcher.App.Rider
 
         public static void partsEngine12(SessionGroup Parent, string Nickname)
         {
-            if (items.TryGetValue(72, out Dictionary<short, string> resultDict))
+            if (items.TryGetValue(72, out Dictionary<ushort, string> resultDict))
             {
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
                 {
@@ -247,7 +273,7 @@ namespace Launcher.App.Rider
 
         public static void partsHandle12(SessionGroup Parent, string Nickname)
         {
-            if (items.TryGetValue(73, out Dictionary<short, string> resultDict))
+            if (items.TryGetValue(73, out Dictionary<ushort, string> resultDict))
             {
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
                 {
@@ -292,7 +318,7 @@ namespace Launcher.App.Rider
 
         public static void partsWheel12(SessionGroup Parent, string Nickname)
         {
-            if (items.TryGetValue(74, out Dictionary<short, string> resultDict))
+            if (items.TryGetValue(74, out Dictionary<ushort, string> resultDict))
             {
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
                 {
@@ -337,7 +363,7 @@ namespace Launcher.App.Rider
 
         public static void partsBooster12(SessionGroup Parent, string Nickname)
         {
-            if (items.TryGetValue(75, out Dictionary<short, string> resultDict))
+            if (items.TryGetValue(75, out Dictionary<ushort, string> resultDict))
             {
                 using (OutPacket oPacket = new OutPacket("LoRpGetRiderItemPacket"))
                 {
@@ -933,7 +959,7 @@ namespace Launcher.App.Rider
             }
         }
 
-        public static void LoRpGetRiderItemPacket(SessionGroup Parent, short itemCat, List<List<ushort>> item)
+        public static void LoRpGetRiderItemPacket(SessionGroup Parent, ushort itemCat, List<List<ushort>> item)
         {
             int range = 100;//分批次数
             int times = item.Count / range + (item.Count % range > 0 ? 1 : 0);
@@ -947,7 +973,7 @@ namespace Launcher.App.Rider
                     oPacket.WriteInt(tempList.Count);
                     for (int f = 0; f < tempList.Count; f++)
                     {
-                        oPacket.WriteShort(itemCat);
+                        oPacket.WriteUShort(itemCat);
                         oPacket.WriteUShort(tempList[f][0]);
                         oPacket.WriteUShort(tempList[f][1]);
                         oPacket.WriteUShort(tempList[f][2]);
