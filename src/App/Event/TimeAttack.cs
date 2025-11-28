@@ -5,7 +5,9 @@ using Launcher.App.Utility;
 public static class TimeAttack
 {
     public static List<string> MissionList = new List<string>();
+
     public static List<string> Competitive = new List<string>();
+
     public static Dictionary<uint, TrackData> TrackDictionary = new Dictionary<uint, TrackData>();
 
     public static byte GetTrackLevel(string Nickname, uint track)

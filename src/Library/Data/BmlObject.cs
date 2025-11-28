@@ -1,4 +1,5 @@
 ﻿using Launcher.Library.IO;
+using System.Linq;
 
 namespace Launcher.Library.Data
 {
@@ -62,7 +63,7 @@ namespace Launcher.Library.Data
         {
             if (!System.IO.File.Exists(path))
             {
-                throw new Exception("Unable to locate object file.");
+                throw new FileNotFoundException("Unable to locate object file.");
             }
 
             byte[] packet = System.IO.File.ReadAllBytes(path);
@@ -88,17 +89,9 @@ namespace Launcher.Library.Data
             }
         }
 
-        public BmlObject GetObject(string name)
+        public BmlObject? GetObject(string name)
         {
-            foreach (Tuple<string, BmlObject> subObject in SubObjects)
-            {
-                if (subObject.Item1 == name)
-                {
-                    return subObject.Item2;
-                }
-            }
-
-            return null;
+            return SubObjects.FirstOrDefault(subObj => subObj.Item1 == name)?.Item2;
         }
 
         public string GetString(string key, string def = "")

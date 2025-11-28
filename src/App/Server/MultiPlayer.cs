@@ -1016,13 +1016,16 @@ public static class MultiPlayer
         for (int i = 0; i < 4; i++) outPacket.WriteInt();
 
         /* ---- Player ---- */
-        Console.WriteLine("PlayerCount = {0}", room.GetPlayerCount());
+        Console.WriteLine($"PlayerCount = {room.GetPlayerCount()}");
         for (int i = 0; i < 8; i++)
         {
             if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p)
             {
-                Console.WriteLine("Player Nickname = {0}, SlotId = {1}", p.Nickname, p.SlotId);
-                outPacket.WriteInt(p.PlayerType); // Player Type, 2 = RoomMaster, 3 = AutoReady, 4 = Observer, 5 = Preparing, 7 = AI
+                Utils.PrintDivLine();
+                Console.WriteLine($"[Player] SlotId = {p.SlotId}, Nickname = {p.Nickname}, Type = {p.PlayerType}, Team = {p.Team}");
+                Console.WriteLine($"[Player] Client = {ClientManager.ClientToIPEndPoint(ProfileService.ProfileConfigs[p.Nickname].Rider.Client)}");
+                Utils.PrintDivLine();
+                outPacket.WriteInt(p.PlayerType); // Player Type
                 outPacket.WriteUInt(Adler32Helper.GenerateAdler32_ASCII(p.Nickname, 0));
                 outPacket.WriteEndPoint(ClientManager.ClientToIPEndPoint(ProfileService.ProfileConfigs[p.Nickname].Rider.Client));
                 outPacket.WriteInt(ProfileService.ProfileConfigs[p.Nickname].Rider.ClubMark_LOGO);
@@ -1034,14 +1037,7 @@ public static class MultiPlayer
                 GameSupport.GetRider(Parent, p.Nickname, outPacket);
                 outPacket.WriteString(ProfileService.ProfileConfigs[p.Nickname].Rider.Card);
                 outPacket.WriteUInt(ProfileService.ProfileConfigs[p.Nickname].Rider.RP);
-                if (room.GameType == 3 || room.GameType == 4)
-                {
-                    outPacket.WriteByte(p.Team);
-                }
-                else
-                {
-                    outPacket.WriteByte(0);
-                }
+                outPacket.WriteByte(((room.GameType == 3 || room.GameType == 4) ? p.Team : (byte)0)); // write TEAM when Team Mode
                 outPacket.WriteByte();
                 outPacket.WriteByte();
                 for (int j = 0; j < 8; j++) outPacket.WriteInt();

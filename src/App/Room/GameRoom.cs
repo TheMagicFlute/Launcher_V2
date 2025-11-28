@@ -2,7 +2,9 @@ namespace Launcher.App.Room;
 
 public class GameRoom
 {
-    // 房间唯一ID（创建后不可修改）
+    /// <summary>
+    /// 房间唯一ID（创建后不可修改）
+    /// </summary>
     public int RoomId { get; }
     public string RoomName { get; set; }
     public uint track { get; set; } = 0;
@@ -298,9 +300,24 @@ public abstract class RoomMember
 // 玩家类
 public class Player : RoomMember
 {
+    /// <summary>
+    /// 玩家 ID (唯一标识符)
+    /// </summary>
     public int ID { get; set; }
-    public string Nickname { get; set; } // 玩家昵称
-    public int PlayerType { get; set; } // 玩家类型
+
+    /// <summary>
+    /// 玩家昵称
+    /// </summary>
+    public string Nickname { get; set; }
+
+    /// <summary>
+    /// 玩家类型 2 = RoomMaster, 3 = AutoReady, 4 = Observer, 5 = Preparing, 7 = AI
+    /// </summary>
+    public int PlayerType { get; set; }
+
+    /// <summary>
+    /// 玩家队伍
+    /// </summary>
     public byte Team { get; set; }
 }
 

@@ -1,5 +1,7 @@
 using Launcher.App.ExcData;
 using Launcher.App.Profile;
+using Launcher.App.Server;
+using System.Text;
 
 namespace Launcher.App.Forms
 {
@@ -10,9 +12,30 @@ namespace Launcher.App.Forms
         public Setting()
         {
             InitializeComponent();
+            NgsOn.CheckedChanged += Change;
+            PlayerName.TextChanged += Change;
+            ServerIP.TextChanged += Change;
+            ServerPort.TextChanged += Change;
         }
 
-        private bool changed = false;
+        private bool Modified = false;
+
+        private void Change(object sender, EventArgs e)
+        {
+            Modify();
+        }
+
+        private void Modify()
+        {
+            Modified = true;
+            Text = "设置*";
+        }
+
+        private void Restore()
+        {
+            Modified = false;
+            Text = "设置";
+        }
 
         private void OnActivated(object sender, EventArgs e)
         {
@@ -21,11 +44,11 @@ namespace Launcher.App.Forms
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!changed)
+            if (!Modified)
             {
                 return;
             }
-            var result = MessageBox.Show("确定要舍弃更改吗？", "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            DialogResult result = MessageBox.Show("确定要舍弃更改吗?", "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result == DialogResult.No)
             {
                 e.Cancel = true;
@@ -49,13 +72,12 @@ namespace Launcher.App.Forms
             }
             Speed_comboBox.Text = (SpeedType.speedNames.FirstOrDefault(x => x.Value == ProfileService.SettingConfig.SpeedType).Key);
             AiSpeed_comboBox.Text = ProfileService.SettingConfig.AiSpeedType;
-            changed = false;
-            Text = "设置";
+            Restore();
         }
 
         private void Speed_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            changed = true;
+            Modify();
             if (Speed_comboBox.SelectedItem != null)
             {
                 string selectedSpeed = Speed_comboBox.SelectedItem.ToString();
@@ -74,7 +96,7 @@ namespace Launcher.App.Forms
 
         private void AiSpeed_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            changed = true;
+            Modify();
             if (AiSpeed_comboBox.SelectedItem != null)
             {
                 string selectedAiSpeed = AiSpeed_comboBox.SelectedItem.ToString();
@@ -100,16 +122,20 @@ namespace Launcher.App.Forms
             ProfileService.SettingConfig.SpeedType = SpeedType.speedNames[Speed_comboBox.Text];
             ProfileService.SettingConfig.AiSpeedType = AiSpeed_comboBox.Text;
             ProfileService.SaveSettings();
-            Console.WriteLine("已保存设置");
+            Console.WriteLine("已保存设置.");
             MessageBox.Show("设置成功保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            changed = false;
-            Dispose();
+            Restore();
         }
 
-        private void Changed(object sender, EventArgs e)
+        private void Show_My_IP_Click(object sender, EventArgs e)
         {
-            changed = true;
-            Text = "设置*";
+            StringBuilder sb = new();
+            List<string> RouterIPList = LanIpGetter.GetAllLocalLanIps();
+            foreach (var ip in RouterIPList)
+            {
+                sb.AppendLine($"{ip}:{ProfileService.SettingConfig.ServerPort}");
+            }
+            new StaticInfo("本机IP", sb.ToString()).ShowDialog();
         }
     }
 }

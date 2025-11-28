@@ -247,7 +247,7 @@ namespace Launcher.App.Event
                 // 二次校验：确保row和col在有效范围内
                 if (row < 0 || row >= 5 || col < 0 || col >= 5)
                 {
-                    Console.WriteLine($"计算出无效的网格坐标：index={index}, row={row}, col={col}");
+                    Console.WriteLine($"计算出无效的网格坐标: index={index}, row={row}, col={col}");
                 }
 
                 grid[row, col] = BingoNums[BingoNumsList[index]]; // 0 = 未选中，1 = 已选中
@@ -270,7 +270,7 @@ namespace Launcher.App.Event
                 BingoItems[item1] = (byte)(isCompleted ? 1 : 0);
             }
 
-            // 检查右上到左下对角线(索引5)
+            // 检查副对角线 (索引5)
             // 对应坐标: (0,4), (1,3), (2,2), (3,1), (4,0)
             bool antiDiagonalCompleted = true;
             for (int i = 0; i < 5; i++)

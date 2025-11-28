@@ -2,6 +2,7 @@
 using Launcher.App.Server;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Launcher.App.Utility;
 
@@ -56,7 +57,7 @@ class MemoryModifier
     // 进程内存操作权限（读取+写入+查询内存信息）
     private const uint PROCESS_ACCESS_FLAGS = 0x0010 | 0x0020 | 0x0008; // PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_QUERY_INFORMATION
 
-    public void LaunchAndModifyMemory(string kartRiderDirectory)
+    public async Task LaunchAndModifyMemory(string kartRiderDirectory)
     {
         DataPacket packet = new DataPacket
         {
@@ -64,7 +65,7 @@ class MemoryModifier
             TimeTicks = MultiPlayer.GetUpTime()
         };
 
-        Process process = null;
+        Process? process = default;
         try
         {
             // 1. 启动目标进程
@@ -73,20 +74,29 @@ class MemoryModifier
             {
                 WorkingDirectory = Path.GetFullPath(kartRiderDirectory),
                 UseShellExecute = true,
-                Verb = "runas" // 请求管理员权限（内存修改可能需要）
+                Verb = "runas" // 以管理员权限运行
             };
 
             process = Process.Start(startInfo);
-            Console.WriteLine($"进程已启动, ID: {process.Id}");
+            if (process == null)
+            {
+                Console.WriteLine("游戏进程启动失败, 请检查权限后重启.");
+                MessageBox.Show("游戏进程启动失败, 请检查权限后重启.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            Console.WriteLine($"进程已启动, PID: {process.Id}");
 
             // 2. 等待进程初始化（根据实际情况调整等待时间，确保进程加载完成）
-            Thread.Sleep(5000); // 等待5秒（可根据需要延长）
+            await Task.Run(() => {process.WaitForInputIdle();});
+            Console.WriteLine("进程初始化完成!");
 
             // 3. 查找并修改内存 星标赛道数量50改为120
-            bool success = ModifyMemory(process.Id, new byte[] { 0x83, 0xFA, 0x32 }, new byte[] { 0x83, 0xFA, 0x78 });
+            Console.WriteLine("正在尝试修改星标赛道数量限制...");
+            // 小端序
+            bool success = ModifyMemory(process.Id, [0x83, 0xFA, 0x32], [0x83, 0xFA, 0x78]);
             if (success)
             {
-                Console.WriteLine("星标赛道数量50改为120");
+                Console.WriteLine("修改星标赛道数量限制: 50 -> 120");
             }
             else
             {

@@ -2,7 +2,9 @@ using Launcher.App.Profile;
 
 namespace Launcher.App.Server
 {
-    // 配件类（气球/头带/护目镜）
+    /// <summary>
+    /// 配件类（气球/头带/护目镜）
+    /// </summary>
     public class AIAccessory
     {
         public short Id { get; set; }
@@ -10,11 +12,20 @@ namespace Launcher.App.Server
         public int Item { get; set; }
     }
 
-    // 角色类
+    /// <summary>
+    /// 角色类
+    /// </summary>
     public class AICharacter
     {
-        public short Id { get; set; }              // 角色ID
-        public List<string> Rids { get; set; }     // rid名称列表（按XML顺序）
+        /// <summary>
+        /// 角色ID
+        /// </summary>
+        public short Id { get; set; }
+
+        /// <summary>
+        /// rid名称列表（按XML顺序）
+        /// </summary>
+        public List<string> Rids { get; set; }
         public List<AIAccessory> Balloons { get; set; }
         public List<AIAccessory> Headbands { get; set; }
         public List<AIAccessory> Goggles { get; set; }
@@ -28,10 +39,15 @@ namespace Launcher.App.Server
         }
     }
 
-    // 卡丁车类
+    /// <summary>
+    /// 卡丁车类
+    /// </summary>
     public class AIKart
     {
-        public short Id { get; set; }              // 卡丁车ID（short）
+        /// <summary>
+        /// 卡丁车ID（short）
+        /// </summary>
+        public short Id { get; set; }
         public int Speed { get; set; }
         public int Item { get; set; }
     }
@@ -110,9 +126,12 @@ namespace Launcher.App.Server
         }
     }
 
+    /// <summary>
+    /// AI 速度配置类
+    /// </summary>
     public class AI
     {
-        public static List<float> GetAISpec(byte GameType)
+        public static List<float>? GetAISpec(byte GameType)
         {
             Random random = new Random();
             var e = 1000;
@@ -165,7 +184,7 @@ namespace Launcher.App.Server
                     return new List<float>() { a, b, c, d, e, f };
                 }
             }
-            Console.WriteLine(ProfileService.SettingConfig.AiSpeedType);
+            Console.WriteLine($"未知/不可用的 AI 速度选项: {ProfileService.SettingConfig.AiSpeedType}");
             return null;
         }
     }

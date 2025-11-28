@@ -30,13 +30,13 @@ namespace Launcher.App.Server
             try
             {
                 Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                Socket clientSocket = RouterListener.Listener.EndAcceptSocket(ar);
+                Socket clientSocket = Listener.EndAcceptSocket(ar);
 
                 // 创建客户端会话（自动开始接收消息）
-                RouterListener.MySession = new SessionGroup(clientSocket, null);
+                MySession = new SessionGroup(clientSocket, null);
 
                 // 将会话添加到管理类
-                ClientManager.AddClient(RouterListener.MySession);
+                ClientManager.AddClient(MySession);
             }
             catch (Exception ex)
             {
@@ -44,30 +44,30 @@ namespace Launcher.App.Server
             }
             finally
             {
-                RouterListener.Listener.BeginAcceptSocket(new AsyncCallback(RouterListener.OnAcceptSocket), null);
+                Listener.BeginAcceptSocket(new AsyncCallback(OnAcceptSocket), null);
             }
         }
 
         public static void Start()
         {
-            if (RouterListener.Listener == null || RouterListener.CurrentUDPServer == null)
+            if (Listener == null || CurrentUDPServer == null)
             {
-                RouterListener.Listener = new TcpListener(IPAddress.Any, ProfileService.SettingConfig.ServerPort);
-                RouterListener.CurrentUDPServer = new System.Net.IPEndPoint(IPAddress.Any, 39311);
+                Listener = new TcpListener(IPAddress.Any, ProfileService.SettingConfig.ServerPort);
+                CurrentUDPServer = new System.Net.IPEndPoint(IPAddress.Any, 39311);
             }
-            if (!RouterListener.Listener.Server.IsBound)
+            if (!Listener.Server.IsBound)
             {
                 var RouterIPList = LanIpGetter.GetAllLocalLanIps();
                 foreach (var ip in RouterIPList)
                 {
-                    Console.WriteLine("Load server IP: {0}:{1}", ip, ProfileService.SettingConfig.ServerPort);
+                    Console.WriteLine($"[Server] Load server IP: {ip}:{ProfileService.SettingConfig.ServerPort}");
                 }
-                RouterListener.Listener.Start();
-                RouterListener.Listener.BeginAcceptSocket(OnAcceptSocket, RouterListener.Listener);
+                Listener.Start();
+                Listener.BeginAcceptSocket(OnAcceptSocket, Listener);
             }
             else
             {
-                RouterListener.Listener.BeginAcceptSocket(OnAcceptSocket, RouterListener.Listener);
+                Listener.BeginAcceptSocket(OnAcceptSocket, Listener);
             }
         }
     }

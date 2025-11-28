@@ -12,9 +12,8 @@ namespace Launcher.Library.Network
 
         public int Index;
 
-        public SocketInfo(System.Net.Sockets.Socket socket, short headerLength) : this(socket, headerLength, false)
-        {
-        }
+        public SocketInfo(System.Net.Sockets.Socket socket, short headerLength)
+            : this(socket, headerLength, false) { }
 
         public SocketInfo(System.Net.Sockets.Socket socket, short headerLength, bool noEncryption)
         {
@@ -27,7 +26,8 @@ namespace Launcher.Library.Network
 
         SocketInfo()
         {
-            DataBuffer = null;
+            Socket = null!;
+            DataBuffer = null!;
         }
 
         public enum StateEnum

@@ -102,13 +102,13 @@ namespace Launcher.App.Forms
                 Utils.PrintDivLine(25);
                 Console.WriteLine($"更新信息: \n{releaseData.Body}");
                 Utils.PrintDivLine(25);
-                string usrInput = MessageBox.Show(
+                DialogResult usrInput = MessageBox.Show(
                     $"发现新版本 {releaseData.Tag_Name}!\n\n更新信息:\n{releaseData.Body}\n\n是否现在更新?",
                     "发现新版本",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question
-                ).ToString().ToLower();
-                if (usrInput == "no" || usrInput == "n")
+                );
+                if (usrInput == DialogResult.No)
                 {
                     Console.WriteLine($"用户取消更新. 如果仍想更新, 请重新启动本程序, 或者访问 https://github.com/{Constants.Owner}/{Constants.Repo}/releases/latest 手动下载最新版本");
                     return false; // cancel update

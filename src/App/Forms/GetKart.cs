@@ -8,8 +8,8 @@ namespace Launcher.App.Forms
 {
     public partial class GetKart : Form
     {
-        public static ushort Item_Type = 0;
-        public static ushort Item_Code = 0;
+        private static ushort Item_Type = 0;
+        private static ushort Item_Code = 0;
 
         public GetKart()
         {
@@ -24,14 +24,14 @@ namespace Launcher.App.Forms
         private void button_Add_Click(object sender, EventArgs e)
         {
             ushort tempValue;
-            if (ushort.TryParse(ItemID.Text, out tempValue))
+            if (ushort.TryParse(Text, out tempValue))
             {
-                GetKart.Item_Code = tempValue;
-                Console.WriteLine($"Add Item:{ItemID.Text} ID:{ItemType.Text}");
+                Item_Code = tempValue;
+                Console.WriteLine($"Add Item:{Text} ID:{Text}");
             }
             (new Thread(() =>
             {
-                if (GetKart.Item_Type == 3)
+                if (Item_Type == 3) // 车辆
                 {
                     ushort KartSN = 2;
 
@@ -45,7 +45,7 @@ namespace Launcher.App.Forms
                     // 查找合适的KartSN
                     ushort currentSN = KartSN;
                     // 循环检查当前SN是否已存在相同KartID的记录
-                    while (newList.Any(kart => kart.KartID == GetKart.Item_Code && kart.KartSN == currentSN))
+                    while (newList.Any(kart => kart.KartID == Item_Code && KartSN == currentSN))
                     {
                         currentSN++; // 存在则SN+1继续检查
                     }
@@ -54,8 +54,8 @@ namespace Launcher.App.Forms
                     {
                         outPacket.WriteByte(1);
                         outPacket.WriteInt(1);
-                        outPacket.WriteUShort(GetKart.Item_Type);
-                        outPacket.WriteUShort(GetKart.Item_Code);
+                        outPacket.WriteUShort(Item_Type);
+                        outPacket.WriteUShort(Item_Code);
                         outPacket.WriteUShort(currentSN);
                         outPacket.WriteShort(1);//수량
                         outPacket.WriteShort(0);
@@ -69,13 +69,13 @@ namespace Launcher.App.Forms
                     // 添加新记录
                     newList.Add(new NewKart
                     {
-                        KartID = GetKart.Item_Code,
+                        KartID = Item_Code,
                         KartSN = currentSN
                     });
 
                     Save_NewKartList(newList);
                 }
-                else
+                else // 其他
                 {
                     var newList = new List<NewItem>();
 
@@ -85,7 +85,7 @@ namespace Launcher.App.Forms
                     }
 
                     // 检查是否已存在相同的记录
-                    var existingItem = newList.FirstOrDefault(item => item.ItemType == GetKart.Item_Type && item.ItemID == GetKart.Item_Code);
+                    var existingItem = newList.FirstOrDefault(item => item.ItemType == Item_Type && item.ItemID == Item_Code);
                     if (existingItem != null)
                     {
                         // 增加数量
@@ -98,8 +98,8 @@ namespace Launcher.App.Forms
                         {
                             outPacket.WriteByte(1);
                             outPacket.WriteInt(1);
-                            outPacket.WriteUShort(GetKart.Item_Type);
-                            outPacket.WriteUShort(GetKart.Item_Code);
+                            outPacket.WriteUShort(Item_Type);
+                            outPacket.WriteUShort(Item_Code);
                             outPacket.WriteShort(0);
                             outPacket.WriteUShort(1);//수량
                             outPacket.WriteShort(0);
@@ -112,8 +112,8 @@ namespace Launcher.App.Forms
                         // 添加新记录
                         newList.Add(new NewItem
                         {
-                            ItemType = GetKart.Item_Type,
-                            ItemID = GetKart.Item_Code,
+                            ItemType = Item_Type,
+                            ItemID = Item_Code,
                             Count = 1
                         });
                         Save_NewItemList(newList);
@@ -136,10 +136,10 @@ namespace Launcher.App.Forms
         {
             if (ItemType.SelectedItem != null)
             {
-                GetKart.Item_Type = (ushort)ItemType.SelectedItem;
+                Item_Type = (ushort)ItemType.SelectedItem;
                 ItemID.Items.Clear();
 
-                if (NewRider.items.TryGetValue(GetKart.Item_Type, out Dictionary<ushort, string> innerDictionary))
+                if (NewRider.items.TryGetValue(Item_Type, out Dictionary<ushort, string> innerDictionary))
                 {
                     foreach (var innerValue in innerDictionary.Values)
                     {
@@ -158,8 +158,8 @@ namespace Launcher.App.Forms
 
                 if (NewRider.items.TryGetValue(selectedOuterKey, out Dictionary<ushort, string> innerDictionary))
                 {
-                    GetKart.Item_Code = innerDictionary.FirstOrDefault(pair => pair.Value == selectedInnerValue).Key;
-                    Console.WriteLine($"Add Item:{selectedInnerValue} ID:{GetKart.Item_Code}");
+                    Item_Code = innerDictionary.FirstOrDefault(pair => pair.Value == selectedInnerValue).Key;
+                    Console.WriteLine($"Add Item:{selectedInnerValue} ID:{Item_Code}");
                 }
             }
         }

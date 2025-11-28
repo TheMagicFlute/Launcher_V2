@@ -165,6 +165,28 @@ namespace Launcher.App.Utility
             }
         }
 
+        public static bool CopyToClipboard(string text)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(text))
+                    text = "";
+
+                Thread thread = new(new ThreadStart(() =>
+                {
+                    Clipboard.SetDataObject(text, true);
+                }));
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"复制文本到剪贴板时发生错误: {ex.Message}");
+                return false;
+            }
+            return true;
+        }
+
         #endregion
 
         #region Pack Tool

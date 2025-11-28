@@ -21,7 +21,10 @@ public static class ClientManager
     private static readonly ConcurrentDictionary<string, SessionGroup> _clientSessions = new ConcurrentDictionary<string, SessionGroup>();
     public static ConcurrentDictionary<string, ClientGroup> ClientGroups = new ConcurrentDictionary<string, ClientGroup>();
 
-    // 添加客户端会话
+    /// <summary>
+    /// 添加客户端会话
+    /// </summary>
+    /// <param name="session">加入的客户端会话</param>
     public static void AddClient(SessionGroup session)
     {
         IPEndPoint clientEndPoint = session.Client.Socket.RemoteEndPoint as IPEndPoint;
@@ -40,7 +43,10 @@ public static class ClientManager
         Console.WriteLine($"客户端 {clientId} 已连接，当前在线数：{_clientSessions.Count}");
     }
 
-    // 移除客户端会话（客户端断开时调用）
+    /// <summary>
+    /// 移除客户端会话（客户端断开时调用）
+    /// </summary>
+    /// <param name="clientSocket">移除的客户端会话</param>
     public static void RemoveClient(Socket clientSocket)
     {
         IPEndPoint clientEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
