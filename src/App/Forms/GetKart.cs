@@ -1,0 +1,190 @@
+using Launcher.App.Profile;
+using Launcher.App.Rider;
+using Launcher.App.Server;
+using Launcher.App.Utility;
+using Launcher.Library.IO;
+
+namespace Launcher.App.Forms
+{
+    public partial class GetKart : Form
+    {
+        private static ushort Item_Type = 0;
+        private static ushort Item_Code = 0;
+
+        public GetKart()
+        {
+            InitializeComponent();
+            foreach (var outerKey in NewRider.items.Keys)
+            {
+                ItemType.Items.Add(outerKey);
+            }
+            ItemType.SelectedIndex = 2;
+        }
+
+        private void button_Add_Click(object sender, EventArgs e)
+        {
+            ushort tempValue;
+            if (ushort.TryParse(Text, out tempValue))
+            {
+                Item_Code = tempValue;
+                Console.WriteLine($"Add Item:{Text} ID:{Text}");
+            }
+            (new Thread(() =>
+            {
+                if (Item_Type == 3) // 车辆
+                {
+                    ushort KartSN = 2;
+
+                    var newList = new List<NewKart>();
+
+                    if (File.Exists(FileName.NewKart_LoadFile))
+                    {
+                        newList = JsonHelper.DeserializeNoBom<List<NewKart>>(FileName.NewKart_LoadFile);
+                    }
+
+                    // 查找合适的KartSN
+                    ushort currentSN = KartSN;
+                    // 循环检查当前SN是否已存在相同KartID的记录
+                    while (newList.Any(kart => kart.KartID == Item_Code && KartSN == currentSN))
+                    {
+                        currentSN++; // 存在则SN+1继续检查
+                    }
+
+                    using (OutPacket outPacket = new OutPacket("PrRequestKartInfoPacket"))
+                    {
+                        outPacket.WriteByte(1);
+                        outPacket.WriteInt(1);
+                        outPacket.WriteUShort(Item_Type);
+                        outPacket.WriteUShort(Item_Code);
+                        outPacket.WriteUShort(currentSN);
+                        outPacket.WriteShort(1);//수량
+                        outPacket.WriteShort(0);
+                        outPacket.WriteShort(-1);
+                        outPacket.WriteShort(0);
+                        outPacket.WriteShort(0);
+                        outPacket.WriteShort(0);
+                        RouterListener.MySession.Client.Send(outPacket);
+                    }
+
+                    // 添加新记录
+                    newList.Add(new NewKart
+                    {
+                        KartID = Item_Code,
+                        KartSN = currentSN
+                    });
+
+                    Save_NewKartList(newList);
+                }
+                else // 其他
+                {
+                    var newList = new List<NewItem>();
+
+                    if (File.Exists(FileName.NewItem_LoadFile))
+                    {
+                        newList = JsonHelper.DeserializeNoBom<List<NewItem>>(FileName.NewItem_LoadFile);
+                    }
+
+                    // 检查是否已存在相同的记录
+                    var existingItem = newList.FirstOrDefault(item => item.ItemType == Item_Type && item.ItemID == Item_Code);
+                    if (existingItem != null)
+                    {
+                        // 增加数量
+                        existingItem.Count++;
+                        Save_NewItemList(newList);
+                    }
+                    else
+                    {
+                        using (OutPacket outPacket = new OutPacket("PrRequestKartInfoPacket"))
+                        {
+                            outPacket.WriteByte(1);
+                            outPacket.WriteInt(1);
+                            outPacket.WriteUShort(Item_Type);
+                            outPacket.WriteUShort(Item_Code);
+                            outPacket.WriteShort(0);
+                            outPacket.WriteUShort(1);//수량
+                            outPacket.WriteShort(0);
+                            outPacket.WriteShort(-1);
+                            outPacket.WriteShort(0);
+                            outPacket.WriteShort(0);
+                            outPacket.WriteShort(0);
+                            RouterListener.MySession.Client.Send(outPacket);
+                        }
+                        // 添加新记录
+                        newList.Add(new NewItem
+                        {
+                            ItemType = Item_Type,
+                            ItemID = Item_Code,
+                            Count = 1
+                        });
+                        Save_NewItemList(newList);
+                    }
+                }
+            })).Start();
+        }
+
+        public static void Save_NewKartList(List<NewKart> NewKart)
+        {
+            File.WriteAllText(FileName.NewKart_LoadFile, JsonHelper.Serialize(NewKart));
+        }
+
+        public static void Save_NewItemList(List<NewItem> NewItem)
+        {
+            File.WriteAllText(FileName.NewItem_LoadFile, JsonHelper.Serialize(NewItem));
+        }
+
+        private void ItemType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ItemType.SelectedItem != null)
+            {
+                Item_Type = (ushort)ItemType.SelectedItem;
+                ItemID.Items.Clear();
+
+                if (NewRider.items.TryGetValue(Item_Type, out Dictionary<ushort, string> innerDictionary))
+                {
+                    foreach (var innerValue in innerDictionary.Values)
+                    {
+                        ItemID.Items.Add(innerValue);
+                    }
+                }
+            }
+        }
+
+        private void ItemID_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ItemType.SelectedItem != null && ItemID.SelectedItem != null)
+            {
+                ushort selectedOuterKey = (ushort)ItemType.SelectedItem;
+                string selectedInnerValue = ItemID.SelectedItem.ToString();
+
+                if (NewRider.items.TryGetValue(selectedOuterKey, out Dictionary<ushort, string> innerDictionary))
+                {
+                    Item_Code = innerDictionary.FirstOrDefault(pair => pair.Value == selectedInnerValue).Key;
+                    Console.WriteLine($"Add Item:{selectedInnerValue} ID:{Item_Code}");
+                }
+            }
+        }
+
+        private void ItemType_MouseEnter(object sender, EventArgs e)
+        {
+            new ToolTip().SetToolTip(ItemType, "在下拉列表中选择物品的类型, 或者输入类型代号.");
+        }
+
+        private void ItemID_MouseEnter(object sender, EventArgs e)
+        {
+            new ToolTip().SetToolTip(ItemID, "在下拉列表中选择物品的ID, 或者输入代号.");
+        }
+    }
+
+    public class NewKart
+    {
+        public ushort KartID { get; set; } = 0;
+        public ushort KartSN { get; set; } = 0;
+    }
+
+    public class NewItem
+    {
+        public ushort ItemType { get; set; } = 0;
+        public ushort ItemID { get; set; } = 0;
+        public ushort Count { get; set; } = 0;
+    }
+}
