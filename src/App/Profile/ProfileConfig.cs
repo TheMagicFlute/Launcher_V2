@@ -40,32 +40,9 @@ namespace Launcher.App.Profile
         public ushort nClientLoc { get; set; }
 
         public bool NgsOn { get; set; } = false;
-    }
 
-    public class ProfileConfig
-    {
-        public ProfileConfig()
-        {
-            ServerSetting = new ServerSetting();
-            Rider = new RiderData();
-            RiderItem = new RiderItemData();
-            MyRoom = new MyRoomData();
-            GameOption = new GameOptionData();
-        }
+        //------------
 
-        public ServerSetting ServerSetting { get; set; }
-
-        public RiderData Rider { get; set; }
-
-        public RiderItemData RiderItem { get; set; }
-
-        public MyRoomData MyRoom { get; set; }
-
-        public GameOptionData GameOption { get; set; }
-    }
-
-    public class ServerSetting
-    {
         public byte PreventItem_Use { get; set; } = 0;
 
         public byte SpeedPatch_Use { get; set; } = 0;
@@ -91,6 +68,24 @@ namespace Launcher.App.Profile
         public bool AutoUpdate { get; set; } = false;
     }
 
+    public class ProfileConfig
+    {
+        public ProfileConfig()
+        {
+            Rider = new RiderData();
+            RiderItem = new RiderItemData();
+            MyRoom = new MyRoomData();
+            GameOption = new GameOptionData();
+        }
+
+        public RiderData Rider { get; set; }
+
+        public RiderItemData RiderItem { get; set; }
+
+        public MyRoomData MyRoom { get; set; }
+
+        public GameOptionData GameOption { get; set; }
+    }
 
     public class RiderData
     {

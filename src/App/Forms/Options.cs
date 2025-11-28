@@ -11,15 +11,15 @@ namespace Launcher.App.Forms
         public Options()
         {
             InitializeComponent();
-            checkBox_AutoUpdate.Checked = ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.AutoUpdate;
+            checkBox_AutoUpdate.Checked = ProfileService.SettingConfig.AutoUpdate;
         }
 
         #region Launcher Options
 
         private void button_ToggleConsole_Click(object sender, EventArgs e)
         {
-            ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ConsoleVisibility = !IsWindowVisible(consoleHandle);
-            ShowWindow(consoleHandle, ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ConsoleVisibility ? SW_SHOW : SW_HIDE);
+            ProfileService.SettingConfig.ConsoleVisibility = !IsWindowVisible(consoleHandle);
+            ShowWindow(consoleHandle, ProfileService.SettingConfig.ConsoleVisibility ? SW_SHOW : SW_HIDE);
             ProfileService.Save(ProfileService.SettingConfig.Name);
         }
 
@@ -30,8 +30,8 @@ namespace Launcher.App.Forms
 
         private void button_ToggleShowPacketDetail_Click(object sender, EventArgs e)
         {
-            ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ShowPacketDetail = !ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ShowPacketDetail;
-            Console.WriteLine($"输出数据包细节: {(ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ShowPacketDetail ? "开" : "关")}");
+            ProfileService.SettingConfig.ShowPacketDetail = !ProfileService.SettingConfig.ShowPacketDetail;
+            Console.WriteLine($"输出数据包细节: {(ProfileService.SettingConfig.ShowPacketDetail ? "开" : "关")}");
             ProfileService.Save(ProfileService.SettingConfig.Name);
         }
 
@@ -47,8 +47,9 @@ namespace Launcher.App.Forms
 
         private void checkBox_AutoUpdate_CheckedChanged(object sender, EventArgs e)
         {
-            ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.AutoUpdate = checkBox_AutoUpdate.Checked;
+            ProfileService.SettingConfig.AutoUpdate = checkBox_AutoUpdate.Checked;
             ProfileService.Save(ProfileService.SettingConfig.Name);
+            Console.WriteLine($"自动检查更新: {(ProfileService.SettingConfig.AutoUpdate ? "ON" : "OFF")}");
         }
 
         private void checkBox_AutoUpdate_MouseEnter(object sender, EventArgs e)

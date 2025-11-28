@@ -977,7 +977,7 @@ namespace Launcher.App.Rider
                         oPacket.WriteUShort(tempList[f][0]);
                         oPacket.WriteUShort(tempList[f][1]);
                         oPacket.WriteUShort(tempList[f][2]);
-                        oPacket.WriteByte(ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.PreventItem_Use);
+                        oPacket.WriteByte(ProfileService.SettingConfig.PreventItem_Use);
                         oPacket.WriteByte(0);
                         oPacket.WriteShort(-1);
                         oPacket.WriteShort(0);

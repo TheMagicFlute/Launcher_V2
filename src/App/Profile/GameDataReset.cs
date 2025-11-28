@@ -12,9 +12,7 @@ namespace Launcher.App.Profile
                 ProfileService.ProfileConfigs[Nickname].Rider.Lucci = SessionGroup.LucciMax;
             }
             ProfileService.Save(Nickname);
-            SpeedPatch.SpeedPatchData(Nickname);
-            //GameSupport.PrLogin();
-            Console.WriteLine("Login...OK");
+            SpeedPatch.SpeedPatchData();
         }
     }
 }

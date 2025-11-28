@@ -2919,7 +2919,7 @@ namespace Launcher.App.Server
                             outPacket.WriteInt(0);
                             outPacket.WriteInt(1);
                             outPacket.WriteString("cc");
-                            outPacket.WriteString(ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.CC.ToString().ToLower());
+                            outPacket.WriteString(ProfileService.SettingConfig.CC.ToString().ToLower());
                             outPacket.WriteInt(6);
                             outPacket.WriteString("content");
                             outPacket.WriteInt(0);
@@ -3004,6 +3004,7 @@ namespace Launcher.App.Server
                                 this.Parent.Client.Send(outPacket);
                             }
                         }
+                        Console.WriteLine($"[Login] {Nickname}...OK");
                         return;
                     }
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqSyncJackpotPointCS", 0))

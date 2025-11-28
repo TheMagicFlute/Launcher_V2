@@ -14,9 +14,9 @@ namespace Launcher.App.ExcData
         public static float StartForwardAccelForceItem = 0f;    // 道具启动加速器加速力 출발 부스터 가속 아이템
         public static float StartForwardAccelForceSpeed = 0f;   // 竞速启动加速器加速力 출발 부스터 가속 스피드
 
-        public static void SpeedPatchData(string NickName)
+        public static void SpeedPatchData()
         {
-            if (ProfileService.ProfileConfigs[NickName].ServerSetting.SpeedPatch_Use == 1)
+            if (ProfileService.SettingConfig.SpeedPatch_Use == 1)
             {
                 DragFactor = -0.003f;
                 ForwardAccelForce = 30f;

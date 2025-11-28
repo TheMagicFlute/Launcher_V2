@@ -97,10 +97,16 @@ namespace Launcher.App
             if (!Directory.Exists(FileName.LogDir))
                 Directory.CreateDirectory(FileName.LogDir);
 
+            // delete update temp files if exist
+            if (File.Exists(FileName.Update_File))
+                File.Delete(FileName.Update_File);
+            if (File.Exists(FileName.Update_Folder))
+                File.Delete(FileName.Update_Folder);
+
             ProfileService.Load(ProfileService.SettingConfig.Name);
 
             // auto hide console window if not in debug mode
-            if (!ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.ConsoleVisibility)
+            if (!ProfileService.SettingConfig.ConsoleVisibility)
                 ShowWindow(consoleHandle, SW_HIDE);
 
             if (!ProfileService.LoadSettings())
@@ -119,13 +125,13 @@ namespace Launcher.App
             if (countryCode != "") // available country code
             {
                 // change country code & write to file
-                ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.CC = (CountryCode)Enum.Parse(typeof(CountryCode), countryCode);
+                ProfileService.SettingConfig.CC = (CountryCode)Enum.Parse(typeof(CountryCode), countryCode);
                 ProfileService.Save(ProfileService.SettingConfig.Name);
             }
-            Console.WriteLine($"最后一次联网打开地区为: {ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.CC}");
+            Console.WriteLine($"最后一次联网打开地区为: {ProfileService.SettingConfig.CC}");
 
             // auto check update
-            if (ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.AutoUpdate)
+            if (ProfileService.SettingConfig.AutoUpdate)
             {
                 new Updater().ShowDialog();
                 Utils.PrintDivLine();

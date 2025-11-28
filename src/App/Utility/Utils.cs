@@ -342,7 +342,7 @@ namespace Launcher.App.Utility
                 input = input.Replace("\\", "/");
                 if (!input.EndsWith("/"))
                     input += "/";
-                rho5Archive.SaveFolder(input, dataPackName, fullName, ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.CC, dataPackID);
+                rho5Archive.SaveFolder(input, dataPackName, fullName, ProfileService.SettingConfig.CC, dataPackID);
             }
             else
             {
@@ -357,7 +357,7 @@ namespace Launcher.App.Utility
             else if (output.EndsWith(".rho5"))
                 output = output.Replace(".rho5", "");
             var packFolderManager = new PackFolderManager();
-            packFolderManager.OpenSingleFile(input, ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].ServerSetting.CC);
+            packFolderManager.OpenSingleFile(input, ProfileService.SettingConfig.CC);
             var packFolderInfoQueue = new Queue<PackFolderInfo>();
             packFolderInfoQueue.Enqueue(packFolderManager.GetRootFolder());
             packFolderManager.GetRootFolder();
