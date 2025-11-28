@@ -95,7 +95,7 @@ namespace Launcher.App.Forms
                 Console.WriteLine("无法获取当前可执行文件路径, 更新检查失败.");
                 return false;
             }
-            if (CheckFileHash(Path.Combine(FileName.AppDir, currentExeFile), launcherAsset.Digest))
+            if (!CheckFileHash(Path.Combine(FileName.AppDir, currentExeFile), launcherAsset.Digest))
             {
                 // ask user whether to update
                 Console.WriteLine($"发现 {releaseData.Tag_Name} 中有更新!");
@@ -324,7 +324,8 @@ namespace Launcher.App.Forms
                     byte[] hash = sha256.ComputeHash(fileStream);
                     string actualHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
                     Console.WriteLine($"文件 SHA256 为: {actualHash}");
-                    return actualHash == expectedHash;
+                    Console.WriteLine($"期望 SHA256 为: {expectedHash}");
+                    return (actualHash == expectedHash);
                 }
             }
         }

@@ -48,7 +48,7 @@ namespace Launcher.App.Forms
         private void checkBox_AutoUpdate_CheckedChanged(object sender, EventArgs e)
         {
             ProfileService.SettingConfig.AutoUpdate = checkBox_AutoUpdate.Checked;
-            ProfileService.Save(ProfileService.SettingConfig.Name);
+            ProfileService.SaveSettings();
             Console.WriteLine($"自动检查更新: {(ProfileService.SettingConfig.AutoUpdate ? "ON" : "OFF")}");
         }
 
