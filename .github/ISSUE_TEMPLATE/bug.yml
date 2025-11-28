@@ -1,5 +1,5 @@
 name: Bug report
-description: Submit a bug report
+description: Submit a bug report / 提交一个 Bug 报告
 labels: ["bug"]
 title: "[Bug]: "
 body:
