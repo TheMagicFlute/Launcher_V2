@@ -34,7 +34,7 @@ namespace Launcher.App.Spec
                     foreach (XmlNode petParamNode in Spec)
                     {
                         float value;
-                        if (petParamNode.Attributes != null && petParamNode.Attributes["DragFactor"] != null && float.TryParse(petParamNode.Attributes["DragFactor"].Value, out value))
+                        if (petParamNode.Attributes is not null && petParamNode.Attributes["DragFactor"] is not null && float.TryParse(petParamNode.Attributes["DragFactor"].Value, out value))
                         {
                             this.DragFactor = value;
                         }
@@ -43,7 +43,7 @@ namespace Launcher.App.Spec
                             this.DragFactor = 0f;
                         }
 
-                        if (petParamNode.Attributes != null && petParamNode.Attributes["ForwardAccelForce"] != null && float.TryParse(petParamNode.Attributes["ForwardAccelForce"].Value, out value))
+                        if (petParamNode.Attributes is not null && petParamNode.Attributes["ForwardAccelForce"] is not null && float.TryParse(petParamNode.Attributes["ForwardAccelForce"].Value, out value))
                         {
                             this.ForwardAccelForce = value;
                         }
@@ -52,7 +52,7 @@ namespace Launcher.App.Spec
                             this.ForwardAccelForce = 0f;
                         }
 
-                        if (petParamNode.Attributes != null && petParamNode.Attributes["DriftEscapeForce"] != null && float.TryParse(petParamNode.Attributes["DriftEscapeForce"].Value, out value))
+                        if (petParamNode.Attributes is not null && petParamNode.Attributes["DriftEscapeForce"] is not null && float.TryParse(petParamNode.Attributes["DriftEscapeForce"].Value, out value))
                         {
                             this.DriftEscapeForce = value;
                         }
@@ -61,7 +61,7 @@ namespace Launcher.App.Spec
                             this.DriftEscapeForce = 0f;
                         }
 
-                        if (petParamNode.Attributes != null && petParamNode.Attributes["CornerDrawFactor"] != null && float.TryParse(petParamNode.Attributes["CornerDrawFactor"].Value, out value))
+                        if (petParamNode.Attributes is not null && petParamNode.Attributes["CornerDrawFactor"] is not null && float.TryParse(petParamNode.Attributes["CornerDrawFactor"].Value, out value))
                         {
                             this.CornerDrawFactor = value;
                         }
@@ -70,7 +70,7 @@ namespace Launcher.App.Spec
                             this.CornerDrawFactor = 0f;
                         }
 
-                        if (petParamNode.Attributes != null && petParamNode.Attributes["NormalBoosterTime"] != null && float.TryParse(petParamNode.Attributes["NormalBoosterTime"].Value, out value))
+                        if (petParamNode.Attributes is not null && petParamNode.Attributes["NormalBoosterTime"] is not null && float.TryParse(petParamNode.Attributes["NormalBoosterTime"].Value, out value))
                         {
                             this.NormalBoosterTime = value;
                         }
@@ -79,7 +79,7 @@ namespace Launcher.App.Spec
                             this.NormalBoosterTime = 0f;
                         }
 
-                        if (petParamNode.Attributes != null && petParamNode.Attributes["ItemBoosterTime"] != null && float.TryParse(petParamNode.Attributes["ItemBoosterTime"].Value, out value))
+                        if (petParamNode.Attributes is not null && petParamNode.Attributes["ItemBoosterTime"] is not null && float.TryParse(petParamNode.Attributes["ItemBoosterTime"].Value, out value))
                         {
                             this.ItemBoosterTime = value;
                         }
@@ -88,7 +88,7 @@ namespace Launcher.App.Spec
                             this.ItemBoosterTime = 0f;
                         }
 
-                        if (petParamNode.Attributes != null && petParamNode.Attributes["TeamBoosterTime"] != null && float.TryParse(petParamNode.Attributes["TeamBoosterTime"].Value, out value))
+                        if (petParamNode.Attributes is not null && petParamNode.Attributes["TeamBoosterTime"] is not null && float.TryParse(petParamNode.Attributes["TeamBoosterTime"].Value, out value))
                         {
                             this.TeamBoosterTime = value;
                         }
@@ -97,7 +97,7 @@ namespace Launcher.App.Spec
                             this.TeamBoosterTime = 0f;
                         }
 
-                        if (petParamNode.Attributes != null && petParamNode.Attributes["StartForwardAccelItem"] != null && float.TryParse(petParamNode.Attributes["StartForwardAccelItem"].Value, out value))
+                        if (petParamNode.Attributes is not null && petParamNode.Attributes["StartForwardAccelItem"] is not null && float.TryParse(petParamNode.Attributes["StartForwardAccelItem"].Value, out value))
                         {
                             this.StartForwardAccelForceItem = value;
                         }
@@ -106,7 +106,7 @@ namespace Launcher.App.Spec
                             this.StartForwardAccelForceItem = 0f;
                         }
 
-                        if (petParamNode.Attributes != null && petParamNode.Attributes["StartForwardAccelSpeed"] != null && float.TryParse(petParamNode.Attributes["StartForwardAccelSpeed"].Value, out value))
+                        if (petParamNode.Attributes is not null && petParamNode.Attributes["StartForwardAccelSpeed"] is not null && float.TryParse(petParamNode.Attributes["StartForwardAccelSpeed"].Value, out value))
                         {
                             this.StartForwardAccelForceSpeed = value;
                         }
@@ -119,6 +119,7 @@ namespace Launcher.App.Spec
                 }
             }
             Console.WriteLine($"-------------------------------------------------------------");
+            Console.WriteLine($"FlyingPet Info");
             Console.WriteLine($"FlyingPet DragFactor:{this.DragFactor}");
             Console.WriteLine($"FlyingPet ForwardAccelForce:{this.ForwardAccelForce}");
             Console.WriteLine($"FlyingPet DriftEscapeForce:{this.DriftEscapeForce}");

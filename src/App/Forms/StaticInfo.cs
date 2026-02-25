@@ -9,12 +9,12 @@ namespace Launcher.App.Forms
             InitializeComponent();
         }
 
-        public StaticInfo(string prompt, string text = "")
-            : this()
+        public void Show(string prompt, string text = "")
         {
             Text = prompt;
             Prompt_Text.Text = prompt;
             Info_Box.Text = text;
+            ShowDialog();
         }
 
         private void Clear_Info_Click(object sender, EventArgs e)

@@ -163,7 +163,7 @@ namespace Launcher.App.Profile
                 {
                     var loadedConfig = JsonHelper.DeserializeNoBom<ItemPresetConfig>(filename.ItemPresetsConfig);
 
-                    if (loadedConfig?.ItemPresets != null)
+                    if (loadedConfig?.ItemPresets is not null)
                     {
                         int count = loadedConfig.ItemPresets.Count;
 

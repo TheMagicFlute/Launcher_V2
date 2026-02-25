@@ -189,7 +189,7 @@ namespace Launcher.Library.Data
             while (p.Available > 0)
             {
                 BmlObject? bmlObject = ReadBML(p);
-                if (bmlObject != null)
+                if (bmlObject is not null)
                 {
                     BmlObjects.Add(bmlObject);
                 }
@@ -240,7 +240,7 @@ namespace Launcher.Library.Data
 
         private static void WriteBML(OutPacket p, BmlObject bml)
         {
-            p.WriteBool(bml != null);
+            p.WriteBool(bml is not null);
             bml?.Save(p);
         }
     }

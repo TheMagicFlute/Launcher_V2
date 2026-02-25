@@ -1,5 +1,4 @@
 ﻿using Launcher.Library.IO;
-using System.Linq;
 
 namespace Launcher.Library.Data
 {

@@ -422,7 +422,7 @@ namespace Launcher.App.ExcData
             TuneLists.TryAdd(Nickname, new List<Tune>());
             var TuneList = TuneLists[Nickname];
             var existingList = TuneList.FirstOrDefault(list => list.ID == id && list.SN == sn);
-            if (existingList == null)
+            if (existingList is null)
             {
                 var newList = new Tune { ID = id, SN = sn, Tune1 = tune1, Tune2 = tune2, Tune3 = tune3, Slot1 = slot1, Count1 = count1, Slot2 = slot2, Count2 = count2 };
                 TuneList.Add(newList);
@@ -451,7 +451,7 @@ namespace Launcher.App.ExcData
             PlantLists.TryAdd(Nickname, new List<Plant>());
             var PlantList = PlantLists[Nickname];
             var existingList = PlantList.FirstOrDefault(list => list.ID == id && list.SN == sn);
-            if (existingList == null)
+            if (existingList is null)
             {
                 var newList = new Plant { ID = id, SN = sn, Engine = 0, EngineID = 0, Handle = 0, HandleID = 0, Wheel = 0, WheelID = 0, Kit = 0, KitID = 0 };
                 switch (item)
@@ -511,7 +511,7 @@ namespace Launcher.App.ExcData
             LevelLists.TryAdd(Nickname, new List<Level>());
             var LevelList = LevelLists[Nickname];
             var existingList = LevelList.FirstOrDefault(list => list.ID == id && list.SN == sn);
-            if (existingList == null)
+            if (existingList is null)
             {
                 var newList = new Level { ID = id, SN = sn, Grade = level, Points = point, Level1 = v1, Level2 = v2, Level3 = v3, Level4 = v4, Effect = Effect };
                 LevelList.Add(newList);
@@ -544,7 +544,7 @@ namespace Launcher.App.ExcData
             var existing12List = Parts12List.FirstOrDefault(list => list.ID == id && list.SN == sn);
             if (Item_Cat_Id == 0)
             {
-                if (existing12List == null)
+                if (existing12List is null)
                 {
                     var newList = new Parts12 { ID = id, SN = sn, Engine = 0, Handle = 0, Wheel = 0, Booster = 0, Coating = 0, TailLamp = 0, BoosterEffect = 0, ExceedType = Item_Id };
                     Parts12List.Add(newList);
@@ -558,7 +558,7 @@ namespace Launcher.App.ExcData
             }
             else if (Item_Cat_Id == 72 || Item_Cat_Id == 73 || Item_Cat_Id == 74 || Item_Cat_Id == 75 || Item_Cat_Id == 76 || Item_Cat_Id == 77 || Item_Cat_Id == 78)
             {
-                if (existing12List == null)
+                if (existing12List is null)
                 {
                     var newList = new Parts12 { ID = id, SN = sn, Engine = 0, Handle = 0, Wheel = 0, Booster = 0, Coating = 0, TailLamp = 0, BoosterEffect = 0, ExceedType = 0 };
                     switch (Item_Cat_Id)
@@ -619,7 +619,7 @@ namespace Launcher.App.ExcData
                 return;
             }
             var existingList = PartsList.FirstOrDefault(list => list.ID == id && list.SN == sn);
-            if (existingList == null)
+            if (existingList is null)
             {
                 var newList = new Parts { ID = id, SN = sn, Engine = 0, EngineGrade = 0, EngineValue = 0, Handle = 0, HandleGrade = 0, HandleValue = 0, Wheel = 0, WheelGrade = 0, WheelValue = 0, Booster = 0, BoosterGrade = 0, BoosterValue = 0, Coating = 0, TailLamp = 0 };
                 switch (Item_Cat_Id)
@@ -699,7 +699,7 @@ namespace Launcher.App.ExcData
             Level12Lists.TryAdd(Nickname, new List<Level12>());
             var Level12List = Level12Lists[Nickname];
             var existingList = Level12List.FirstOrDefault(list => list.ID == id && list.SN == sn);
-            if (existingList == null)
+            if (existingList is null)
             {
                 var newList = new Level12 { ID = id, SN = sn, Grade = level, SkillPoints = point, Skill1 = 0, SkillGrade1 = 0, Skill2 = 0, SkillGrade2 = 0, Skill3 = 0, SkillGrade3 = 0 };
                 switch (field)

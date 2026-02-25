@@ -20,7 +20,7 @@ namespace Launcher.App.Forms
             NgsOn = new CheckBox();
             Save = new Button();
             Show_My_IP = new Button();
-            button2 = new Button();
+            Restore_IP = new Button();
             SuspendLayout();
             // 
             // AiSpeed_comboBox
@@ -68,9 +68,11 @@ namespace Launcher.App.Forms
             // PlayerName
             // 
             PlayerName.Location = new Point(55, 6);
+            PlayerName.MaxLength = 20;
             PlayerName.Name = "PlayerName";
             PlayerName.Size = new Size(114, 21);
             PlayerName.TabIndex = 1;
+            PlayerName.TextChanged += Change;
             // 
             // Name_label
             // 
@@ -85,10 +87,12 @@ namespace Launcher.App.Forms
             // ServerIP
             // 
             ServerIP.Location = new Point(55, 33);
+            ServerIP.MaxLength = 15;
             ServerIP.Name = "ServerIP";
             ServerIP.Size = new Size(114, 21);
             ServerIP.TabIndex = 2;
-            ServerIP.Text = "127.0.0.1";
+            ServerIP.TextChanged += ServerIP_TextChanged;
+            ServerIP.LostFocus += ServerIP_LostFocus;
             // 
             // IP_label
             // 
@@ -96,17 +100,18 @@ namespace Launcher.App.Forms
             IP_label.ForeColor = Color.Blue;
             IP_label.Location = new Point(7, 36);
             IP_label.Name = "IP_label";
-            IP_label.Size = new Size(23, 12);
+            IP_label.Size = new Size(35, 12);
             IP_label.TabIndex = 3;
-            IP_label.Text = "IP:";
+            IP_label.Text = "IPv4:";
             // 
             // ServerPort
             // 
             ServerPort.Location = new Point(55, 60);
+            ServerPort.MaxLength = 5;
             ServerPort.Name = "ServerPort";
             ServerPort.Size = new Size(114, 21);
             ServerPort.TabIndex = 3;
-            ServerPort.Text = "39312";
+            ServerPort.TextChanged += ServerPort_TextChanged;
             // 
             // Port_label
             // 
@@ -128,6 +133,7 @@ namespace Launcher.App.Forms
             NgsOn.TabIndex = 6;
             NgsOn.Text = "NgsOn";
             NgsOn.UseVisualStyleBackColor = true;
+            NgsOn.CheckedChanged += Change;
             // 
             // Save
             // 
@@ -149,14 +155,15 @@ namespace Launcher.App.Forms
             Show_My_IP.UseVisualStyleBackColor = true;
             Show_My_IP.Click += Show_My_IP_Click;
             // 
-            // button2
+            // Restore_IP
             // 
-            button2.Location = new Point(72, 139);
-            button2.Name = "button2";
-            button2.Size = new Size(40, 23);
-            button2.TabIndex = 9;
-            button2.Text = "管理";
-            button2.UseVisualStyleBackColor = true;
+            Restore_IP.Location = new Point(175, 31);
+            Restore_IP.Name = "Restore_IP";
+            Restore_IP.Size = new Size(86, 23);
+            Restore_IP.TabIndex = 9;
+            Restore_IP.Text = "还原IP至单机";
+            Restore_IP.UseVisualStyleBackColor = true;
+            Restore_IP.Click += Restore_IP_Click;
             // 
             // Setting
             // 
@@ -164,7 +171,7 @@ namespace Launcher.App.Forms
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
             ClientSize = new Size(273, 171);
-            Controls.Add(button2);
+            Controls.Add(Restore_IP);
             Controls.Add(Show_My_IP);
             Controls.Add(PlayerName);
             Controls.Add(Name_label);
@@ -207,6 +214,6 @@ namespace Launcher.App.Forms
         private Label Speed_label;
         private Label AiSpeed_label;
         private Button Show_My_IP;
-        private Button button2;
+        private Button Restore_IP;
     }
 }

@@ -30,11 +30,11 @@ namespace Launcher.Library.File.OldImplements
         public RhoFileStream(Rho rho, string path)
         {
             RhoFileInfo rhoFileInfo = rho.GetFile(path);
-            if (rhoFileInfo == null)
+            if (rhoFileInfo is null)
                 throw new FileNotFoundException($"File: {path} cannot be found in this rho file.", path);
             _baseFile = rhoFileInfo;
             _baseRho = rhoFileInfo.BaseRho;
-            if (_baseRho == null)
+            if (_baseRho is null)
                 throw new InvalidOperationException("Rho has been disposed.");
             _baseBlockInfo = _baseRho.GetBlockInfo(_baseFile.FileBlockIndex);
             _baseStream = _baseRho.baseStream;
@@ -59,11 +59,11 @@ namespace Launcher.Library.File.OldImplements
 
         public RhoFileStream(RhoFileInfo rhoFileInfo)
         {
-            if (rhoFileInfo == null)
+            if (rhoFileInfo is null)
                 throw new ArgumentNullException("fileInfo is null.");
             _baseFile = rhoFileInfo;
             _baseRho = rhoFileInfo.BaseRho;
-            if (_baseRho == null)
+            if (_baseRho is null)
                 throw new ArgumentException("The base rho file has been disposed.");
             _baseBlockInfo = _baseRho.GetBlockInfo(_baseFile.FileBlockIndex);
             _baseStream = _baseRho.baseStream;

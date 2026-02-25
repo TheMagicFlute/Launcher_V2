@@ -73,7 +73,7 @@ public static class MultiPlayer
     {
         int roomId = RoomManager.TryGetRoomId(nickname);
         var room = RoomManager.GetRoom(roomId);
-        if (room == null)
+        if (room is null)
         {
             Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
         }
@@ -123,7 +123,7 @@ public static class MultiPlayer
             {
                 firstTeam = ai.Team;
             }
-            Console.WriteLine("第一名 ID: {0} Team: {1}", firstId, firstTeam);
+            Console.WriteLine($"第一名 ID: {firstId} Team: {firstTeam}");
             for (int i = 0; i < 8; i++)
             {
                 if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p2)
@@ -180,7 +180,7 @@ public static class MultiPlayer
                     outPacket.WriteShort(ProfileService.ProfileConfigs[p3.Nickname].RiderItem.Set_Kart);
                     int playerRanking = room.Ranking[i];
                     int playerPoint = teamPoints[playerRanking];
-                    Console.WriteLine("Player {0} 排名 {1} 得分 {2}", p3.SlotId, playerRanking, playerPoint);
+                    Console.WriteLine($"Player {p3.SlotId} 排名 {playerRanking} 得分 {playerPoint}");
                     outPacket.WriteInt(playerRanking);
                     outPacket.WriteShort();
                     outPacket.WriteByte();
@@ -238,7 +238,7 @@ public static class MultiPlayer
                     outPacket.WriteShort(a3.Kart);
                     int AiRanking = room.Ranking[a3.SlotId];
                     int AiPoint = teamPoints[AiRanking];
-                    Console.WriteLine("AI {0} 排名 {1} 得分 {2}", a3.SlotId, AiRanking, AiPoint);
+                    Console.WriteLine($"AI {a3.SlotId} 排名 {AiRanking} 得分 {AiPoint}");
                     outPacket.WriteInt(AiRanking);
                     outPacket.WriteHexString("A0 60");
                     if (room.GameType == 3 || room.GameType == 4)
@@ -260,7 +260,7 @@ public static class MultiPlayer
                     }
                 }
             }
-            Console.WriteLine("红队得分 {0} 蓝队得分 {1}", redTeam, blueTeam);
+            Console.WriteLine($"红队得分 {redTeam} 蓝队得分 {blueTeam}");
             outPacket.WriteBytes(new byte[34]);
             outPacket.WriteHexString("FF FF FF FF 00 00 00 00 00");
             Parent.Client.Send(outPacket);
@@ -277,7 +277,7 @@ public static class MultiPlayer
 
     static short ParseShort(XAttribute attribute)
     {
-        if (attribute == null || !short.TryParse(attribute.Value, out short result))
+        if (attribute is null || !short.TryParse(attribute.Value, out short result))
         {
             return 0; // 默认值或错误处理
         }
@@ -299,9 +299,9 @@ public static class MultiPlayer
         {
             int roomId = RoomManager.TryGetRoomId(nickname);
             var room = RoomManager.GetRoom(roomId);
-            if (room == null)
+            if (room is null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
+                Console.WriteLine($"CreateRoom Failed, roomId = {roomId}");
             }
             iPacket.ReadInt();
             uint item = iPacket.ReadUInt();
@@ -334,7 +334,7 @@ public static class MultiPlayer
                                 Set_settleTrigger(Parent, nickname, filename);
                             }
                         }
-                        Console.WriteLine("GameSlotPacket, Arrivaled. Ticks = {0}", ArrivalTicks);
+                        Console.WriteLine($"GameSlotPacket Received! RoomID = {roomId} Player = {nickname} Ticks = {ArrivalTicks}");
                     }
                 }
             }
@@ -379,7 +379,7 @@ public static class MultiPlayer
                         GameSupport.AttackedSkill(Parent, nickname, type, uni, targetSkill);
                     }
                 }
-                Console.WriteLine("GameSlotPacket, Attacked. Skill = {0}", skill);
+                Console.WriteLine($"GameSlotPacket Attacked. Skill = {skill}");
             }
             else if (type == 18)
             {
@@ -399,7 +399,7 @@ public static class MultiPlayer
                         GameSupport.AddItemSkill(Parent, nickname, targetSkill);
                     }
                 }
-                Console.WriteLine("GameSlotPacket, Mapping. Skill = {0}", skill);
+                Console.WriteLine($"GameSlotPacket Mapping. Skill = {skill}");
             }
             return;
         }
@@ -407,9 +407,9 @@ public static class MultiPlayer
         {
             int roomId = RoomManager.TryGetRoomId(nickname);
             var room = RoomManager.GetRoom(roomId);
-            if (room == null)
+            if (room is null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
+                Console.WriteLine($"CreateRoom Failed, roomId = {roomId}");
             }
             var state = iPacket.ReadByte();
             //start
@@ -431,9 +431,9 @@ public static class MultiPlayer
                 }
                 room.TimeData = new Dictionary<int, uint>();
                 room.EndTicks = 0;
-                Console.WriteLine("StartTicks = {0}", StartTicks);
+                Console.WriteLine($"StartTicks = {StartTicks}");
             }
-            //finish
+            // finish
             else if (state == 2)
             {
                 iPacket.ReadInt();
@@ -449,7 +449,7 @@ public static class MultiPlayer
                 {
                     var player = RoomManager.GetPlayer(roomId, nickname);
                     room.TimeData.TryAdd(player.SlotId, time);
-                    Console.WriteLine("GameControlPacket, slotId = {0}, Time = {1}", slotId, time);
+                    Console.WriteLine($"GameControlPacket, NickName = {nickname} slotId = {slotId}, Time = {time}");
                 }
                 if (room.EndTicks == 0)
                 {
@@ -491,7 +491,7 @@ public static class MultiPlayer
             Nickname = nickname;
 
             IPEndPoint serverEndPoint = Parent.Client.Socket.LocalEndPoint as IPEndPoint;
-            if (serverEndPoint == null) return;
+            if (serverEndPoint is null) return;
 
             int length = iPacket.ReadInt();
             iPacket.ReadBytes(length);
@@ -603,7 +603,7 @@ public static class MultiPlayer
         else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqChannelMovein", 0))
         {
             IPEndPoint clientEndPoint = Parent.Client.Socket.RemoteEndPoint as IPEndPoint;
-            if (clientEndPoint == null) return;
+            if (clientEndPoint is null) return;
             string clientId = ClientManager.GetClientId(clientEndPoint);
             var ClientGroup = ClientManager.ClientGroups[clientId];
             if (ClientGroup.Nickname == "" && Nickname != "")
@@ -642,15 +642,15 @@ public static class MultiPlayer
         {
             int roomId = RoomManager.TryGetRoomId(nickname);
             var room = RoomManager.GetRoom(roomId);
-            if (room == null)
+            if (room is null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
+                Console.WriteLine($"CreateRoom Failed, RoomID = {roomId}");
             }
-            string RoomName = iPacket.ReadString();    //room name
-            Console.WriteLine("RoomName = {0}, len = {1}", RoomName, RoomName.Length);
+            string RoomName = iPacket.ReadString();
+            Console.WriteLine($"RoomName = {{{RoomName}}}, RoomName.len = {RoomName.Length}");
             string Password = iPacket.ReadString();
-            Console.WriteLine("Password = {0}, len = {1}", Password, Password.Length);
-            var unk1 = iPacket.ReadByte(); //7c
+            Console.WriteLine($"Password = {{{Password}}}, RoomName.len = {Password.Length}");
+            var unk1 = iPacket.ReadByte(); // 7c
             iPacket.ReadInt();
             var AiCount = iPacket.ReadInt();
             Console.WriteLine("AiCount = {0}", AiCount);
@@ -671,7 +671,7 @@ public static class MultiPlayer
             var roomData = roomList[nickname];
             var RoomId = RoomManager.CreateRoom();
             var Room = RoomManager.GetRoom(RoomId);
-            Console.WriteLine("CreateRoom = {0}", RoomId);
+            Console.WriteLine("CreateRoom OK, RoomID = {0}", RoomId);
             if (roomData.GameType == 3 || roomData.GameType == 4)
             {
                 bool CreateBool = RoomManager.AddPlayer(RoomId, nickname, 2, 2);
@@ -716,9 +716,9 @@ public static class MultiPlayer
         {
             int roomId = RoomManager.TryGetRoomId(nickname);
             var room = RoomManager.GetRoom(roomId);
-            if (room == null)
+            if (room is null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
+                Console.WriteLine("CreateRoom Failed, RoomID = {0}", roomId);
             }
             room.track = iPacket.ReadUInt();
             iPacket.ReadInt();
@@ -761,7 +761,7 @@ public static class MultiPlayer
             {
                 int roomId = RoomManager.TryGetRoomId(nickname);
                 var room = RoomManager.GetRoom(roomId);
-                if (room == null)
+                if (room is null)
                 {
                     Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
                 }
@@ -825,7 +825,7 @@ public static class MultiPlayer
         {
             int roomId = RoomManager.TryGetRoomId(nickname);
             var room = RoomManager.GetRoom(roomId);
-            if (room == null)
+            if (room is null)
             {
                 Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
             }
@@ -865,7 +865,7 @@ public static class MultiPlayer
         {
             int roomId = RoomManager.TryGetRoomId(nickname);
             var room = RoomManager.GetRoom(roomId);
-            if (room == null)
+            if (room is null)
             {
                 Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
             }
@@ -885,7 +885,7 @@ public static class MultiPlayer
         {
             int roomId = RoomManager.TryGetRoomId(nickname);
             var room = RoomManager.GetRoom(roomId);
-            if (room == null)
+            if (room is null)
             {
                 Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
             }
@@ -922,12 +922,12 @@ public static class MultiPlayer
         {
             int roomId = RoomManager.TryGetRoomId(nickname);
             var room = RoomManager.GetRoom(roomId);
-            if (room == null)
+            if (room is null)
             {
                 Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
             }
             var player = RoomManager.GetPlayer(roomId, nickname);
-            if (player == null)
+            if (player is null)
             {
                 Console.WriteLine("GetPlayer Failed, roomId = {0}, nickname = {1}", roomId, nickname);
                 return;
@@ -995,12 +995,12 @@ public static class MultiPlayer
         int roomId = RoomManager.TryGetRoomId(nickname);
         Console.WriteLine("GrSlotDataPacket, roomId = {0}", roomId);
         var room = RoomManager.GetRoom(roomId);
-        if (room == null)
+        if (room is null)
         {
             Console.WriteLine("GetRoom Failed, roomId = {0}", roomId);
         }
         var player = RoomManager.GetPlayer(roomId, nickname);
-        if (player == null)
+        if (player is null)
         {
             Console.WriteLine("GetPlayer Failed, roomId = {0}, nickname = {1}", roomId, nickname);
         }
@@ -1016,7 +1016,7 @@ public static class MultiPlayer
         for (int i = 0; i < 4; i++) outPacket.WriteInt();
 
         /* ---- Player ---- */
-        Console.WriteLine($"PlayerCount = {room.GetPlayerCount()}");
+        Console.WriteLine($"Player Count = {room.GetPlayerCount()}");
         for (int i = 0; i < 8; i++)
         {
             if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p)
@@ -1135,7 +1135,7 @@ public static class MultiPlayer
     {
         int roomId = RoomManager.TryGetRoomId(nickname);
         var room = RoomManager.GetRoom(roomId);
-        if (room == null)
+        if (room is null)
         {
             Console.WriteLine("GetRoom Failed, roomId = {0}", roomId);
         }
@@ -1209,7 +1209,7 @@ public static class MultiPlayer
     static void AddAi(SessionGroup Parent, int roomId, int Id)
     {
         var room = RoomManager.GetRoom(roomId);
-        if (room == null)
+        if (room is null)
         {
             Console.WriteLine("GetRoom Failed, roomId = {0}", roomId);
         }

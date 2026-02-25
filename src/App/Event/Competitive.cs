@@ -23,7 +23,7 @@ namespace Launcher.App.Event
         // 保存数据，如果Track重复则比较Time，Time小则替换
         public void SaveData(string Nickname, CompetitiveData data)
         {
-            if (data == null)
+            if (data is null)
                 throw new ArgumentNullException(nameof(data));
 
             if (!FileName.FileNames.ContainsKey(Nickname))
@@ -39,7 +39,7 @@ namespace Launcher.App.Event
 
             // 查找是否存在相同的Track
             var existingData = CompetitiveList.FirstOrDefault(Competitive => Competitive.Track == data.Track);
-            if (existingData != null)
+            if (existingData is not null)
             {
                 // 存在相同Track，比较Time
                 if (data.Time < existingData.Time)
@@ -92,7 +92,7 @@ namespace Launcher.App.Event
                     .FirstOrDefault(competitive =>
                         IsTimeInPeriod(now, competitive.Attribute("openPeriod").Value));
 
-                if (currentCompetitive == null)
+                if (currentCompetitive is null)
                 {
                     Console.WriteLine("未找到当前时间所在的Competitive周期");
                     return new List<string>();
@@ -110,7 +110,7 @@ namespace Launcher.App.Event
                     .FirstOrDefault(set =>
                         set.Attribute("setId").Value == weekNumber.ToString());
 
-                if (targetSet == null)
+                if (targetSet is null)
                 {
                     Console.WriteLine($"未找到setId为{weekNumber}的Set节点");
                     return new List<string>();

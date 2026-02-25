@@ -17,49 +17,48 @@ namespace Launcher.App.Server
 {
     public class ClientSession : Session
     {
-        public SessionGroup Parent
-        {
-            get;
-            set;
-        }
+        public SessionGroup Parent { get; set; }
 
-        public ClientSession(SessionGroup parent, System.Net.Sockets.Socket socket) : base(socket)
-        {
-            this.Parent = parent;
-        }
+        public ClientSession(SessionGroup parent, System.Net.Sockets.Socket socket)
+            : base(socket) { this.Parent = parent; }
 
-        Dictionary<string, uint> Time = new Dictionary<string, uint>();
+        /// <summary>
+        /// 玩家的对局时间
+        /// </summary>
+        private Dictionary<string, uint> Time = new();
 
-        public override void OnDisconnect()
-        {
-            this.Parent.Client.Disconnect();
-        }
+        /// <summary>
+        /// 收到的包计数
+        /// </summary>
+
+        private ulong PacketCount = 0;
+
+        public override void OnDisconnect() { this.Parent.Client.Disconnect(); }
 
         public override void OnPacket(InPacket iPacket)
         {
             int ALLnum;
             lock (this.Parent.m_lock)
             {
-                IPEndPoint clientEndPoint = Parent.Client.Socket.RemoteEndPoint as IPEndPoint;
-                if (clientEndPoint == null) return;
+                IPEndPoint? clientEndPoint = Parent.Client.Socket.RemoteEndPoint as IPEndPoint;
+                if (clientEndPoint is null)
+                    return;
                 string clientId = ClientManager.GetClientId(clientEndPoint);
-                var ClientGroup = ClientManager.ClientGroups[clientId];
+                ClientGroup? ClientGroup = ClientManager.ClientGroups[clientId];
                 string Nickname = ClientGroup.Nickname;
                 uint UserNO = Adler32Helper.GenerateAdler32_ASCII(Nickname, 0);
                 iPacket.Position = 0;
-                uint hash = iPacket.ReadUInt();
+                uint hash = iPacket.ReadUInt(); // 包名哈希值
                 if (hash != Adler32Helper.GenerateAdler32_ASCII("PqServerSideUdpBindCheck", 0))
                 {
-                    string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    Console.WriteLine($"[{currentTime}][{Nickname}] " + (PacketName)hash + ": " + BitConverter.ToString(iPacket.ToArray()).Replace("-", " "));
+                    Console.WriteLine($"[{++PacketCount}][{DateTime.Now:yyyy-MM-dd HH:mm:ss}][{UserNO}({Nickname})]{(PacketName)hash}: {BitConverter.ToString(iPacket.ToArray()).Replace("-", " ")}");
                 }
                 if (hash == Adler32Helper.GenerateAdler32_ASCII("PqCnAuthenLogin", 0))
                 {
-                    iPacket.ReadInt();
-                    iPacket.ReadInt();
-                    string dataPacket = Base64Helper.Decode(iPacket.ReadString(true));
-                    DataPacket packet = JsonHelper.Deserialize<DataPacket>(dataPacket);
-                    if (ClientManager.HasClientWithNickname(packet.Nickname))
+                    _ = iPacket.ReadInt();
+                    _ = iPacket.ReadInt();
+                    DataPacket packet = JsonHelper.Deserialize<DataPacket>(Base64Helper.Decode(iPacket.ReadString(true)));
+                    if (ClientManager.HasClientWithNickname(packet.Nickname)) // 曾登录过
                     {
                         using (OutPacket outPacket = new OutPacket("PrCnAuthenLogin"))
                         {
@@ -70,8 +69,9 @@ namespace Launcher.App.Server
                             this.Parent.Client.Send(outPacket);
                         }
                     }
-                    else
+                    else // 该用户未曾登陆过
                     {
+                        // 注册
                         Nickname = packet.Nickname;
                         ClientGroup.Nickname = packet.Nickname;
                         FileName.Load(packet.Nickname);
@@ -87,13 +87,9 @@ namespace Launcher.App.Server
                     long dTicks = MultiPlayer.GetUpTime();
                     long timeTicks = packet.TimeTicks + 10000;
                     if (MultiPlayer.diff.ContainsKey(packet.Nickname))
-                    {
                         MultiPlayer.diff[packet.Nickname] = dTicks - timeTicks;
-                    }
                     else
-                    {
                         MultiPlayer.diff.Add(packet.Nickname, dTicks - timeTicks);
-                    }
                     Console.WriteLine($"[{packet.Nickname}] diff = {MultiPlayer.diff[packet.Nickname]}");
                     ProfileService.ProfileConfigs[packet.Nickname].Rider.Client = clientId;
                     ProfileService.Save(packet.Nickname);
@@ -101,15 +97,30 @@ namespace Launcher.App.Server
                 }
                 if (hash != Adler32Helper.GenerateAdler32(Encoding.ASCII.GetBytes("PcReportRaidOccur"), 0) && hash != Adler32Helper.GenerateAdler32(Encoding.ASCII.GetBytes("PqGameReportMyBadUdp"), 0))
                 {
-                    if (hash == Adler32Helper.GenerateAdler32_ASCII("GrRiderTalkPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqEnterMagicHatPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoPingRequestPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventInitPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqCountdownBoxPeriodPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqVipGradeCheck", 0))
+                    if (hash == Adler32Helper.GenerateAdler32_ASCII("GrRiderTalkPacket", 0)
+                     || hash == Adler32Helper.GenerateAdler32_ASCII("PqEnterMagicHatPacket", 0)
+                     || hash == Adler32Helper.GenerateAdler32_ASCII("LoPingRequestPacket", 0)
+                     || hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventInitPacket", 0)
+                     || hash == Adler32Helper.GenerateAdler32_ASCII("PqCountdownBoxPeriodPacket", 0)
+                     || hash == Adler32Helper.GenerateAdler32_ASCII("PqVipGradeCheck", 0))
                     {
                         return;
                     }
-                    else if (hash == Adler32Helper.GenerateAdler32_ASCII("LoRqUpdateRiderSchoolDataPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("RmRiderTalkPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqNeedTimerGiftEvent", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("GameBoosterAddPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqCheckReplayItemPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqGetRecommandChatServerInfo", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoCheckLoginEvent", 0))
+                    else if (hash == Adler32Helper.GenerateAdler32_ASCII("LoRqUpdateRiderSchoolDataPacket", 0)
+                          || hash == Adler32Helper.GenerateAdler32_ASCII("RmRiderTalkPacket", 0)
+                          || hash == Adler32Helper.GenerateAdler32_ASCII("PqNeedTimerGiftEvent", 0)
+                          || hash == Adler32Helper.GenerateAdler32_ASCII("GameBoosterAddPacket", 0)
+                          || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqCheckReplayItemPacket", 0)
+                          || hash == Adler32Helper.GenerateAdler32_ASCII("PqGetRecommandChatServerInfo", 0)
+                          || hash == Adler32Helper.GenerateAdler32_ASCII("LoCheckLoginEvent", 0))
                     {
                         return;
                     }
-                    else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqBlockWordLogPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqWriteActionLogPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventTimerPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("VipPlaytimeCheck", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqEventRewardPacket", 0))
+                    else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqBlockWordLogPacket", 0)
+                          || hash == Adler32Helper.GenerateAdler32_ASCII("PqWriteActionLogPacket", 0)
+                          || hash == Adler32Helper.GenerateAdler32_ASCII("PqAddTimeEventTimerPacket", 0)
+                          || hash == Adler32Helper.GenerateAdler32_ASCII("VipPlaytimeCheck", 0)
+                          || hash == Adler32Helper.GenerateAdler32_ASCII("LoRqEventRewardPacket", 0))
                     {
                         //PqGetRecommandChatServerInfo = 라이더 챗
                         return;
@@ -134,11 +145,21 @@ namespace Launcher.App.Server
                             this.Parent.Client.Send(outPacket);
                         }
                         var manager = new CompetitiveDataManager();
-                        CompleteTrackScoreCalculator calculator = new CompleteTrackScoreCalculator();
+                        CompleteTrackScoreCalculator calculator = new();
                         var scores = calculator.CalculateTrackScoreDetails(Track, Time[Nickname], Booster, Crash, TimeAttack.TrackDictionary);
-                        if (scores != null)
+                        if (scores is not null)
                         {
-                            var data = new CompetitiveData { Track = Track, Kart = Kart, Time = Time[Nickname], Booster = Booster, BoosterPoint = scores.BoostScore, Crash = Crash, CrashPoint = scores.CrashScore, Point = scores.TotalScore };
+                            var data = new CompetitiveData
+                            {
+                                Track = Track,
+                                Kart = Kart,
+                                Time = Time[Nickname],
+                                Booster = Booster,
+                                BoosterPoint = scores.BoostScore,
+                                Crash = Crash,
+                                CrashPoint = scores.CrashScore,
+                                Point = scores.TotalScore
+                            };
                             manager.SaveData(Nickname, data);
                         }
                         using (OutPacket outPacket = new OutPacket("PrGetCompetitiveSlotInfo"))
@@ -207,6 +228,7 @@ namespace Launcher.App.Server
                         Console.WriteLine("PlaneCheck: {0}, Total: {1}, Max: {2}, Dist: {3}", PlaneCheck, this.Parent.TotalSendPlaneCount, this.Parent.SendPlaneCount, single3);
                         return;
                     }
+                    /// TODO 重做重命名事件
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("SpRqRenameRidPacket", 0))
                     {
                         var nickname = iPacket.ReadString(false);
@@ -346,7 +368,7 @@ namespace Launcher.App.Server
                                 outPacket.WriteString(ProfileService.ProfileConfigs[Nickname].Rider.Card);
                                 outPacket.WriteUInt(ProfileService.ProfileConfigs[Nickname].Rider.RP);
                                 outPacket.WriteInt(0);
-                                outPacket.WriteByte(6);//Licenses
+                                outPacket.WriteByte(6); // Licenses
                                 outPacket.WriteUShort((ushort)RouterListener.DataTime()[0]);
                                 outPacket.WriteUShort((ushort)RouterListener.DataTime()[1]);
                                 outPacket.WriteBytes(new byte[17]);
@@ -503,11 +525,7 @@ namespace Launcher.App.Server
                             outPacket.WriteInt(0);
                             this.Parent.Client.Send(outPacket);
                         }
-                        using (OutPacket outPacket = new OutPacket("PcSlaveNotice"))
-                        {
-                            outPacket.WriteString($"单机版完全免费, GitHub: https://github.com/{Constants.Owner}/{Constants.Repo}");
-                            this.Parent.Client.Send(outPacket);
-                        }
+                        GameSupport.PcSlaveNotice(Parent, Nickname, $"单机版完全免费, GitHub: {Constants.GH_REPO_URL}");
                         return;
                     }
                     else if (hash == Adler32Helper.GenerateAdler32_ASCII("ChReRqEnterMyRoomPacket", 0) || hash == Adler32Helper.GenerateAdler32_ASCII("ChRqEnterRandomMyRoomPacket", 0))
@@ -873,7 +891,7 @@ namespace Launcher.App.Server
                         }
                         var LevelList = KartExcData.LevelLists[Nickname];
                         var existingLevelList = LevelList.FirstOrDefault(level => level.ID == Kart && level.SN == SN);
-                        if (existingLevelList == null)
+                        if (existingLevelList is null)
                         {
                             pointleft = (short)(35 - v1 - v2 - v3 - v4);
                             KartExcData.AddLevelList(Nickname, Kart, SN, 5, pointleft, v1, v2, v3, v4, 0);
@@ -925,7 +943,7 @@ namespace Launcher.App.Server
                             outPacket.WriteInt(1);
                             outPacket.WriteShort(Kart);
                             outPacket.WriteShort(SN);
-                            if (existingLevelList != null)
+                            if (existingLevelList is not null)
                             {
                                 outPacket.WriteShort(existingLevelList.Grade);
                                 outPacket.WriteShort(existingLevelList.Points);
@@ -970,11 +988,7 @@ namespace Launcher.App.Server
                             outPacket.WriteHexString("00 00 00 00 FF FF 00 00 00 00 00 00 00 00");
                             this.Parent.Client.Send(outPacket);
                         }
-                        using (OutPacket outPacket = new OutPacket("PcSlaveNotice"))
-                        {
-                            outPacket.WriteString("使用粒子激活器R直接获得启变佳！");
-                            this.Parent.Client.Send(outPacket);
-                        }
+                        GameSupport.PcSlaveNotice(Parent, Nickname, "使用 粒子激活器 R 可直接获得启变佳!");
                         KartExcData.AddTuneList(Nickname, Kart, KartSN, 0, 0, 0, -1, 0, -1, 0);
                         return;
                     }
@@ -989,7 +1003,7 @@ namespace Launcher.App.Server
                         Random random = new Random();
                         var TuneList = KartExcData.TuneLists[Nickname];
                         var existingList = TuneList.FirstOrDefault(tune => tune.ID == Kart && tune.SN == KartSN);
-                        if (existingList != null)
+                        if (existingList is not null)
                         {
                             if (Item == 5)
                             {
@@ -1113,7 +1127,7 @@ namespace Launcher.App.Server
 
                         var TuneList = KartExcData.TuneLists[Nickname];
                         var existingList = TuneList.FirstOrDefault(tune => tune.ID == Kart && tune.SN == KartSN);
-                        if (existingList != null)
+                        if (existingList is not null)
                         {
                             using (OutPacket outPacket = new OutPacket("PrUseProtectSpannerItem"))
                             {
@@ -1170,7 +1184,7 @@ namespace Launcher.App.Server
 
                         var TuneList = KartExcData.TuneLists[Nickname];
                         var existingList = TuneList.FirstOrDefault(tune => tune.ID == Kart && tune.SN == KartSN);
-                        if (existingList != null)
+                        if (existingList is not null)
                         {
                             using (OutPacket outPacket = new OutPacket("PrUseResetSocketItem"))
                             {
@@ -2552,7 +2566,7 @@ namespace Launcher.App.Server
                             XmlDocument doc = new XmlDocument();
                             doc.Load(FileName.NewKart_LoadFile);
                             XmlElement elementToRemove = doc.SelectSingleNode("//Kart[@id='" + ItemID + "' and @sn='" + SN + "']") as XmlElement;
-                            if (elementToRemove != null)
+                            if (elementToRemove is not null)
                             {
                                 elementToRemove.ParentNode.RemoveChild(elementToRemove);
                             }
@@ -2574,7 +2588,7 @@ namespace Launcher.App.Server
                     {
                         using (OutPacket outPacket = new OutPacket("PrShopCashPage"))
                         {
-                            outPacket.WriteString($"https://github.com/{Constants.Owner}/{Constants.Repo}/releases");
+                            outPacket.WriteString(Constants.SHOP_PAGE);
                             this.Parent.Client.Send(outPacket);
                         }
                         return;
@@ -2585,7 +2599,7 @@ namespace Launcher.App.Server
                         using (OutPacket outPacket = new OutPacket("PrShopURLPage"))
                         {
                             outPacket.WriteInt(URLPageType);
-                            outPacket.WriteString($"https://github.com/{Constants.Owner}/{Constants.Repo}/releases");
+                            outPacket.WriteString(Constants.SHOP_PAGE);
                             this.Parent.Client.Send(outPacket);
                         }
                         return;
@@ -2883,7 +2897,7 @@ namespace Launcher.App.Server
                         GameDataReset.DataReset(Nickname);
 
                         IPEndPoint serverEndPoint = Parent.Client.Socket.LocalEndPoint as IPEndPoint;
-                        if (serverEndPoint == null) return;
+                        if (serverEndPoint is null) return;
 
                         bool PcMsgPassport = true;
 
@@ -2951,9 +2965,9 @@ namespace Launcher.App.Server
                             outPacket.WriteString("name");
                             outPacket.WriteString("endingBanner");
                             outPacket.WriteString("enable");
-                            outPacket.WriteString("false");
+                            outPacket.WriteString("true");
                             outPacket.WriteString("value");
-                            outPacket.WriteString($"https://github.com/{Constants.Owner}/{Constants.Repo}/releases");
+                            outPacket.WriteString(Constants.ENDING_BANNER);
                             outPacket.WriteInt(0);
                             outPacket.WriteString("content");
                             outPacket.WriteInt(0);
@@ -3124,7 +3138,7 @@ namespace Launcher.App.Server
                         uint[] money = new uint[] { 0, 10, 12, 15, 20, 30 };
                         var Level12List = KartExcData.Level12Lists[Nickname];
                         var existingParts = Level12List.FirstOrDefault(level12 => level12.ID == kart && level12.SN == sn);
-                        if (existingParts != null)
+                        if (existingParts is not null)
                         {
                             using (OutPacket outPacket = new OutPacket("PrKart12TuningLevelUp"))
                             {
@@ -3210,7 +3224,7 @@ namespace Launcher.App.Server
                         short field = iPacket.ReadShort();
                         var Level12List = KartExcData.Level12Lists[Nickname];
                         var existingParts = Level12List.FirstOrDefault(level12 => level12.ID == kart && level12.SN == sn);
-                        if (existingParts != null)
+                        if (existingParts is not null)
                         {
                             using (OutPacket outPacket = new OutPacket("PrKart12RestictTuningSkill"))
                             {
@@ -3269,7 +3283,7 @@ namespace Launcher.App.Server
                         byte AddDel = iPacket.ReadByte();
                         var Level12List = KartExcData.Level12Lists[Nickname];
                         var existingParts = Level12List.FirstOrDefault(level12 => level12.ID == kart && level12.SN == sn);
-                        if (existingParts != null)
+                        if (existingParts is not null)
                         {
                             short point = existingParts.SkillPoints;
                             short skilllevel = 0;
@@ -3405,7 +3419,7 @@ namespace Launcher.App.Server
                         int ExceedType1 = 0;
                         KartExcData.Parts12Lists.TryAdd(Nickname, new List<Parts12>());
                         var targetPart = KartExcData.Parts12Lists[Nickname].FirstOrDefault(parts => parts.ID == kart1 && parts.SN == sn1);
-                        if (targetPart != null)
+                        if (targetPart is not null)
                         {
                             ExceedType1 = targetPart.ExceedType;
                         }
@@ -3631,7 +3645,7 @@ namespace Launcher.App.Server
                         short id1 = iPacket.ReadShort();
                         short id2 = iPacket.ReadShort();
                         var ItemPreset = ItemPresetsService.ItemPresetConfigs[Nickname].ItemPresets.FirstOrDefault(ItemPreset => ItemPreset.ID == id1 && ItemPreset.ID == id2);
-                        if (ItemPreset != null)
+                        if (ItemPreset is not null)
                         {
                             ItemPreset.Badge = iPacket.ReadByte();
                             iPacket.ReadBytes(8);

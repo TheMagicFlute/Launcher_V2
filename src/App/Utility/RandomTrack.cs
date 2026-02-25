@@ -121,7 +121,7 @@ namespace Launcher.App.Utility
                 XDocument doc = randomTrack;
                 var TrackSet = doc.Descendants("RandomTrackSet")
                     .FirstOrDefault(rts => (string)rts.Attribute("gameType") == RandomTrackGameType && (string)rts.Attribute("randomType") == RandomTrackSetRandomTrack);
-                if (TrackSet != null)
+                if (TrackSet is not null)
                 {
                     Random random = new Random();
                     var randomTrack = TrackSet.Descendants("track").ElementAt(random.Next(TrackSet.Descendants("track").Count()));
@@ -131,7 +131,7 @@ namespace Launcher.App.Utility
                 {
                     var TrackList = doc.Descendants("RandomTrackList")
                         .FirstOrDefault(rts => (string)rts.Attribute("randomType") == RandomTrackSetRandomTrack);
-                    if (TrackList != null)
+                    if (TrackList is not null)
                     {
                         Random random = new Random();
                         var randomTrack = TrackList.Descendants("track").ElementAt(random.Next(TrackList.Descendants("track").Count()));

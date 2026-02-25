@@ -1,5 +1,4 @@
 using Launcher.App.Constant;
-using Launcher.App.Forms;
 using Launcher.App.Logger;
 using Launcher.App.Profile;
 using Launcher.App.Utility;
@@ -45,16 +44,6 @@ namespace Launcher.App
         /// </summary>
         public static IntPtr consoleHandle;
 
-        /// <summary>
-        /// 游戏所在的目录
-        /// </summary>
-        public static string RootDirectory = FileName.AppDir;
-
-        /// <summary>
-        /// 当前系统架构 小写字符串 目前仅有 x64 x86 arm64
-        /// </summary>
-        public static string architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
-
         // ----- Form Dialogs -----
         public static Forms.MainForm LauncherDlg;
         public static Forms.GetKart GetKartDlg;
@@ -83,7 +72,7 @@ namespace Launcher.App
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             SetAdaptiveConsoleEncoding();
 
-            if (args != null && args.Length > 1)
+            if (args is not null && args.Length > 1)
             {
                 // remove the 1st arg (which is the path to the program)
                 // then process the last args
@@ -114,9 +103,11 @@ namespace Launcher.App
 
             if (Constants.DBG)
                 Console.Write("[DEBUG] ");
-            Console.WriteLine($"中国跑跑卡丁车单机启动器 {Constants.Version} for {architecture}" +
+            if (Constants.ADMIN)
+                Console.Write("[ADMIN] ");
+            Console.WriteLine($"中国跑跑卡丁车单机启动器 {Constants.VERSION} for {Constants.ARCHITECTURE}" +
                 $" - built on {File.GetLastWriteTime(Process.GetCurrentProcess().MainModule.FileName):yyyy/MM/dd HH:mm:ss K}, #{ThisAssembly.Git.Commit}");
-            string args_string = args != null && args.Length > 0 ? string.Join(' ', args) : "null";
+            string args_string = args is not null && args.Length > 0 ? string.Join(' ', args) : "null";
             Console.WriteLine($"启动参数/开关: [{args_string}]");
             Utils.PrintDivLine();
 
@@ -129,11 +120,12 @@ namespace Launcher.App
                 ProfileService.Save(ProfileService.SettingConfig.Name);
             }
             Console.WriteLine($"最后一次联网打开地区为: {ProfileService.SettingConfig.CC}");
+            Utils.PrintDivLine();
 
             // auto check update
             if (ProfileService.SettingConfig.AutoUpdate)
             {
-                new Updater().ShowDialog();
+                new Forms.Updater().ShowDialog();
                 Utils.PrintDivLine();
             }
 

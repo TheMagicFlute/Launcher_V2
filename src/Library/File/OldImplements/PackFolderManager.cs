@@ -8,8 +8,12 @@ namespace Launcher.Library.File.OldImplements
 {
     public class PackFolderManager
     {
+        public PackFolderManager() { }
+
         public bool Initizated { get; private set; } = false;
+
         public CountryCode regionCode = CountryCode.None;
+
         private struct ProcessObj
         {
             public string Path;
@@ -17,11 +21,6 @@ namespace Launcher.Library.File.OldImplements
             public BinaryXmlTag Obj;
 
             public PackFolderInfo Parent;
-        }
-
-        public PackFolderManager()
-        {
-
         }
 
         //private List<PackFolderInfo> RootFolder { get; init; } = new List<PackFolderInfo>();
@@ -49,7 +48,7 @@ namespace Launcher.Library.File.OldImplements
             Queue<ProcessObj> ProcessQue = new Queue<ProcessObj>();
             if (rootTag.Name != "PackFolder" || rootTag.GetAttribute("name") != "KartRider")
             {
-                throw new NotSupportedException($"aaa.pk file not support.");
+                throw new NotSupportedException($"aaa.pk file is not supported.");
             }
             foreach (BinaryXmlTag subtag in rootTag.Children)
             {
@@ -114,7 +113,7 @@ namespace Launcher.Library.File.OldImplements
                         }
                         Rho rhoFile = new Rho($"{fileInfo.DirectoryName}\\{fileName}", rhoFileKey);
                         Queue<(PackFolderInfo, RhoDirectory)> dirQue = new Queue<(PackFolderInfo, RhoDirectory)>();
-                        RhoDirectory rootDir = rhoFile.RootDirectory;
+                        RhoDirectory rootDir = rhoFile.GameDir;
                         dirQue.Enqueue((NewFolder, rootDir));
                         while (dirQue.Count > 0)
                         {
@@ -236,7 +235,7 @@ namespace Launcher.Library.File.OldImplements
                 ParentFolder = null
             };
             RootFolder.Folders.Add(rootFolder);
-            dirQue.Enqueue((rootFolder, rho.RootDirectory));
+            dirQue.Enqueue((rootFolder, rho.GameDir));
 
             while (dirQue.Count > 0)
             {
@@ -306,7 +305,7 @@ namespace Launcher.Library.File.OldImplements
                     else
                     {
                         PackFolderInfo packFolderInfo2 = packFolderInfo.Folders.Find((x) => x.FolderName == part);
-                        if ((object)packFolderInfo2 == null)
+                        if ((object)packFolderInfo2 is null)
                         {
                             List<PackFolderInfo> folders = packFolderInfo.Folders;
                             PackFolderInfo obj = new PackFolderInfo
@@ -344,7 +343,7 @@ namespace Launcher.Library.File.OldImplements
                     ParentFolder = null
                 };
                 RootFolder.Folders.Add(rootFolder);
-                dirQue.Enqueue((rootFolder, rho.RootDirectory));
+                dirQue.Enqueue((rootFolder, rho.GameDir));
 
                 while (dirQue.Count > 0)
                 {
@@ -431,7 +430,7 @@ namespace Launcher.Library.File.OldImplements
             int depth = path_sp.Length;
             foreach (string path in path_sp)
             {
-                if (currentFolder == null)
+                if (currentFolder is null)
                     return null;
                 if (depth == 1)
                     return currentFolder.Files.ToArray();
@@ -454,7 +453,7 @@ namespace Launcher.Library.File.OldImplements
             List<PackFileInfo> find_files = new List<PackFileInfo>();
             foreach (string path in path_sp)
             {
-                if (currentFolder == null)
+                if (currentFolder is null)
                     return null;
                 if (depth == 1)
                 {

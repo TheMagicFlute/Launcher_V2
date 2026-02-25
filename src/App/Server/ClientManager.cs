@@ -28,7 +28,7 @@ public static class ClientManager
     public static void AddClient(SessionGroup session)
     {
         IPEndPoint clientEndPoint = session.Client.Socket.RemoteEndPoint as IPEndPoint;
-        if (clientEndPoint == null) return;
+        if (clientEndPoint is null) return;
 
         string clientId = GetClientId(clientEndPoint);
         _clientSessions.TryAdd(clientId, session);
@@ -50,7 +50,7 @@ public static class ClientManager
     public static void RemoveClient(Socket clientSocket)
     {
         IPEndPoint clientEndPoint = clientSocket.RemoteEndPoint as IPEndPoint;
-        if (clientEndPoint == null) return;
+        if (clientEndPoint is null) return;
 
         string clientId = GetClientId(clientEndPoint);
         if (_clientSessions.TryRemove(clientId, out _))

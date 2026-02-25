@@ -1,5 +1,4 @@
-﻿
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -9,7 +8,7 @@
     <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
     <ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
 
-    <!--PublishAot>true</PublishAot-->
+    <PublishAot>false</PublishAot>
     <PublishSingleFile>true</PublishSingleFile>
     <PublishReadyToRun>true</PublishReadyToRun>
 
@@ -19,18 +18,17 @@
     <RootNamespace>Launcher</RootNamespace>
     <ApplicationIcon>Properties\favicon.ico</ApplicationIcon>
 
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <NuGetAudit>False</NuGetAudit>
+    <NuGetAudit>false</NuGetAudit>
 
     <!-- 启用应用程序清单 -->
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
-    <!-- 可选: 如果需要在调试时也以管理员身份运行 -->
     <EnableClickOnceSecuritySettings>true</EnableClickOnceSecuritySettings>
 
     <!-- Versioning & Assembly Information -->
     <AssemblyName>Launcher</AssemblyName>
-	  <AssemblyTitle>Launcher</AssemblyTitle>
+    <AssemblyTitle>Launcher</AssemblyTitle>
     <Description>CN Kart Offline Launcher</Description>
     <GitVersion>false</GitVersion>
     <Version>1.0.0</Version>
@@ -51,27 +49,41 @@
     <UserSecretsId>14b62e2f-0b80-4024-9d73-02b052518861</UserSecretsId>
   </PropertyGroup>
 
+  <!-- Debug 配置：启用符号和可移植 PDB，禁用单文件/ReadyToRun（调试期间） -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>9999</WarningLevel>
     <PublishDir>.\</PublishDir>
-    <DebugType>none</DebugType>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <PublishSingleFile>false</PublishSingleFile>
+    <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <WarningLevel>9999</WarningLevel>
     <PublishDir>.\</PublishDir>
-    <DebugType>none</DebugType>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <PublishSingleFile>false</PublishSingleFile>
+    <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <WarningLevel>9999</WarningLevel>
     <PublishDir>.\</PublishDir>
-    <DebugType>none</DebugType>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <PublishSingleFile>false</PublishSingleFile>
+    <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">
     <WarningLevel>9999</WarningLevel>
     <PublishDir>.\</PublishDir>
-    <DebugType>none</DebugType>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <PublishSingleFile>false</PublishSingleFile>
+    <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
-	
+
+  <!-- Release 配置（按需保留无符号或开启符号） -->
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <WarningLevel>9999</WarningLevel>
     <PublishDir>.\</PublishDir>

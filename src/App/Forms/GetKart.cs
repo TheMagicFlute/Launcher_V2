@@ -86,7 +86,7 @@ namespace Launcher.App.Forms
 
                     // 检查是否已存在相同的记录
                     var existingItem = newList.FirstOrDefault(item => item.ItemType == Item_Type && item.ItemID == Item_Code);
-                    if (existingItem != null)
+                    if (existingItem is not null)
                     {
                         // 增加数量
                         existingItem.Count++;
@@ -134,7 +134,7 @@ namespace Launcher.App.Forms
 
         private void ItemType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (ItemType.SelectedItem != null)
+            if (ItemType.SelectedItem is not null)
             {
                 Item_Type = (ushort)ItemType.SelectedItem;
                 ItemID.Items.Clear();
@@ -151,7 +151,7 @@ namespace Launcher.App.Forms
 
         private void ItemID_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (ItemType.SelectedItem != null && ItemID.SelectedItem != null)
+            if (ItemType.SelectedItem is not null && ItemID.SelectedItem is not null)
             {
                 ushort selectedOuterKey = (ushort)ItemType.SelectedItem;
                 string selectedInnerValue = ItemID.SelectedItem.ToString();

@@ -17,11 +17,11 @@ namespace Launcher.App.Utility
         {
             try
             {
-                PackFolderManager packFolderManager = new PackFolderManager();
+                PackFolderManager packFolderManager = new();
                 packFolderManager.OpenDataFolder(input);
                 string regionCode = packFolderManager.regionCode.ToString().ToLower();
 
-                Queue<PackFolderInfo> packFolderInfoQueue = new Queue<PackFolderInfo>();
+                Queue<PackFolderInfo> packFolderInfoQueue = new();
                 packFolderInfoQueue.Enqueue(packFolderManager.GetRootFolder());
                 while (packFolderInfoQueue.Count > 0)
                 {
@@ -32,7 +32,7 @@ namespace Launcher.App.Utility
                         if (fullName.Contains("flyingPet") && fullName.Contains($"param@{regionCode}.bml"))
                         {
                             Console.WriteLine(fullName);
-                            string name = fullName.Substring(10, fullName.Length - 23);
+                            string name = fullName[10..^13];
                             if (!FlyingPet.flyingSpec.ContainsKey(name))
                             {
                                 byte[] data = packFileInfo.GetData();
@@ -87,7 +87,7 @@ namespace Launcher.App.Utility
                             {
                                 XDocument doc = XDocument.Load(stream);
 
-                                var kartsWithName = doc.Descendants("kart").Where(kart => kart.Attribute("name") != null);
+                                var kartsWithName = doc.Descendants("kart").Where(kart => kart.Attribute("name") is not null);
                                 if (kartsWithName.Count() > 0)
                                 {
                                     foreach (var kart in kartsWithName)
@@ -101,7 +101,7 @@ namespace Launcher.App.Utility
                                     }
                                 }
 
-                                var flyingWithName = doc.Descendants("flyingPet").Where(kart => kart.Attribute("name") != null);
+                                var flyingWithName = doc.Descendants("flyingPet").Where(kart => kart.Attribute("name") is not null);
                                 if (flyingWithName.Count() > 0)
                                 {
                                     foreach (var flyingPet in flyingWithName)
@@ -123,7 +123,7 @@ namespace Launcher.App.Utility
                             using (MemoryStream stream = new MemoryStream(data))
                             {
                                 XDocument doc = XDocument.Load(stream);
-                                var kartsWithName = doc.Descendants("kart").Where(kart => kart.Attribute("name") != null);
+                                var kartsWithName = doc.Descendants("kart").Where(kart => kart.Attribute("name") is not null);
                                 if (kartsWithName.Count() > 0)
                                 {
                                     foreach (var kart in kartsWithName)
@@ -140,7 +140,7 @@ namespace Launcher.App.Utility
                                         }
                                     }
                                 }
-                                var flyingsWithName = doc.Descendants("flyingPet").Where(flyingPet => flyingPet.Attribute("name") != null);
+                                var flyingsWithName = doc.Descendants("flyingPet").Where(flyingPet => flyingPet.Attribute("name") is not null);
                                 if (flyingsWithName.Count() > 0)
                                 {
                                     foreach (var flyingPet in flyingsWithName)
@@ -215,7 +215,7 @@ namespace Launcher.App.Utility
                                 var targetCategory = xdoc.Descendants("category")
                                     .FirstOrDefault(c => c.Attribute("catLevel")?.Value == RiderSchool.catLevel.ToString());
 
-                                if (targetCategory != null)
+                                if (targetCategory is not null)
                                 {
                                     List<byte> validSteps = targetCategory.Descendants("item")
                                        .Select(item => item.Attribute("step")?.Value)
@@ -610,13 +610,13 @@ namespace Launcher.App.Utility
                                 {
                                     XmlElement rewardSetElement = node as XmlElement;
 
-                                    if (rewardSetElement != null && rewardSetElement.GetAttribute("id") == BingoLotteryID)
+                                    if (rewardSetElement is not null && rewardSetElement.GetAttribute("id") == BingoLotteryID)
                                     {
                                         targetRewardSet = node;
                                         break;
                                     }
                                 }
-                                if (targetRewardSet == null)
+                                if (targetRewardSet is null)
                                 {
                                     Console.WriteLine($"未找到ID为{BingoLotteryID}的lottery节点");
                                 }
@@ -663,7 +663,7 @@ namespace Launcher.App.Utility
             catch (Exception ex)
             {
                 Console.WriteLine("Error: " + ex.Message);
-                return null;
+                return new PackFolderManager();
             }
         }
 
@@ -737,11 +737,11 @@ namespace Launcher.App.Utility
 
         private static void ProcessNodes(XmlNodeList nodes, string attributeName, string suffix = "")
         {
-            if (nodes == null) return;
+            if (nodes is null) return;
             foreach (XmlNode xn in nodes)
             {
                 XmlElement xe = xn as XmlElement;
-                if (xe == null) continue;
+                if (xe is null) continue;
                 string attributeValue = xe.GetAttribute(attributeName);
                 if (string.IsNullOrWhiteSpace(attributeValue))
                 {

@@ -11,7 +11,7 @@ namespace Launcher.Library.Utilities
         {
             get
             {
-                return mHead.Next == null ? default : mHead.Next.Item;
+                return mHead.Next is null ? default : mHead.Next.Item;
             }
         }
 
@@ -46,7 +46,7 @@ namespace Launcher.Library.Utilities
                             pItem = next.Item;
                             flag1 = LockFreeQueue<T>.CompareAndExchange(ref mHead, singleLinkNode, next);
                         }
-                        else if (next != null)
+                        else if (next is not null)
                         {
                             LockFreeQueue<T>.CompareAndExchange(ref mTail, singleLinkNode1, next);
                         }
@@ -87,7 +87,7 @@ namespace Launcher.Library.Utilities
                 SingleLinkNode next = singleLinkNode.Next;
                 if (mTail == singleLinkNode)
                 {
-                    if (next != null)
+                    if (next is not null)
                     {
                         LockFreeQueue<T>.CompareAndExchange(ref mTail, singleLinkNode, next);
                     }

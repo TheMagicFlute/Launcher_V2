@@ -42,7 +42,7 @@ namespace Launcher.App.Rider
             FavoriteItemLists.TryAdd(Nickname, new List<Favorite_Item>());
             var FavoriteItemList = FavoriteItemLists[Nickname];
             var existingItem = FavoriteItemList.FirstOrDefault(item => item.ItemCatID == itemCatID && item.ItemID == itemID && item.ItemSN == itemSN);
-            if (existingItem == null)
+            if (existingItem is null)
             {
                 var newItem = new Favorite_Item { ItemCatID = itemCatID, ItemID = itemID, ItemSN = itemSN };
                 FavoriteItemList.Add(newItem);
@@ -55,7 +55,7 @@ namespace Launcher.App.Rider
             if (FavoriteItemLists.ContainsKey(Nickname))
             {
                 var itemToRemove = FavoriteItemLists[Nickname].FirstOrDefault(item => item.ItemCatID == itemCatID && item.ItemID == itemID && item.ItemSN == itemSN);
-                if (itemToRemove != null)
+                if (itemToRemove is not null)
                 {
                     FavoriteItemLists[Nickname].Remove(itemToRemove);
                     Save_ItemList(Nickname, FavoriteItemLists[Nickname]);

@@ -62,7 +62,7 @@ namespace Launcher.Library.IO
         public new void Dispose()
         {
             this.m_disposed = true;
-            if (this.m_stream != null)
+            if (this.m_stream is not null)
             {
                 this.m_stream.Dispose();
             }
@@ -123,7 +123,7 @@ namespace Launcher.Library.IO
 
         public void WriteEndPoint(IPEndPoint endpoint)
         {
-            if (endpoint != null)
+            if (endpoint is not null)
             {
                 this.WriteEndPoint(endpoint.Address, (ushort)endpoint.Port);
             }
@@ -147,10 +147,7 @@ namespace Launcher.Library.IO
 
         public void WriteHexString(string value)
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException("value");
-            }
+            ArgumentNullException.ThrowIfNull(value, nameof(value));
             value = value.Replace(" ", "");
             for (int i = 0; i < value.Length; i += 2)
             {
@@ -183,10 +180,7 @@ namespace Launcher.Library.IO
 
         public void WriteString(string value, bool ascii = false)
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException("value");
-            }
+            ArgumentNullException.ThrowIfNull(value, nameof(value));
             this.WriteInt(value.Length);
             this.WriteString(value, value.Length, ascii);
         }
@@ -194,9 +188,9 @@ namespace Launcher.Library.IO
         public void WriteString(string value, int length, bool ascii = false)
         {
             int i;
-            if ((value == null || length < 0 ? true : length > value.Length))
+            if ((value is null || length < 0 || length > value.Length))
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
             if (ascii)
             {

@@ -46,7 +46,7 @@ public static class RoomManager
     {
         var room = GetRoom(roomId);
 
-        if (room == null || string.IsNullOrEmpty(nickname))
+        if (room is null || string.IsNullOrEmpty(nickname))
             return false;
 
         // 去重：严格区分大小写
@@ -103,7 +103,7 @@ public static class RoomManager
     public static bool RemovePlayer(int roomId, byte slotId)
     {
         var room = GetRoom(roomId);
-        if (room == null)
+        if (room is null)
             return false;
 
         var member = room.GetSlot(slotId);
@@ -145,14 +145,14 @@ public static class RoomManager
     }
 
     // 扩展：获取指定位置的详细成员信息（玩家昵称或AI属性）
-    public static object TryGetSlotDetail(int roomId, byte slotId)
+    public static object? TryGetSlotDetail(int roomId, byte slotId)
     {
         object detail = null;
         if (!_rooms.TryGetValue(roomId, out var room))
             return detail;
 
         var member = room.GetSlotMember(slotId);
-        if (member == null)
+        if (member is null)
             return detail; // 空位置，detail为null
 
         if (member is Player player)

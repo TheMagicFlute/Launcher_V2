@@ -142,7 +142,7 @@ public class SpecialKartConfig
         }
 
         var config = JsonHelper.DeserializeNoBom<SpecialKartConfig>(filePath);
-        if (config == null)
+        if (config is null)
         {
             throw new Exception("配置文件解析失败，可能是JSON格式错误");
         }

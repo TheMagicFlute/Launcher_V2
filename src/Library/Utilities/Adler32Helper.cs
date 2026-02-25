@@ -29,7 +29,7 @@ namespace Launcher.Library.Utilities
                 }
                 num = (uint)(num4 | (num5 << 16));
             }
-            else if (str == null)
+            else if (str is null)
             {
                 num = 1;
             }

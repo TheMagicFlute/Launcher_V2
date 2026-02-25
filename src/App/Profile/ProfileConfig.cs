@@ -8,7 +8,7 @@ namespace Launcher.App.Profile
         /// <summary>
         /// 用户名
         /// </summary>
-        public string Name { get; set; } = Constants.Owner;
+        public string Name { get; set; } = Constants.OWNER;
 
         /// <summary>
         /// 服务器IP
@@ -97,7 +97,7 @@ namespace Launcher.App.Profile
 
         public string ClubName { get; set; } = "TCCstar";
 
-        public string ClubIntro { get; set; } = $"跑跑卡丁车交流群: 84338611\n单机启动器下载地址: https://github.com/{Constants.Owner}/{Constants.Repo}/releases";
+        public string ClubIntro { get; set; } = $"跑跑卡丁车交流群: 84338611\n单机启动器下载地址: {Constants.GH_LATEST_RELEASE}";
 
         public string RiderIntro { get; set; } = "";
 

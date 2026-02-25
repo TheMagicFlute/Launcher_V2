@@ -24,7 +24,7 @@ namespace Launcher.Library.File.OldImplements
 
         private Dictionary<uint, RhoDataInfo> Blocks;
 
-        public RhoDirectory RootDirectory { get; set; }
+        public RhoDirectory GameDir { get; set; }
 
         public Rho(string FileName, uint rhoFileKey = 0)
         {
@@ -110,11 +110,11 @@ namespace Launcher.Library.File.OldImplements
                 }
             }
             // Part 4
-            RootDirectory = new RhoDirectory(this);
-            RootDirectory.DirectoryName = "";
-            RootDirectory.DirIndex = 0xFFFFFFFF;
+            GameDir = new RhoDirectory(this);
+            GameDir.DirectoryName = "";
+            GameDir.DirIndex = 0xFFFFFFFF;
             Queue<RhoDirectory> processQueue = new Queue<RhoDirectory>();
-            processQueue.Enqueue(RootDirectory);
+            processQueue.Enqueue(GameDir);
             while (processQueue.Count > 0)
             {
                 RhoDirectory curDir = processQueue.Dequeue();
@@ -158,7 +158,7 @@ namespace Launcher.Library.File.OldImplements
         public RhoFileInfo GetFile(string Path)
         {
             string[] PathSplit = Path.Split('/');
-            RhoDirectory rd = RootDirectory;
+            RhoDirectory rd = GameDir;
             for (int i = 1; i < PathSplit.Length - 1; i++)
             {
                 string curPathName = PathSplit[i].Trim();

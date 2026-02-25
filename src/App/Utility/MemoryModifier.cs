@@ -2,7 +2,7 @@
 using Launcher.App.Server;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+using System.Text;
 
 namespace Launcher.App.Utility;
 
@@ -41,6 +41,27 @@ class MemoryModifier
         uint dwLength
     );
 
+    // 窗口操作 API（Unicode）
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool SetWindowTextW(IntPtr hWnd, string lpString);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern int GetWindowTextLengthW(IntPtr hWnd);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern int GetWindowTextW(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool IsWindowVisible(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+    private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
     // 内存区域信息结构体（用于枚举内存页）
     [StructLayout(LayoutKind.Sequential)]
     private struct MEMORY_BASIC_INFORMATION
@@ -78,7 +99,7 @@ class MemoryModifier
             };
 
             process = Process.Start(startInfo);
-            if (process == null)
+            if (process is null)
             {
                 Console.WriteLine("游戏进程启动失败, 请检查权限后重启.");
                 MessageBox.Show("游戏进程启动失败, 请检查权限后重启.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -86,22 +107,27 @@ class MemoryModifier
             }
             Console.WriteLine($"进程已启动, PID: {process.Id}");
 
-            // 2. 等待进程初始化（根据实际情况调整等待时间，确保进程加载完成）
-            await Task.Run(() => {process.WaitForInputIdle();});
-            Console.WriteLine("进程初始化完成!");
-
-            // 3. 查找并修改内存 星标赛道数量50改为120
+            // 2. 立即尝试修改内存
             Console.WriteLine("正在尝试修改星标赛道数量限制...");
-            // 小端序
             bool success = ModifyMemory(process.Id, [0x83, 0xFA, 0x32], [0x83, 0xFA, 0x78]);
             if (success)
-            {
                 Console.WriteLine("修改星标赛道数量限制: 50 -> 120");
-            }
             else
-            {
                 Console.WriteLine("未找到目标内存特征码，修改失败");
-            }
+
+            // 3. 等待窗口出现并追加标题（更稳健的等待策略）
+            string suffix = $" - {ProfileService.SettingConfig.Name} (launched by Kart Launcher)";
+            // 异步等待并追加；不阻塞调用线程
+            _ = Task.Run(async () =>
+            {
+                // TODO: 60 秒内以固定 10s 间隔无限次尝试
+                TimeSpan totalTimeout = TimeSpan.FromSeconds(60);
+                bool appended = await WaitAndAppendWindowTitleByPid(process.Id, suffix, totalTimeout);
+                Console.WriteLine(appended ? $"窗口标题已追加: {suffix}" : "追加窗口标题失败或超时");
+            });
+
+            // 原有等待（如果需要让主流程等待进程进入空闲）
+            try { process.WaitForInputIdle(10000); } catch { /* 忽略 */ }
         }
         catch (System.ComponentModel.Win32Exception ex)
         {
@@ -115,6 +141,93 @@ class MemoryModifier
         {
             process?.Dispose(); // 释放进程资源（不影响目标进程运行）
         }
+    }
+
+    /// <summary>
+    /// 按 PID 枚举顶级窗口，等待可见且标题非空的窗口出现，然后在其标题尾部追加 suffix。
+    /// 使用总超时与固定重试间隔（100ms），在 60 秒内无限次尝试直到成功或超时。
+    /// </summary>
+    private static async Task<bool> WaitAndAppendWindowTitleByPid(int pid, string suffix, TimeSpan timeout)
+    {
+        var sw = Stopwatch.StartNew();
+        const int retryDelayMs = 10000; // 固定重试间隔 10s
+        while (sw.Elapsed < timeout)
+        {
+            try
+            {
+                var handles = FindTopLevelWindowHandlesByPid(pid);
+                foreach (var hWnd in handles)
+                {
+                    if (hWnd == IntPtr.Zero)
+                        continue;
+
+                    if (!IsWindowVisible(hWnd))
+                        continue;
+
+                    // 读取现有标题
+                    int len = GetWindowTextLengthW(hWnd);
+                    string original = string.Empty;
+                    if (len > 0)
+                    {
+                        var sb = new StringBuilder(len + 1);
+                        if (GetWindowTextW(hWnd, sb, sb.Capacity) > 0)
+                            original = sb.ToString();
+                    }
+
+                    // 去重：如果已有相同后缀则跳过
+                    if (!string.IsNullOrEmpty(original) && original.EndsWith(suffix))
+                        return true;
+
+                    string newTitle = string.IsNullOrEmpty(original) ? suffix.TrimStart() : original + suffix;
+                    bool result = SetWindowTextW(hWnd, newTitle);
+                    if (!result)
+                    {
+                        int err = Marshal.GetLastWin32Error();
+                        Console.WriteLine($"SetWindowTextW 失败，错误码: {err}");
+                        continue;
+                    }
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"等待/追加窗口标题时异常: {ex.Message}");
+            }
+
+            // 固定间隔重试（无限次，直到 timeout）
+            await Task.Delay(retryDelayMs);
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 枚举指定 PID 的顶级窗口句柄（可能有多个），返回列表。
+    /// </summary>
+    private static List<IntPtr> FindTopLevelWindowHandlesByPid(int pid)
+    {
+        var results = new List<IntPtr>();
+
+        try
+        {
+            EnumWindows((hWnd, lParam) =>
+            {
+                if (hWnd == IntPtr.Zero)
+                    return true;
+
+                GetWindowThreadProcessId(hWnd, out uint windowPid);
+                if ((int)windowPid == pid)
+                {
+                    results.Add(hWnd);
+                }
+                return true; // 继续枚举
+            }, IntPtr.Zero);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"枚举窗口失败: {ex.Message}");
+        }
+
+        return results;
     }
 
     /// <summary>

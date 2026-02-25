@@ -23,9 +23,8 @@ namespace Launcher.App.Forms
             }
         }
 
-        public readonly static string simpleName = "Launcher_" + Program.architecture;
-        public readonly static string zipName = simpleName + ".zip";
-        public readonly static string exeName = simpleName + ".exe";
+        public static readonly string simpleName = $"Launcher_{Constants.ARCHITECTURE}";
+        public static readonly string exeName = $"{simpleName}.exe";
 
         private static GitHubReleaseRoot? releaseData;
         private static GitHubReleaseAsset? launcherAsset;
@@ -54,7 +53,7 @@ namespace Launcher.App.Forms
             Console.WriteLine($"当前Commit: {ThisAssembly.Git.Commit}");
             Console.WriteLine($"当前Commit SHA: {ThisAssembly.Git.Sha}");
             Console.WriteLine($"当前Commit日期: {ThisAssembly.Git.CommitDate}");
-            Console.WriteLine($"当前版本为: {Constants.Version}");
+            Console.WriteLine($"当前版本为: {Constants.VERSION}");
 
             releaseData = await GetReleaseDetailAsync();
 
@@ -65,31 +64,31 @@ namespace Launcher.App.Forms
                 return false;
             }
 
-            if (releaseData == null)
+            if (releaseData is null)
             {
                 Console.WriteLine("更新信息获取失败!");
-                Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 https://github.com/{Constants.Owner}/{Constants.Repo}/releases/latest 手动下载最新版本");
+                Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 {Constants.GH_LATEST_RELEASE} 手动下载最新版本");
                 return false;
             }
 
-            if (releaseData?.Assets == null || releaseData.Assets.Length == 0)
+            if (releaseData?.Assets is null || releaseData.Assets.Length == 0)
             {
                 Console.WriteLine("错误: API返回的资产列表为空");
                 return false;
             }
             launcherAsset = Array.Find(
                 releaseData.Assets,
-                asset => string.Equals(asset.Name, zipName, StringComparison.OrdinalIgnoreCase) // 忽略文件名大小写
+                asset => string.Equals(asset.Name, exeName, StringComparison.OrdinalIgnoreCase) // 忽略文件名大小写
             );
-            if (launcherAsset == null)
+            if (launcherAsset is null)
             {
-                Console.WriteLine($"错误: 在资产列表中找不到 {zipName}");
+                Console.WriteLine($"错误: 在资产列表中找不到 {exeName}");
                 return false;
             }
 
             // 检查更新: 由于版本号使用日期格式, 当天多次发布的版本号相同, 故选择直接比较Digest
             // 如目前版本的SHA256与最新版本的SHA256不同, 则说明需要更新
-            string? currentExeFile = Process.GetCurrentProcess().MainModule.FileName ?? Assembly.GetExecutingAssembly().Location;
+            string? currentExeFile = Process.GetCurrentProcess().MainModule?.FileName ?? Assembly.GetExecutingAssembly().Location;
             if (string.IsNullOrEmpty(currentExeFile))
             {
                 Console.WriteLine("无法获取当前可执行文件路径, 更新检查失败.");
@@ -110,7 +109,7 @@ namespace Launcher.App.Forms
                 );
                 if (usrInput == DialogResult.No)
                 {
-                    Console.WriteLine($"用户取消更新. 如果仍想更新, 请重新启动本程序, 或者访问 https://github.com/{Constants.Owner}/{Constants.Repo}/releases/latest 手动下载最新版本");
+                    Console.WriteLine($"用户取消更新. 如果仍想更新, 请重新启动本程序, 或者访问 {Constants.GH_LATEST_RELEASE} 手动下载最新版本");
                     return false; // cancel update
                 }
                 // 尝试下载最新的版本
@@ -169,12 +168,9 @@ namespace Launcher.App.Forms
                         response.EnsureSuccessStatusCode();
                         using (Stream contentStream = await response.Content.ReadAsStreamAsync())
                         {
-                            if (!Directory.Exists(FileName.Update_Folder))
-                                Directory.CreateDirectory(FileName.Update_Folder);
-
                             long? totalBytes = response.Content.Headers.ContentLength;
                             DateTime startTime = DateTime.Now;
-                            using (FileStream fileStream = new FileStream(Path.Combine(FileName.Update_Folder, zipName), FileMode.Create, FileAccess.Write, FileShare.None))
+                            using (FileStream fileStream = new FileStream(Path.Combine(FileName.AppDir, exeName), FileMode.Create, FileAccess.Write, FileShare.None))
                             {
                                 byte[] buffer = new byte[4096];
                                 int bytesRead;
@@ -187,7 +183,7 @@ namespace Launcher.App.Forms
                                     PromptMsg.Text = $"正在下载更新: {totalRead / 1024}KB / {(totalBytes.HasValue ? totalBytes.Value / 1024 : 0)}KB";
                                     int progressInt = (int)progress;
                                     var updaterForm = Application.OpenForms.OfType<Updater>().FirstOrDefault();
-                                    if (updaterForm != null)
+                                    if (updaterForm is not null)
                                     {
                                         try
                                         {
@@ -211,10 +207,10 @@ namespace Launcher.App.Forms
                         }
                     }
                     Console.WriteLine($"期望 SHA256 为: {launcherAsset.Digest}");
-                    if (!CheckFileHash(Path.Combine(FileName.Update_Folder, zipName), launcherAsset.Digest))
+                    if (!CheckFileHash(Path.Combine(FileName.AppDir, exeName), launcherAsset.Digest))
                     {
                         Console.WriteLine($"文件 SHA256 校验失败, 下载可能不完整或被篡改.");
-                        Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 https://github.com/{Constants.Owner}/{Constants.Repo}/releases/latest 手动下载最新版本");
+                        Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 {Constants.GH_LATEST_RELEASE} 手动下载最新版本");
                         return false;
                     }
                     Console.WriteLine($"文件 SHA256 校验成功.");
@@ -224,17 +220,16 @@ namespace Launcher.App.Forms
             catch (Exception ex)
             {
                 Console.WriteLine($"下载过程中出现错误: {ex.Message}");
-                Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 https://github.com/{Constants.Owner}/{Constants.Repo}/releases/latest 手动下载最新版本");
+                Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 {Constants.GH_LATEST_RELEASE} 手动下载最新版本");
                 return false;
             }
         }
 
         public static bool ApplyUpdate()
         {
+            Console.WriteLine("正在尝试应用更新...");
             try
             {
-                Console.WriteLine("正在尝试应用更新...");
-                System.IO.Compression.ZipFile.ExtractToDirectory(Path.Combine(FileName.Update_Folder, zipName), FileName.Update_Folder);
                 try
                 {
                     File.WriteAllText(FileName.Update_File, updateScript, Program.targetEncoding);
@@ -252,7 +247,7 @@ namespace Launcher.App.Forms
             catch (Exception ex)
             {
                 Console.WriteLine($"\n应用更新时出错: {ex.Message}");
-                Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 https://github.com/{Constants.Owner}/{Constants.Repo}/releases/latest 手动下载最新版本");
+                Console.WriteLine($"如果仍想更新, 请重新启动本程序, 或者访问 {Constants.GH_LATEST_RELEASE} 手动下载最新版本");
                 return false;
             }
         }
@@ -267,7 +262,7 @@ namespace Launcher.App.Forms
                 httpClient.Timeout = TimeSpan.FromSeconds(10); // 设置10秒超时
 
                 // 发送GET请求获取API响应
-                var response = await httpClient.GetAsync($"https://api.github.com/repos/{Constants.Owner}/{Constants.Repo}/releases/latest");
+                var response = await httpClient.GetAsync($"https://api.github.com/repos/{Constants.OWNER}/{Constants.REPO}/releases/latest");
                 response.EnsureSuccessStatusCode(); // 若状态码不是200-299, 抛出异常 (如404、500)
 
                 // 读取响应内容并反序列化为C#对象
@@ -344,7 +339,7 @@ namespace Launcher.App.Forms
             catch (Exception ex)
             {
                 Console.WriteLine($"请求 URL 时发生异常: {ex.Message}");
-                Console.WriteLine($"请检查你的网络是否连接正常.如连接正常, 请在 https://github.com/{Constants.Owner}/{Constants.Repo}/issues 提问.");
+                Console.WriteLine($"请检查你的网络是否连接正常.如连接正常, 请在 {Constants.GH_ISSUE_URL} 提问.");
                 return false;
             }
         }

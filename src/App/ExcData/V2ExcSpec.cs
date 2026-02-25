@@ -28,7 +28,7 @@ namespace Launcher.App.ExcData
         {
             List<short> skills = new List<short>();
             var existingLevel = KartExcData.Level12Lists[Nickname].FirstOrDefault(Level12 => Level12.ID == ProfileService.ProfileConfigs[Nickname].RiderItem.Set_Kart && Level12.SN == ProfileService.ProfileConfigs[Nickname].RiderItem.Set_KartSN);
-            if (existingLevel != null)
+            if (existingLevel is not null)
             {
                 if (existingLevel.SkillGrade1 != 0)
                 {
@@ -98,7 +98,7 @@ namespace Launcher.App.ExcData
                 short Wheel = (short)Kart.defaultWheelType;
                 short Booster = (short)Kart.defaultBoosterType;
 
-                if (existingParts != null)
+                if (existingParts is not null)
                 {
                     if (existingParts.ExceedType != 0)
                     {
@@ -137,7 +137,7 @@ namespace Launcher.App.ExcData
                 Console.WriteLine("-------------------------------------------------------------");
 
                 var existingLevel = Level12List.FirstOrDefault(level => level.ID == KartAndSN.Kart && level.SN == KartAndSN.SN);
-                if (existingLevel != null)
+                if (existingLevel is not null)
                 {
                     Console.WriteLine("-------------------------------------------------------------");
 

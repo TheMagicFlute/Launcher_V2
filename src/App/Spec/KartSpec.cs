@@ -258,7 +258,7 @@ namespace Launcher.App.Spec
 
                     var targetNode = xdoc.Descendants("Kart").FirstOrDefault(kart => (short)kart.Attribute("ID") == kartId);
 
-                    if (targetNode == null)
+                    if (targetNode is null)
                     {
                         Console.WriteLine($"[KartSpec] 警告: ModelMax.xml中无节点ID={kartId}");
                         return (DefaultModelDimension, DefaultModelDimension);
@@ -266,7 +266,7 @@ namespace Launcher.App.Spec
 
                     var maxXAttr = targetNode.Attribute("modelMaxX");
                     var maxYAttr = targetNode.Attribute("modelMaxY");
-                    if (maxXAttr == null || maxYAttr == null)
+                    if (maxXAttr is null || maxYAttr is null)
                     {
                         Console.WriteLine($"[KartSpec] 警告: ID={kartId} 缺少modelMaxX或modelMaxY属性");
                         return (DefaultModelDimension, DefaultModelDimension);

@@ -112,7 +112,7 @@ namespace Launcher.Library.Xml
 
         public void ToString(ref TextFormater formater, int nowLevel)
         {
-            bool HaveText = Text != null && Text != "";
+            bool HaveText = !string.IsNullOrEmpty(Text);
             bool HaveAttributes = Attributes.Count > 0;
             bool HaveSubTag = Children.Count > 0;
             string Start = "";

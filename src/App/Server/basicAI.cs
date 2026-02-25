@@ -64,7 +64,7 @@ namespace Launcher.App.Server
         /// <returns>不重复的角色ID列表（short）</returns>
         public List<short> GetRandomCharacterIds(Dictionary<short, AICharacter> characterDict, int count)
         {
-            if (characterDict == null || characterDict.Count == 0 || count <= 0)
+            if (characterDict is null || characterDict.Count == 0 || count <= 0)
                 return new List<short>();
 
             count = Math.Min(count, characterDict.Count);
@@ -77,7 +77,7 @@ namespace Launcher.App.Server
         /// </summary>
         public short? GetRandomRidIndex(AICharacter character)
         {
-            if (character?.Rids == null || character.Rids.Count == 0)
+            if (character?.Rids is null || character.Rids.Count == 0)
                 return null;
             return (short)_random.Next(character.Rids.Count);
         }
@@ -87,7 +87,7 @@ namespace Launcher.App.Server
         /// </summary>
         public short? GetRandomAccessoryId(List<AIAccessory> accessories)
         {
-            if (accessories == null || accessories.Count == 0)
+            if (accessories is null || accessories.Count == 0)
                 return null;
             return accessories[_random.Next(accessories.Count)].Id;
         }
@@ -101,7 +101,7 @@ namespace Launcher.App.Server
         public List<short> GetRandomKartIds(Dictionary<short, AIKart> kartDict, int count,
             bool requireSpeed = false, bool requireItem = false)
         {
-            if (kartDict == null || kartDict.Count == 0 || count <= 0)
+            if (kartDict is null || kartDict.Count == 0 || count <= 0)
                 return new List<short>();
 
             // 根据参数筛选符合条件的卡丁车ID

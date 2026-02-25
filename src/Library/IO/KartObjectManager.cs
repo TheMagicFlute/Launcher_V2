@@ -26,12 +26,12 @@ namespace Launcher.Library.IO
         public static void RegisterClass(Type type)
         {
             Type? baseType = type.BaseType;
-            while (baseType != null && baseType != typeof(KartObject))
+            while (baseType is not null && baseType != typeof(KartObject))
                 baseType = baseType.BaseType;
             if (baseType is null)
                 throw new Exception("");
             ConstructorInfo? constructorInfo = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, new Type[0]);
-            if (constructorInfo == null)
+            if (constructorInfo is null)
                 throw new Exception("");
             KartObjectInfo kartObjectInfo = new(type, constructorInfo);
             KartObject newObj = kartObjectInfo.CreateObject();
@@ -81,7 +81,7 @@ namespace Launcher.Library.IO
         public bool CanbeConvertTo(Type targetType)
         {
             Type? superType = targetType;
-            while (superType != null)
+            while (superType is not null)
             {
                 if (superType == targetType)
                     return true;

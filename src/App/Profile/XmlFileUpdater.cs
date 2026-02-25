@@ -25,14 +25,14 @@ namespace Launcher.App.Profile
 
                 // 从程序集资源加载XML（修复资源加载逻辑）
                 XDocument resourceXml = XDocument.Parse(resourceName);
-                if (resourceXml == null)
+                if (resourceXml is null)
                 {
                     Console.WriteLine($"无法加载资源文件: {resourceName}");
                     return;
                 }
 
                 // 验证XML根节点
-                if (localXml.Root == null || resourceXml.Root == null)
+                if (localXml.Root is null || resourceXml.Root is null)
                 {
                     Console.WriteLine("XML文件结构不完整，缺少根节点");
                     return;
@@ -87,7 +87,7 @@ namespace Launcher.App.Profile
                 {
                     // 如果元素存在，递归检查其子元素
                     var localElement = FindCorrespondingElement(localRoot, resourceElement, uniqueAttribute);
-                    if (localElement != null)
+                    if (localElement is not null)
                     {
                         bool childUpdated = MergeXml(localElement, resourceElement, uniqueAttribute);
                         isUpdated = isUpdated || childUpdated;
@@ -103,13 +103,13 @@ namespace Launcher.App.Profile
         /// </summary>
         private bool CheckElementExists(XElement parent, XElement elementToCheck, string uniqueAttribute)
         {
-            return FindCorrespondingElement(parent, elementToCheck, uniqueAttribute) != null;
+            return FindCorrespondingElement(parent, elementToCheck, uniqueAttribute) is not null;
         }
 
         /// <summary>
         /// 查找本地XML中与资源XML中相对应的元素
         /// </summary>
-        private XElement FindCorrespondingElement(XElement parent, XElement elementToFind, string uniqueAttribute)
+        private XElement? FindCorrespondingElement(XElement parent, XElement elementToFind, string uniqueAttribute)
         {
             // 1. 先通过元素名过滤候选元素
             var candidates = parent.Elements(elementToFind.Name);
@@ -117,12 +117,13 @@ namespace Launcher.App.Profile
                 return null;
 
             // 2. 使用唯一属性（如ID）精确匹配（适配Kart节点的ID属性）
-            XAttribute uniqueAttr = elementToFind.Attribute(uniqueAttribute);
-            if (uniqueAttr != null)
+            XAttribute? uniqueAttr = elementToFind.Attribute(uniqueAttribute);
+            if (uniqueAttr is not null)
             {
                 string targetValue = uniqueAttr.Value;
                 return candidates.FirstOrDefault(e =>
-                    e.Attribute(uniqueAttribute)?.Value.Equals(targetValue, StringComparison.OrdinalIgnoreCase) == true);
+                    e.Attribute(uniqueAttribute)?
+                    .Value.Equals(targetValue, StringComparison.OrdinalIgnoreCase) == true);
             }
 
             // 3. 没有唯一属性时，使用所有属性组合匹配
@@ -150,7 +151,7 @@ namespace Launcher.App.Profile
             foreach (var attr in a.Attributes())
             {
                 var correspondingAttr = b.Attribute(attr.Name);
-                if (correspondingAttr == null || !correspondingAttr.Value.Equals(attr.Value, StringComparison.Ordinal))
+                if (correspondingAttr is null || !correspondingAttr.Value.Equals(attr.Value, StringComparison.Ordinal))
                 {
                     return false;
                 }
@@ -164,7 +165,7 @@ namespace Launcher.App.Profile
         private string GetElementIdentifier(XElement element, string uniqueAttribute)
         {
             var idAttr = element.Attribute(uniqueAttribute);
-            if (idAttr != null)
+            if (idAttr is not null)
             {
                 return $"{element.Name} (ID: {idAttr.Value})";
             }

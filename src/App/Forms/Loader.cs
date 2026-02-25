@@ -1,55 +1,61 @@
-﻿using Launcher.App.Profile;
+﻿using Launcher.App.Constant;
+using Launcher.App.Profile;
 using Launcher.App.Server;
 using Launcher.App.Utility;
 using Launcher.Properties;
+using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace Launcher.App.Forms
 {
     public partial class Loader : Form
     {
-        private readonly System.Windows.Forms.Timer animationTimer;
-
         public Loader()
         {
             InitializeComponent();
-
-            // 在构造函数中初始化定时器（在 UI 线程运行）
-            animationTimer = new System.Windows.Forms.Timer();
-            animationTimer.Interval = 50; // 25ms 每次 tick，可根据需要调整
-            animationTimer.Tick += AnimationTimer_Tick;
         }
 
         private void OnLoad(object sender, EventArgs e)
         {
-            StartAnimation();
+            if (!Check_Game())
+            {
+                Dispose();
+                return;
+            }
 
             Task.Run(() =>
             {
                 try
                 {
+                    PromptMsg.Text = "读取正在加载...";
                     Load_Main();
                     PromptMsg.Text = "读取Data文件...";
                     Load_Data();
                     PromptMsg.Text = "加载特殊赛车配置...";
                     Load_Kart_Data();
+
+                    MainForm.GameIsReady = true;
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error when loading: {ex.Message}");
+                }
                 finally
                 {
-                    // 操作完成后停止动画并进行 UI 收尾并关闭窗体
+                    // 操作完成后, 关闭加载窗口
                     try
                     {
-                        this.Invoke(() =>
+                        Invoke(() =>
                         {
-                            try
+                            Utils.PrintDivLine();
+                            if (Constants.DBG)
                             {
-                                animationTimer.Stop();
-                                animationTimer.Dispose();
-                                ProgressBar.Value = ProgressBar.Minimum;
+                                Console.WriteLine($"Config:\n{JsonConvert.SerializeObject(ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name], Formatting.Indented)}");
+                                Utils.PrintDivLine();
                             }
-                            catch { }
-
+                            Console.WriteLine($"[INFO] Game: {MainForm.KartRider}");
+                            Console.WriteLine($"[INFO] Game Client Version: P{MainForm.PinFileData.Header.MinorVersion}");
+                            Console.WriteLine($"[INFO] Launcher Version: {Constants.VERSION}");
                             Utils.PrintDivLine();
                             Dispose();
                         });
@@ -59,46 +65,72 @@ namespace Launcher.App.Forms
             });
         }
 
-        private void Load_Main()
+        private bool Check_Game()
         {
             if (Process.GetProcessesByName("KartRider").Length != 0)
             {
                 Utils.MsgKartIsRunning();
-                return;
+                return false;
             }
 
-            // find game directory
-            if (Utils.CheckGameAvailability(FileName.AppDir))
+            if (!MainForm.GameIsReady)
             {
-                // working directory
-                Program.RootDirectory = FileName.AppDir;
-                Console.WriteLine("使用当前目录下的游戏.");
+                // Cheack + set default game path
+                // find game directory
+                if (Utils.CheckGameAvailability(FileName.AppDir))
+                {
+                    // working directory
+                    MainForm.GameDir = FileName.AppDir;
+                    Console.WriteLine("使用当前目录下的游戏.");
+                    MainForm.GameIsReady = true;
+                }
+                else if (Utils.CheckGameAvailability(FileName.TCGKartGamePath))
+                {
+                    // TCGame registered directory
+                    MainForm.GameDir = FileName.TCGKartGamePath;
+                    Console.WriteLine("使用TCGame注册的游戏目录下的游戏.");
+                    MainForm.GameIsReady = true;
+                }
+                else
+                {
+                    // game not found
+                    MainForm.GameDir = string.Empty;
+                    Utils.MsgFileNotFound();
+                    return false;
+                }
             }
-            else if (Utils.CheckGameAvailability(FileName.TCGKartGamePath))
-            {
-                // TCGame registered directory
-                Program.RootDirectory = FileName.TCGKartGamePath;
-                Console.WriteLine("使用TCGame注册的游戏目录下的游戏.");
-            }
-            else
-            {
-                // game not found
-                Utils.MsgFileNotFound();
-            }
-            Console.WriteLine($"游戏目录: {Program.RootDirectory}");
+            Console.WriteLine($"游戏目录: {(MainForm.GameDir != string.Empty ? MainForm.GameDir : "未知")}");
             Utils.PrintDivLine();
+            return true;
         }
 
-        private void Load_Data()
+        private void Load_Main()
+        {
+            if (MainForm.GameIsReady)
+            {
+                MainForm.KartRider = Path.GetFullPath(Path.Combine(MainForm.GameDir, FileName.KartRider));
+                MainForm.PinFile = Path.GetFullPath(Path.Combine(MainForm.GameDir, FileName.PinFile));
+                MainForm.PinFileBak = Path.GetFullPath(Path.Combine(MainForm.GameDir, FileName.PinFileBak));
+                MainForm.PinFileData = new(MainForm.PinFile);
+
+                ProfileService.SettingConfig.ClientVersion = MainForm.PinFileData.Header.MinorVersion;
+                ProfileService.ProfileConfigs[ProfileService.SettingConfig.Name].GameOption.Version = MainForm.PinFileData.Header.MinorVersion;
+                ProfileService.SettingConfig.LocaleID = MainForm.PinFileData.Header.LocaleID;
+                ProfileService.SettingConfig.nClientLoc = MainForm.PinFileData.Header.Unk2;
+                ProfileService.Save(ProfileService.SettingConfig.Name);
+            }
+        }
+
+        private async void Load_Data()
         {
             Console.WriteLine("读取Data文件...");
             try
             {
-                var packFolderManager = KartRhoFile.Dump(Path.GetFullPath(Path.Combine(Program.RootDirectory, @"Data\aaa.pk")));
-                if (packFolderManager == null)
+                Library.File.OldImplements.PackFolderManager packFolderManager = KartRhoFile.Dump(Path.GetFullPath(Path.Combine(MainForm.GameDir, @"Data\aaa.pk")));
+                if (packFolderManager is null)
                 {
                     // MsgErrorReadData 可能会弹窗，必须回到 UI 线程调用
-                    this.Invoke(() => Utils.MsgErrorReadData());
+                    Invoke(Utils.MsgErrorReadData);
                     return;
                 }
                 packFolderManager.Reset();
@@ -110,49 +142,22 @@ namespace Launcher.App.Forms
             }
         }
 
-        private void Load_Kart_Data()
+        private async void Load_Kart_Data()
         {
             Console.WriteLine("加载特殊赛车配置...");
             string ModelMax = Resources.ModelMax;
             if (!File.Exists(FileName.ModelMax_LoadFile))
             {
-                using (StreamWriter streamWriter = new StreamWriter(FileName.ModelMax_LoadFile, false))
+                using (StreamWriter streamWriter = new(FileName.ModelMax_LoadFile, false))
                 {
                     streamWriter.Write(ModelMax);
                 }
             }
-            XmlUpdater updater = new();
-            updater.UpdateLocalXmlWithResource(FileName.ModelMax_LoadFile, ModelMax);
+
+            new XmlUpdater().UpdateLocalXmlWithResource(FileName.ModelMax_LoadFile, ModelMax);
 
             SpecialKartConfig.SaveConfigToFile(FileName.SpecialKartConfig);
             MultiPlayer.kartConfig = SpecialKartConfig.LoadConfigFromFile(FileName.SpecialKartConfig);
-        }
-
-        private void StartAnimation()
-        {
-            // 启动定时器（UI 线程），Tick 时安全更新 ProgressBar
-            if (!animationTimer.Enabled)
-                animationTimer.Start();
-        }
-
-        private void AnimationTimer_Tick(object? sender, EventArgs e)
-        {
-            try
-            {
-                // 循环进度条：不断增加 Value，超过 Maximum 时回到 Minimum（可保留超出的步长或直接回到 Minimum）
-                int step = 5; // 每次增加的步长，可按需调整
-                int next = ProgressBar.Value + step;
-                if (next > ProgressBar.Maximum)
-                {
-                    // 超出最大值后从 Minimum 重新开始
-                    ProgressBar.Value = ProgressBar.Minimum;
-                }
-                else
-                {
-                    ProgressBar.Value = next;
-                }
-            }
-            catch { }
         }
     }
 }

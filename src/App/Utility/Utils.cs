@@ -1,4 +1,5 @@
 using KartRider.Library.File;
+using Launcher.App.Forms;
 using Launcher.App.Profile;
 using Launcher.Library.Data;
 using Launcher.Library.File;
@@ -8,6 +9,8 @@ using Launcher.Library.File.Rho5;
 using Launcher.Library.IO;
 using Launcher.Library.Xml;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Xml;
@@ -36,14 +39,14 @@ namespace Launcher.App.Utility
         public static void MsgFileNotFound()
         {
             Console.WriteLine($"Error: 找不到 {FileName.KartRider} 或 {FileName.PinFile}.");
-            MessageBox.Show(FileName.KartRider + " 或 " + FileName.PinFile + " 找不到文件!\n点击确认退出程序.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Environment.Exit(1);
+            MessageBox.Show(FileName.KartRider + " 或 " + FileName.PinFile + " 找不到文件!\n请确认游戏是否完整, 并打开 文件 -> 选择游戏 以重试.", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MainForm.GameIsReady = false;
         }
 
         public static void MsgErrorReadData()
         {
+            Console.WriteLine($"Error: 读取Data内文件失败！");
             MessageBox.Show("读取游戏Data内文件失败！\n请检查游戏是否完整，或尝试重新安装游戏！\n点击确认退出程序", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Environment.Exit(1);
         }
 
         public static void MsgWelcome()
@@ -165,6 +168,11 @@ namespace Launcher.App.Utility
             }
         }
 
+        /// <summary>
+        /// Copy some text to the clipboard
+        /// </summary>
+        /// <param name="text">The text to be copied</param>
+        /// <returns></returns>
         public static bool CopyToClipboard(string text)
         {
             try
@@ -185,6 +193,49 @@ namespace Launcher.App.Utility
                 return false;
             }
             return true;
+        }
+
+        /// <summary>
+        /// Send a desktop notification
+        /// </summary>
+        /// <param name="title">Notification title</param>
+        /// <param name="message">Notification message</param>
+        /// <param name="icon">Notification icon</param>
+        /// <param name="timeout">Notification display duration in milliseconds</param>
+        public static void Send_Notification(string title, string message, ToolTipIcon icon = ToolTipIcon.Info, int timeout = 5000)
+        {
+            using var notifyIcon = new NotifyIcon
+            {
+                Visible = true,
+                Icon = SystemIcons.Application
+            };
+            notifyIcon.ShowBalloonTip(timeout, title, message, icon);
+            // Dispose the NotifyIcon after showing the notification
+            Task.Delay(timeout + 1000).ContinueWith(t => notifyIcon.Dispose());
+        }
+
+        /// <summary>
+        /// Check the ipv4 address is valid or not
+        /// </summary>
+        /// <param name="ip">The ipv4 address</param>
+        /// <returns></returns>
+        public static bool IsValidIPv4(string ip)
+        {
+            return IPAddress.TryParse(ip, out IPAddress? address)
+                && address is not null
+                && address.AddressFamily == AddressFamily.InterNetwork;
+        }
+
+        /// <summary>
+        /// Check the port is valid or not
+        /// </summary>
+        /// <param name="port">The port</param>
+        /// <returns></returns>
+        public static bool IsValidPort(string port)
+        {
+            if (!ushort.TryParse(port, out ushort uport))
+                return false;
+            return 0 <= uport && uport <= 65535;
         }
 
         #endregion
@@ -262,7 +313,7 @@ namespace Launcher.App.Utility
                         {
                             encodea(arg, arg);
                             string? parent = Path.GetDirectoryName(arg);
-                            if (parent == null)
+                            if (parent is null)
                             {
                                 Console.WriteLine($"Error: Unable to find .rho files in {parent}");
                                 return;
@@ -329,7 +380,7 @@ namespace Launcher.App.Utility
             if (!output.EndsWith(".rho5"))
                 output += ".rho5";
             var fileInfo = new FileInfo(output);
-            if (fileInfo.Directory != null)
+            if (fileInfo.Directory is not null)
             {
                 var fullName = fileInfo.Directory.FullName;
                 if (!Directory.Exists(fullName))
@@ -374,7 +425,7 @@ namespace Launcher.App.Utility
 
         private static void RhoFolders(string input, string output, PackFolderInfo rhoFolders)
         {
-            if (rhoFolders.GetFilesInfo() != null)
+            if (rhoFolders.GetFilesInfo() is not null)
                 foreach (var item in rhoFolders.GetFilesInfo())
                 {
                     var fullName = input + "/" + item.FullName.Replace(".rho", "");
@@ -388,7 +439,7 @@ namespace Launcher.App.Utility
                     }
                 }
 
-            if (rhoFolders.Folders != null)
+            if (rhoFolders.Folders is not null)
                 foreach (var rhoFolder in rhoFolders.Folders)
                 {
                     var Folder = output + "/" + rhoFolder.FolderName;
@@ -415,7 +466,7 @@ namespace Launcher.App.Utility
         private static void XtoB(string input)
         {
             var xdoc = XDocument.Load(input);
-            if (xdoc.Root == null)
+            if (xdoc.Root is null)
                 return;
             var childCounts = CountChildren(xdoc.Root, 0, new List<int>());
             using (var reader = XmlReader.Create(input))
@@ -486,7 +537,7 @@ namespace Launcher.App.Utility
         private static void AAAD(string input)
         {
             var xdoc = XDocument.Load(input);
-            if (xdoc.Root == null)
+            if (xdoc.Root is null)
                 return;
             var childCounts = CountChildren(xdoc.Root, 0, new List<int>());
             byte[] byteArray;
@@ -548,7 +599,7 @@ namespace Launcher.App.Utility
                     var folderName = splitParts[i];
                     var subFolder = currentFolder.Elements("PackFolder")
                         .FirstOrDefault(f => (string)f.Attribute("name") == folderName);
-                    if (subFolder == null)
+                    if (subFolder is null)
                     {
                         if (folderName == "character" || folderName == "flyingPet" || folderName == "pet" ||
                             folderName == "track")

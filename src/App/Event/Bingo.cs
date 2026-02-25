@@ -40,7 +40,7 @@ namespace Launcher.App.Event
                 foreach (XmlNode node in rewardNodes)
                 {
                     XmlElement rewardElement = node as XmlElement;
-                    if (rewardElement == null) continue;
+                    if (rewardElement is null) continue;
 
                     // 获取stockId和概率
                     if (int.TryParse(rewardElement.GetAttribute("stockId"), out int stockId) &&
@@ -115,7 +115,7 @@ namespace Launcher.App.Event
                 // 生成0到总概率之间的随机数
                 int randomValue = random.Next(0, currentTotalProb);
                 int currentSum = 0;
-                Reward selectedReward = null;
+                Reward? selectedReward = null;
 
                 // 根据概率分布查找选中的奖励
                 foreach (var reward in availableRewards)
@@ -129,7 +129,7 @@ namespace Launcher.App.Event
                 }
 
                 // 添加选中的奖励ID到结果
-                if (selectedReward != null && selectedIds.Add(selectedReward.StockId))
+                if (selectedReward is not null && selectedIds.Add(selectedReward.StockId))
                 {
                     result.Add(selectedReward.StockId);
                     // 移除所有相同StockId的奖励，确保不会重复选中
@@ -220,7 +220,7 @@ namespace Launcher.App.Event
         public static void CheckLinesAsArray()
         {
             // 验证字典包含25个元素
-            if (BingoNums == null)
+            if (BingoNums is null)
                 Console.WriteLine("BingoNums字典不能为null");
 
             if (BingoNums.Count != 25)

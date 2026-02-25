@@ -1,6 +1,7 @@
-using Launcher.App.Event;
 using Launcher.App.Profile;
 using Launcher.App.Utility;
+
+namespace Launcher.App.Event;
 
 public static class TimeAttack
 {
@@ -23,14 +24,7 @@ public static class TimeAttack
             TrainingMission = JsonHelper.DeserializeNoBom<List<TrainingMission>>(filename.TrainingMission_LoadFile);
         }
         var trackLevel = TrainingMission.FirstOrDefault(item => item.Track == track);
-        if (trackLevel != null)
-        {
-            return trackLevel.Level;
-        }
-        else
-        {
-            return 0;
-        }
+        return (trackLevel is not null ? trackLevel.Level : (byte)0);
     }
 
     public static byte TrainingMission(string Nickname, uint Track)
@@ -47,7 +41,7 @@ public static class TimeAttack
         }
         File.WriteAllText(filename.TrainingMission_LoadFile, JsonHelper.Serialize(TrainingMission));
         var trackLevel = TrainingMission.FirstOrDefault(item => item.Track == Track);
-        if (trackLevel != null)
+        if (trackLevel is not null)
         {
             trackLevel.Level++;
             return trackLevel.Level;

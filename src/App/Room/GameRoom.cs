@@ -76,7 +76,7 @@ public class GameRoom
             throw new ArgumentOutOfRangeException(nameof(slotId), "格子ID必须在0-7之间");
 
         var member = _slots[slotId];
-        if (member == null)
+        if (member is null)
             return SlotStatus.Empty;       // 空位置
         if (member is Player)
             return SlotStatus.Player;      // 玩家
@@ -98,7 +98,7 @@ public class GameRoom
         {
             for (byte i = 0; i < 4; i++)
             {
-                if (_slots[i] == null)
+                if (_slots[i] is null)
                 {
                     _slots[i] = new Player
                     {
@@ -121,7 +121,7 @@ public class GameRoom
         {
             for (byte i = 4; i < 8; i++)
             {
-                if (_slots[i] == null)
+                if (_slots[i] is null)
                 {
                     _slots[i] = new Player
                     {
@@ -144,7 +144,7 @@ public class GameRoom
         {
             for (byte i = 0; i < 8; i++)
             {
-                if (_slots[i] == null)
+                if (_slots[i] is null)
                 {
                     _slots[i] = new Player
                     {
@@ -177,7 +177,7 @@ public class GameRoom
             throw new ArgumentOutOfRangeException(nameof(slotId), "格子ID必须在0-7之间");
 
         var removedMember = _slots[slotId];
-        if (removedMember == null)
+        if (removedMember is null)
             return false; // 格子已为空
 
         if (removedMember is Player player)
@@ -201,14 +201,14 @@ public class GameRoom
     // 其他方法：设置AI、获取格子信息等（沿用之前的逻辑，略）
     public byte TrySetAi(Ai aiData, int Id, byte team)
     {
-        if (aiData == null)
+        if (aiData is null)
             throw new ArgumentNullException(nameof(aiData), "AI数据不能为null");
 
         if (team == 2)
         {
             for (byte i = 0; i < 4; i++)
             {
-                if (_slots[i] == null)
+                if (_slots[i] is null)
                 {
                     aiData.ID = _IDs.Contains(Id) ? _blueIDs.Except(_IDs).ToList().DefaultIfEmpty().Min() : Id;
                     _slots[i] = aiData;
@@ -223,7 +223,7 @@ public class GameRoom
         {
             for (byte i = 4; i < 8; i++)
             {
-                if (_slots[i] == null)
+                if (_slots[i] is null)
                 {
                     aiData.ID = _IDs.Contains(Id) ? _redIDs.Except(_IDs).ToList().DefaultIfEmpty().Min() : Id;
                     _slots[i] = aiData;
@@ -238,7 +238,7 @@ public class GameRoom
         {
             for (byte i = 0; i < 8; i++)
             {
-                if (_slots[i] == null)
+                if (_slots[i] is null)
                 {
                     aiData.ID = _IDs.Contains(Id) ? _allIDs.Except(_IDs).ToList().DefaultIfEmpty().Min() : Id;
                     _slots[i] = aiData;
@@ -266,9 +266,9 @@ public class GameRoom
     public bool ChangeSlotId(byte slotId, byte newSlotId)
     {
         if (!IsValidSlotId(slotId) || !IsValidSlotId(newSlotId))
-            throw new ArgumentOutOfRangeException(nameof(slotId), "格子ID必须在0-7之间");
+            throw new ArgumentOutOfRangeException(nameof(slotId), "格子 ID 必须在 0-7 之间");
 
-        if (_slots[newSlotId] != null)
+        if (_slots[newSlotId] is not null)
             return false;
 
         _slots[newSlotId] = _slots[slotId];
@@ -280,15 +280,19 @@ public class GameRoom
     {
         for (byte i = 0; i < 8; i++)
         {
-            if (_slots[i] != null && _slots[i] is Ai ai && ai.ID == Id)
+            if (_slots[i] is not null
+             && _slots[i] is Ai ai
+             && ai.ID == Id)
                 return i;
-            else if (_slots[i] != null && _slots[i] is Player player && player.ID == Id)
+            else if (_slots[i] is not null
+                  && _slots[i] is Player player
+                  && player.ID == Id)
                 return i;
         }
         return 255;
     }
 
-    private bool IsValidSlotId(byte slotId) => slotId >= 0 && slotId < 8;
+    private static bool IsValidSlotId(byte slotId) => slotId >= 0 && slotId <= 7;
 }
 
 // 房间成员基类

@@ -84,7 +84,7 @@ namespace Launcher.App.ExcData
             short Set_Kart = ProfileService.ProfileConfigs[Nickname].RiderItem.Set_Kart;
             short Set_KartSN = ProfileService.ProfileConfigs[Nickname].RiderItem.Set_KartSN;
             var existingTune = TuneList.FirstOrDefault(tune => tune.ID == Set_Kart && tune.SN == Set_KartSN);
-            if (existingTune != null)
+            if (existingTune is not null)
             {
                 if (existingTune.Tune1 == 103 || existingTune.Tune2 == 103 || existingTune.Tune3 == 103)
                 {
@@ -143,7 +143,7 @@ namespace Launcher.App.ExcData
             short Set_Kart = ProfileService.ProfileConfigs[Nickname].RiderItem.Set_Kart;
             short Set_KartSN = ProfileService.ProfileConfigs[Nickname].RiderItem.Set_KartSN;
             var existingPlant = PlantList.FirstOrDefault(plant => plant.ID == Set_Kart && plant.SN == Set_KartSN);
-            if (existingPlant != null)
+            if (existingPlant is not null)
             {
                 if (existingPlant.Engine == 43)
                 {
@@ -1063,7 +1063,7 @@ namespace Launcher.App.ExcData
             short Set_Kart = ProfileService.ProfileConfigs[Nickname].RiderItem.Set_Kart;
             short Set_KartSN = ProfileService.ProfileConfigs[Nickname].RiderItem.Set_KartSN;
             var existingLevel = LevelList.FirstOrDefault(level => level.ID == Set_Kart && level.SN == Set_KartSN);
-            if (existingLevel != null)
+            if (existingLevel is not null)
             {
                 excSpecs.KartLevel_DragFactor = KartLevel_DragFactor[existingLevel.Level1];
                 excSpecs.KartLevel_ForwardAccel = KartLevel_ForwardAccel[existingLevel.Level1];
@@ -1095,7 +1095,7 @@ namespace Launcher.App.ExcData
             short Set_Kart = ProfileService.ProfileConfigs[Nickname].RiderItem.Set_Kart;
             short Set_KartSN = ProfileService.ProfileConfigs[Nickname].RiderItem.Set_KartSN;
             var existingParts = PartsList.FirstOrDefault(parts => parts.ID == Set_Kart && parts.SN == Set_KartSN);
-            if (existingParts != null)
+            if (existingParts is not null)
             {
                 for (short i = 63; i < 67; i++)
                 {

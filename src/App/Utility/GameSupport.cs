@@ -21,8 +21,8 @@ namespace Launcher.App.Utility
         public static List<int> quest = new List<int>();
         public static int seasonId = 0;
 
-        public static Keys[] keys = new Keys[]
-        {
+        public static Keys[] keys =
+        [
             new Keys { first_val = 2919676295, second_val = 263300380, key1 = "QyvKvO60jogWDupzJ7gm0kRQdooFjWRjSjlq0gu/x2k=", key2 = "GXQstj1A95XiHvjrOGuPkzdyL+7qxETl/cPlUZk2KA4=" },
             new Keys { first_val = 3595571486, second_val = 2168420743, key1 = "+B1K8NAOvJd3cXFieRWTkRNj2rlv2qVmALSUdXFpNl0=", key2 = "TwKtPFLx+3AuKg5PFa021r3hKyFDK2sFBzQJJCI26wA=" },
             new Keys { first_val = 3059596768, second_val = 1772034572, key1 = "DI5gSCYZrEcZjR4fma5gSevvLBGSzKMoOPl7ZHDmfgA=", key2 = "bLV2VEcHkS8SrZVuPwitWN+I2851xwVEr+UBEzcYz+8=" },
@@ -31,7 +31,7 @@ namespace Launcher.App.Utility
             new Keys { first_val = 2031112783, second_val = 2190302224, key1 = "5wpYhubc/NxIqTklY0UoZNu7ZaCRr8Zypw32i1PiHfs=", key2 = "HxjlBMdgLG97tWeLkzJ/1eWpNfDLz56z3FQTl72AecU=" },
             new Keys { first_val = 3640782532, second_val = 2489762877, key1 = "ComjZh2R0y82PVv25nzqrcqnusvQbGfngimO69PO7bc=", key2 = "pQ04kPHlUS67of2l4D3rukfTsJrSB15G4NtoAx+X8ec=" },
             new Keys { first_val = 912740103, second_val = 3754337362, key1 = "A7H8oUUAoWg65+rFF8h9xcr/aiYwecEfNQyGNF5WHhs=", key2 = "ycsTsKSzTxbOraG5PrjtBWP81YCor02tCxJquIl+5NM=" }
-        };
+        ];
 
         public static uint PcFirstMessage(SessionGroup Parent)
         {
@@ -43,13 +43,13 @@ namespace Launcher.App.Utility
                 outPacket.WriteUShort(ProfileService.SettingConfig.LocaleID);
                 outPacket.WriteUShort(1);
                 outPacket.WriteUShort(ProfileService.SettingConfig.ClientVersion);
-                outPacket.WriteString($"https://github.com/{Constants.Owner}/{Constants.Repo}");
+                outPacket.WriteString(Constants.GH_REPO_URL);
                 outPacket.WriteUInt(key.first_val);
                 outPacket.WriteUInt(key.second_val);
                 outPacket.WriteByte((byte)ProfileService.SettingConfig.nClientLoc);
                 outPacket.WriteString(key.key1);
                 int count = 3;
-                int[] time = new int[] { 1547597728, 1707244048, 1862052984 };
+                int[] time = [1547597728, 1707244048, 1862052984];
                 outPacket.WriteInt(count);
                 for (int i = 0; i < count; i++)
                 {
@@ -361,6 +361,15 @@ namespace Launcher.App.Utility
                 oPacket.WriteShort(skill);
                 oPacket.WriteBytes(new byte[5]);
                 Parent.Client.Send(oPacket);
+            }
+        }
+
+        public static void PcSlaveNotice(SessionGroup Parent, string Nickname, string Message)
+        {
+            using (OutPacket outPacket = new("PcSlaveNotice"))
+            {
+                outPacket.WriteString(Message ?? "null");
+                Parent.Client.Send(outPacket);
             }
         }
     }

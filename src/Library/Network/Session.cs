@@ -117,14 +117,14 @@ namespace Launcher.Library.Network
             ByteArraySegment next = this.mSendSegments.Next;
             try
             {
-                if (next == null)
+                if (next is null)
                 {
                     this.mSendSegments.Dequeue();
                 }
                 else if ((int)next.Buffer.Length >= next.Length)
                 {
                     IPEndPoint clientEndPoint = this._socket.RemoteEndPoint as IPEndPoint;
-                    if (clientEndPoint == null) return;
+                    if (clientEndPoint is null) return;
                     string clientId = ClientManager.GetClientId(clientEndPoint);
                     var clientGroup = ClientManager.ClientGroups[clientId];
                     byte[] buffer = next.Buffer;
@@ -225,7 +225,7 @@ namespace Launcher.Library.Network
                             if (this.mCursor >= 4)
                             {
                                 IPEndPoint clientEndPoint = this._socket.RemoteEndPoint as IPEndPoint;
-                                if (clientEndPoint == null) return;
+                                if (clientEndPoint is null) return;
                                 string clientId = ClientManager.GetClientId(clientEndPoint);
                                 var clientGroup = ClientManager.ClientGroups[clientId];
                                 uint num1 = BitConverter.ToUInt32(this.mBuffer, 0);
@@ -303,7 +303,7 @@ namespace Launcher.Library.Network
                         {
                             this.mSendSegments.Dequeue();
                         }
-                        if (this.mSendSegments.Next == null)
+                        if (this.mSendSegments.Next is null)
                         {
                             this.mSending = 0;
                         }
@@ -364,7 +364,7 @@ namespace Launcher.Library.Network
         public void Send(OutPacket pPacket)
         {
             IPEndPoint clientEndPoint = this._socket.RemoteEndPoint as IPEndPoint;
-            if (clientEndPoint == null) return;
+            if (clientEndPoint is null) return;
             string clientId = ClientManager.GetClientId(clientEndPoint);
             var clientGroup = ClientManager.ClientGroups[clientId];
             var nickname = clientGroup.Nickname;

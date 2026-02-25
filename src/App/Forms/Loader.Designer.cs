@@ -28,19 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            ProgressBar = new ProgressBar();
             PromptMsg = new Label();
             SuspendLayout();
-            // 
-            // ProgressBar
-            // 
-            ProgressBar.Location = new Point(12, 47);
-            ProgressBar.MarqueeAnimationSpeed = 25;
-            ProgressBar.Name = "ProgressBar";
-            ProgressBar.Size = new Size(410, 32);
-            ProgressBar.Step = 1;
-            ProgressBar.Style = ProgressBarStyle.Continuous;
-            ProgressBar.TabIndex = 0;
             // 
             // PromptMsg
             // 
@@ -55,13 +44,16 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(434, 91);
+            ClientSize = new Size(380, 57);
             ControlBox = false;
             Controls.Add(PromptMsg);
-            Controls.Add(ProgressBar);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
+            MinimizeBox = false;
             Name = "Loader";
+            ShowIcon = false;
+            ShowInTaskbar = false;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "加载中";
             Load += OnLoad;
             ResumeLayout(false);
@@ -69,8 +61,6 @@
         }
 
         #endregion
-
-        private ProgressBar ProgressBar;
         private Label PromptMsg;
     }
 }
